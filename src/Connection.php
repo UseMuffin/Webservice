@@ -8,6 +8,12 @@ use Muffin\Webservice\Exception\UnexpectedDriverException;
 
 class Connection
 {
+    /**
+     * Constructor
+     *
+     * @param array $config Custom configuration.
+     * @throws \Muffin\Webservice\Exception\UnexpectedDriverException If the driver is not an instance of `Muffin\Webservice\AbstractDriver`.
+     */
     public function __construct($config)
     {
         $config = $this->_normalizeConfig($config);
@@ -19,9 +25,16 @@ class Connection
         if (!($this->_driver instanceof AbstractDriver)) {
             throw new UnexpectedDriverException(['driver' => $driver]);
         }
-
     }
 
+    /**
+     * Validates certain custom configuration values.
+     *
+     * @param array $config Raw custom configuration.
+     * @return array
+     * @throws \Muffin\Webservice\Exception\MissingConnectionException If the connection does not exist.
+     * @throws \Muffin\Webservice\Exception\MissingDriverException If the driver does not exist.
+     */
     protected function _normalizeConfig($config)
     {
         if (empty($config['driver'])) {
@@ -37,6 +50,13 @@ class Connection
         return $config;
     }
 
+    /**
+     * Proxies the driver's methods.
+     *
+     * @param string $method Method name.
+     * @param array $args Arguments to pass-through
+     * @return mixed
+     */
     public function __call($method, $args)
     {
         return call_user_func_array([$this->_driver, $method], $args);
