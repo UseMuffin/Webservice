@@ -32,7 +32,10 @@ Plugin::load('Muffin/Webservice');
 You can only use this plugin as a base to a separate plugin or to manage custom webservice
 drivers connections.
 
-_Examples coming soon..._
+Until an official documentation is written, [David Yell][1] wrote a good [post to get you started][2].
+
+[1]:https://github.com/davidyell 
+[2]:http://jedistirfry.co.uk/blog/2015-09/connecting-to-a-web-service/
 
 ## Patches & Features
 
