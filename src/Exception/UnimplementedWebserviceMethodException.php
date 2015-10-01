@@ -9,5 +9,5 @@ class UnimplementedWebserviceMethodException extends Exception
     /**
      * {@inheritDoc}
      */
-    protected $_messageTemplate = 'Driver (`%s`) does not implement `%s`';
+    protected $_messageTemplate = 'Webservice %s does not implement %s';
 }
