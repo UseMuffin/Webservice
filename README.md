@@ -24,18 +24,135 @@ bin/cake plugin load Muffin/Webservice
 or by manually adding statement shown below to `boostrap.php`:
 
 ```php
-Plugin::load('Muffin/Webservice');
+Plugin::load('Muffin/Webservice', ['bootstrap' => true]);
 ```
 
 ## Usage
+
+### As base for a driver
 
 You can only use this plugin as a base to a separate plugin or to manage custom webservice
 drivers connections.
 
 Until an official documentation is written, [David Yell][1] wrote a good [post to get you started][2].
 
-[1]:https://github.com/davidyell 
+[1]:https://github.com/davidyell
 [2]:http://jedistirfry.co.uk/blog/2015-09/connecting-to-a-web-service/
+
+### As an ORM
+
+#### Create a webservice
+
+```php
+<?php
+
+namespace App\Webservice;
+
+use App\Model\Resource\Article;
+use Cake\Network\Http\Client;
+use Muffin\Webservice\QueryLogger;
+use Muffin\Webservice\ResultSet;
+use Muffin\Webservice\WebserviceInterface;
+use Muffin\Webservice\WebserviceQuery;
+
+class ArticlesWebservice implements WebserviceInterface
+{
+
+    public function logger(QueryLogger $logger = null)
+    {
+        return new QueryLogger();
+    }
+
+    public function execute(WebserviceQuery $query)
+    {
+        switch ($query->action()) {
+            case WebserviceQuery::ACTION_READ:
+                $client = new Client();
+                $response = $client->get('http://example.com/articles.json');
+
+                if (!$response->isOk()) {
+                    return false;
+                }
+
+                $resources = [];
+                foreach ($response->articles as $article) {
+                    $resources[] = new Article([
+                        'id' => $article->id,
+                        'title' => $article->title,
+                        'body' => $article->body
+                    ], [
+                        'markClean' => true,
+                        'markNew' => false,
+                    ]);
+                }
+
+                return new ResultSet($resources, $response->total);
+        }
+
+        return false;
+    }
+}
+```
+
+#### Create an endpoint
+
+```php
+<?php
+
+namespace App\Model\Endpoint;
+
+use Cake\Datasource\ConnectionManager;
+use Muffin\Webservice\Model\Endpoint;
+
+class ArticlesEndpoint extends Endpoint
+{
+
+    public function initialize(array $config)
+    {
+        $this->webservice(ConnectionManager::get('ArticlesWebservice')->webservice());
+    }
+}
+```
+
+#### Create a resource
+
+```php
+<?php
+
+namespace App\Model\Resource;
+
+use Muffin\Webservice\Model\Resource;
+
+class Article extends Resource
+{
+
+}
+```
+
+#### Use it
+
+```php
+<?php
+
+namespace App\Controller;
+
+use Cake\Event\Event;
+
+class ArticlesController extends AppController
+{
+
+    public function beforeFilter(Event $event)
+    {
+        $this->loadModel('Articles', 'Endpoint');
+    }
+
+    public function index()
+    {
+        $articles = $this->Articles->find();
+    }
+
+}
+```
 
 ## Patches & Features
 
