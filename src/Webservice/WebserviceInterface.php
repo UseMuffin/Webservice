@@ -2,10 +2,10 @@
 
 namespace Muffin\Webservice\Webservice;
 
-use Muffin\Webservice\WebserviceQuery;
+use Muffin\Webservice\Query;
 
 interface WebserviceInterface
 {
 
-    public function execute(WebserviceQuery $query);
+    public function execute(Query $query);
 }

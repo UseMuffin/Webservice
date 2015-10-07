@@ -3,13 +3,11 @@
 namespace Muffin\Webservice;
 
 use Cake\Datasource\QueryTrait;
-use Cake\Datasource\RepositoryInterface;
-use Cake\Error\Debugger;
 use Cake\Utility\Hash;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 
-class WebserviceQuery
+class Query
 {
 
     use QueryTrait;
@@ -126,7 +124,7 @@ class WebserviceQuery
      *
      * @internal This method is only for compatibility with some plugins
      *
-     * @return $this|array|WebserviceQuery
+     * @return $this|array|Query
      */
     public function where($conditions = null, $types = [], $overwrite = false)
     {

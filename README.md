@@ -53,7 +53,7 @@ use Cake\Network\Http\Client;
 use Muffin\Webservice\QueryLogger;
 use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\WebserviceInterface;
-use Muffin\Webservice\WebserviceQuery;
+use Muffin\Webservice\Query;
 
 class ArticlesWebservice implements WebserviceInterface
 {
@@ -63,10 +63,10 @@ class ArticlesWebservice implements WebserviceInterface
         return new QueryLogger();
     }
 
-    public function execute(WebserviceQuery $query)
+    public function execute(Query $query)
     {
         switch ($query->action()) {
-            case WebserviceQuery::ACTION_READ:
+            case Query::ACTION_READ:
                 $client = new Client();
                 $response = $client->get('http://example.com/articles.json');
 

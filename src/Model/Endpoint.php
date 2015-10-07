@@ -10,7 +10,7 @@ use Cake\Network\Exception\NotImplementedException;
 use Cake\Utility\Inflector;
 use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Webservice\WebserviceInterface;
-use Muffin\Webservice\WebserviceQuery;
+use Muffin\Webservice\Query;
 
 class Endpoint implements RepositoryInterface
 {
@@ -317,7 +317,7 @@ class Endpoint implements RepositoryInterface
      *
      * @param string $type the type of query to perform
      * @param array|\ArrayAccess $options An array that will be passed to Query::applyOptions()
-     * @return \Muffin\Webservice\WebserviceQuery
+     * @return \Muffin\Webservice\Query
      */
     public function find($type = 'all', $options = [])
     {
@@ -331,11 +331,11 @@ class Endpoint implements RepositoryInterface
      * By default findAll() applies no conditions, you
      * can override this method in subclasses to modify how `find('all')` works.
      *
-     * @param \Muffin\Webservice\WebserviceQuery $query The query to find with
+     * @param \Muffin\Webservice\Query $query The query to find with
      * @param array $options The options to use for the find
-     * @return \Muffin\Webservice\WebserviceQuery The query builder
+     * @return \Muffin\Webservice\Query The query builder
      */
-    public function findAll(WebserviceQuery $query, array $options)
+    public function findAll(Query $query, array $options)
     {
         return $query;
     }
@@ -393,11 +393,11 @@ class Endpoint implements RepositoryInterface
      * ]
      * ```
      *
-     * @param \Muffin\Webservice\WebserviceQuery $query The query to find with
+     * @param \Muffin\Webservice\Query $query The query to find with
      * @param array $options The options for the find
-     * @return \Muffin\Webservice\WebserviceQuery The query builder
+     * @return \Muffin\Webservice\Query The query builder
      */
-    public function findList(WebserviceQuery $query, array $options)
+    public function findList(Query $query, array $options)
     {
         $options += [
             'keyField' => $this->primaryKey(),
@@ -492,11 +492,11 @@ class Endpoint implements RepositoryInterface
     /**
      * Creates a new Query instance for this repository
      *
-     * @return WebserviceQuery
+     * @return Query
      */
     public function query()
     {
-        return new WebserviceQuery($this->webservice(), $this);
+        return new Query($this->webservice(), $this);
     }
 
     /**
@@ -671,11 +671,11 @@ class Endpoint implements RepositoryInterface
      * if no query is passed a new one will be created and returned
      *
      * @param string $type name of the finder to be called
-     * @param \Muffin\Webservice\WebserviceQuery $query The query object to apply the finder options to
+     * @param \Muffin\Webservice\Query $query The query object to apply the finder options to
      * @param array $options List of options to pass to the finder
-     * @return \Muffin\Webservice\WebserviceQuery
+     * @return \Muffin\Webservice\Query
      */
-    public function callFinder($type, WebserviceQuery $query, array $options = [])
+    public function callFinder($type, Query $query, array $options = [])
     {
         $query->applyOptions($options);
         $options = $query->getOptions();

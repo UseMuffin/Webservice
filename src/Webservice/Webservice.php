@@ -6,7 +6,7 @@ use Cake\Datasource\ConnectionInterface;
 use Cake\Utility\Text;
 use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
-use Muffin\Webservice\WebserviceQuery;
+use Muffin\Webservice\Query;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -84,7 +84,7 @@ abstract class Webservice implements WebserviceInterface
         return false;
     }
 
-    public function execute(WebserviceQuery $query, array $options = [])
+    public function execute(Query $query, array $options = [])
     {
         $result = $this->_executeQuery($query, $options);
 
@@ -95,21 +95,21 @@ abstract class Webservice implements WebserviceInterface
         return $result;
     }
 
-    protected function _executeQuery(WebserviceQuery $query, array $options = [])
+    protected function _executeQuery(Query $query, array $options = [])
     {
         switch ($query->action()) {
-            case WebserviceQuery::ACTION_CREATE:
+            case Query::ACTION_CREATE:
                 return $this->_executeCreateQuery($query, $options);
-            case WebserviceQuery::ACTION_READ:
+            case Query::ACTION_READ:
                 return $this->_executeReadQuery($query, $options);
-            case WebserviceQuery::ACTION_UPDATE:
+            case Query::ACTION_UPDATE:
                 return $this->_executeUpdateQuery($query, $options);
-            case WebserviceQuery::ACTION_DELETE:
+            case Query::ACTION_DELETE:
                 return $this->_executeDeleteQuery($query, $options);
         }
     }
 
-    protected function _executeCreateQuery(WebserviceQuery $query, array $options = [])
+    protected function _executeCreateQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
@@ -117,7 +117,7 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
-    protected function _executeReadQuery(WebserviceQuery $query, array $options = [])
+    protected function _executeReadQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
@@ -125,7 +125,7 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
-    protected function _executeUpdateQuery(WebserviceQuery $query, array $options = [])
+    protected function _executeUpdateQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
@@ -133,7 +133,7 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
-    protected function _executeDeleteQuery(WebserviceQuery $query, array $options = [])
+    protected function _executeDeleteQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
@@ -154,7 +154,7 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
-    protected function _logQuery(WebserviceQuery $query, LoggerInterface $logger)
+    protected function _logQuery(Query $query, LoggerInterface $logger)
     {
         if (!$this->driver()->logQueries()) {
             return;
