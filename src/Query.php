@@ -122,13 +122,17 @@ class Query
      * @param array $types
      * @param bool|false $overwrite
      *
-     * @internal This method is only for compatibility with some plugins
-     *
      * @return $this|array|Query
      */
     public function where($conditions = null, $types = [], $overwrite = false)
     {
-        return $this->conditions($conditions, !$overwrite);
+        if ($conditions === null) {
+            return $this->_conditions;
+        }
+
+        $this->_conditions = (!$overwrite) ? Hash::merge($this->_conditions, $conditions) : $conditions;
+
+        return $this;
     }
 
     public function action($action = null)
@@ -138,17 +142,6 @@ class Query
         }
 
         $this->_action = $action;
-
-        return $this;
-    }
-
-    public function conditions(array $conditions = null, $merge = true)
-    {
-        if ($conditions === null) {
-            return $this->_conditions;
-        }
-
-        $this->_conditions = ($merge) ? Hash::merge($this->_conditions, $conditions) : $conditions;
 
         return $this;
     }
