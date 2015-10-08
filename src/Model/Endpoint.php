@@ -432,12 +432,6 @@ class Endpoint implements RepositoryInterface
             'groupField' => null
         ];
 
-        if (isset($options['idField'])) {
-            $options['keyField'] = $options['idField'];
-            unset($options['idField']);
-            trigger_error('Option "idField" is deprecated, use "keyField" instead.', E_USER_WARNING);
-        }
-
         $options = $this->_setFieldMatchers(
             $options,
             ['keyField', 'valueField', 'groupField']
