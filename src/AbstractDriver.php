@@ -43,6 +43,13 @@ abstract class AbstractDriver implements LoggerAwareInterface
      */
     abstract public function initialize();
 
+    /**
+     * Set or return an instance of the client used for communication
+     *
+     * @param object $client
+     *
+     * @return $this
+     */
     public function client($client = null)
     {
         if ($client === null) {
@@ -93,6 +100,8 @@ abstract class AbstractDriver implements LoggerAwareInterface
     }
 
     /**
+     * Returns a logger instance
+     *
      * @return \Psr\Log\LoggerInterface
      */
     public function logger()
@@ -100,6 +109,11 @@ abstract class AbstractDriver implements LoggerAwareInterface
         return $this->logger;
     }
 
+    /**
+     * Returns the connection name used in the configuration
+     *
+     * @return string
+     */
     public function configName()
     {
         if (empty($this->_config['name'])) {
@@ -108,6 +122,14 @@ abstract class AbstractDriver implements LoggerAwareInterface
         return $this->_config['name'];
     }
 
+    /**
+     * Enables or disables query logging for this driver
+     *
+     * @param boolean|null $enable whether to turn logging on or disable it.
+     *   Use null to read current value.
+     *
+     * @return bool
+     */
     public function logQueries($enable = null)
     {
         if ($enable === null) {
