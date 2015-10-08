@@ -493,7 +493,7 @@ class Endpoint implements RepositoryInterface
         $finder = isset($options['finder']) ? $options['finder'] : 'all';
         unset($options['key'], $options['cache'], $options['finder']);
 
-        $query = $this->find($finder, $options)->conditions($conditions);
+        $query = $this->find($finder, $options)->where($conditions);
 
         if ($cacheConfig) {
             if (!$cacheKey) {
