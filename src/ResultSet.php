@@ -33,18 +33,20 @@ class ResultSet implements ResultSetInterface
 
     protected $_total;
 
+    /**
+     * Construct the ResultSet
+     *
+     * @param array $resources The resources to attach
+     * @param int|null $total The total amount of resources available
+     */
     public function __construct(array $resources, $total = null)
     {
         $this->_results = \SplFixedArray::fromArray($resources, false);
         $this->_total = $total;
     }
 
-
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * {@inheritDoc}
      */
     public function current()
     {
@@ -52,10 +54,7 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
+     * {@inheritDoc}
      */
     public function rewind()
     {
@@ -63,10 +62,7 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * String representation of object
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
+     * {@inheritDoc}
      */
     public function serialize()
     {
@@ -77,11 +73,7 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
+     * {@inheritDoc}
      */
     public function valid()
     {
@@ -95,10 +87,7 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * {@inheritDoc}
      */
     public function key()
     {
@@ -106,10 +95,7 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
+     * {@inheritDoc}
      */
     public function next()
     {
@@ -117,13 +103,7 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Constructs the object
-     * @link http://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized <p>
-     * The string representation of the object.
-     * </p>
-     * @return void
+     * {@inheritDoc}
      */
     public function unserialize($serialized)
     {
@@ -131,19 +111,18 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Count elements of an object
-     * @link http://php.net/manual/en/countable.count.php
-     * @return int The custom count as an integer.
-     * </p>
-     * <p>
-     * The return value is cast to an integer.
+     * {@inheritDoc}
      */
     public function count()
     {
         return count($this->_results);
     }
 
+    /**
+     * Returns the total amount of results
+     *
+     * @return int|null
+     */
     public function total()
     {
         return $this->_total;

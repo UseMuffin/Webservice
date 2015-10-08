@@ -46,7 +46,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Set or return an instance of the client used for communication
      *
-     * @param object $client
+     * @param object $client The client to use
      *
      * @return $this
      */
@@ -61,6 +61,14 @@ abstract class AbstractDriver implements LoggerAwareInterface
         return $this;
     }
 
+    /**
+     * Set or get a instance of a webservice
+     *
+     * @param string $name The name of the webservice
+     * @param WebserviceInterface|null $webservice The instance of the webservice you'd like to set
+     *
+     * @return $this
+     */
     public function webservice($name, WebserviceInterface $webservice = null)
     {
         if ($webservice !== null) {
@@ -112,7 +120,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Enables or disables query logging for this driver
      *
-     * @param boolean|null $enable whether to turn logging on or disable it.
+     * @param bool|null $enable whether to turn logging on or disable it.
      *   Use null to read current value.
      *
      * @return bool
@@ -131,7 +139,9 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param string $method Method name.
      * @param array $args Arguments to pass-through.
+     *
      * @return mixed
+     *
      * @throws \RuntimeException If the client object has not been initialized.
      * @throws \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException If the method does not exist in the client.
      */
@@ -154,6 +164,11 @@ abstract class AbstractDriver implements LoggerAwareInterface
         return call_user_func_array([$this->_client, $method], $args);
     }
 
+    /**
+     * Returns a handy representation of this driver
+     *
+     * @return array
+     */
     public function __debugInfo()
     {
         return [

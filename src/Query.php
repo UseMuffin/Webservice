@@ -65,12 +65,23 @@ class Query
      */
     protected $_resultSet;
 
+    /**
+     * Construct the query
+     *
+     * @param WebserviceInterface $webservice The webservice to use
+     * @param Endpoint $endpoint The endpoint this is executed from
+     */
     public function __construct(WebserviceInterface $webservice, Endpoint $endpoint)
     {
         $this->_webservice = $webservice;
         $this->endpoint($endpoint);
     }
 
+    /**
+     * Mark the query as create
+     *
+     * @return $this
+     */
     public function create()
     {
         $this->action(self::ACTION_CREATE);
@@ -78,6 +89,11 @@ class Query
         return $this;
     }
 
+    /**
+     * Mark the query as read
+     *
+     * @return $this
+     */
     public function read()
     {
         $this->action(self::ACTION_READ);
@@ -85,6 +101,11 @@ class Query
         return $this;
     }
 
+    /**
+     * Mark the query as update
+     *
+     * @return $this
+     */
     public function update()
     {
         $this->action(self::ACTION_UPDATE);
@@ -92,6 +113,11 @@ class Query
         return $this;
     }
 
+    /**
+     * Mark the query as delete
+     *
+     * @return $this
+     */
     public function delete()
     {
         $this->action(self::ACTION_DELETE);
@@ -100,7 +126,10 @@ class Query
     }
 
     /**
-     * @param Endpoint|null $endpoint
+     * Set the endpoint to be used
+     *
+     * @param Endpoint|null $endpoint The endpoint to use
+     *
      * @return Endpoint|$this
      */
     public function endpoint(Endpoint $endpoint = null)
@@ -133,19 +162,27 @@ class Query
         ));
     }
 
+    /**
+     * Alias a field with the endpoint's current alias.
+     *
+     * @param string $field The field to alias.
+     * @return string The field prefixed with the endpoint alias.
+     */
     public function aliasField($field)
     {
         return [$field => $field];
     }
 
     /**
-     * @param null $conditions
-     * @param array $types
-     * @param bool|false $overwrite
+     * Apply conditions to the query
      *
-     * @return $this|array|Query
+     * @param array|null $conditions The conditions to apply
+     * @param array|null $types Not used
+     * @param bool $overwrite Whether to overwrite the current conditions
+     *
+     * @return $this|array
      */
-    public function where($conditions = null, $types = [], $overwrite = false)
+    public function where(array $conditions = null, $types = [], $overwrite = false)
     {
         if ($conditions === null) {
             return $this->_conditions;
@@ -156,6 +193,13 @@ class Query
         return $this;
     }
 
+    /**
+     * Charge this query's action
+     *
+     * @param int|null $action Action to use
+     *
+     * @return $this|int
+     */
     public function action($action = null)
     {
         if ($action === null) {
@@ -167,10 +211,28 @@ class Query
         return $this;
     }
 
-    public function page($page = null)
+    /**
+     * Set the page of results you want.
+     *
+     * This method provides an easier to use interface to set the limit + offset
+     * in the record set you want as results. If empty the limit will default to
+     * the existing limit clause, and if that too is empty, then `25` will be used.
+     *
+     * Pages should start at 1.
+     *
+     * @param int $page The page number you want.
+     * @param int $limit The number of rows you want in the page. If null
+     *  the current limit clause will be used.
+     *
+     * @return $this
+     */
+    public function page($page = null, $limit = null)
     {
         if ($page === null) {
             return $this->_page;
+        }
+        if ($limit !== null) {
+            $this->limit($limit);
         }
 
         $this->_page = $page;
@@ -178,6 +240,22 @@ class Query
         return $this;
     }
 
+    /**
+     * Sets the number of records that should be retrieved from database,
+     * accepts an integer or an expression object that evaluates to an integer.
+     * In some databases, this operation might not be supported or will require
+     * the query to be transformed in order to limit the result set size.
+     *
+     * ### Examples
+     *
+     * ```
+     * $query->limit(10) // generates LIMIT 10
+     * ```
+     *
+     * @param int $limit number of records to be returned
+     *
+     * @return $this
+     */
     public function limit($limit = null)
     {
         if ($limit === null) {
@@ -190,7 +268,10 @@ class Query
     }
 
     /**
-     * @param null $fields
+     * Set fields to save in resources
+     *
+     * @param array|null $fields The field to set
+     *
      * @return $this|array
      */
     public function set($fields = null)
@@ -208,6 +289,13 @@ class Query
         return $this;
     }
 
+    /**
+     * Set the order in which results should be
+     *
+     * @param array|null $fields The array of fields and their direction
+     *
+     * @return $this|array
+     */
     public function order(array $fields = null)
     {
         if ($fields === null) {
@@ -224,6 +312,7 @@ class Query
      * This is handy for passing all query clauses at once.
      *
      * @param array $options the options to be applied
+     *
      * @return $this This object
      */
     public function applyOptions(array $options)
@@ -249,6 +338,11 @@ class Query
         return $this;
     }
 
+    /**
+     * Returns the total amount of results for this query
+     *
+     * @return bool|int
+     */
     public function count()
     {
         if ($this->action() !== self::ACTION_READ) {
@@ -263,7 +357,16 @@ class Query
     }
 
     /**
-     * @inheritDoc
+     * Returns the first result out of executing this query, if the query has not been
+     * executed before, it will set the limit clause to 1 for performance reasons.
+     *
+     * ### Example:
+     *
+     * ```
+     * $singleUser = $query->first();
+     * ```
+     *
+     * @return mixed the first result from the ResultSet
      */
     public function first()
     {
@@ -274,6 +377,11 @@ class Query
         return $this->all()->first();
     }
 
+    /**
+     * Execute the query
+     *
+     * @return \Traversable
+     */
     public function execute()
     {
         return $this->_execute();
@@ -291,6 +399,11 @@ class Query
         ]);
     }
 
+    /**
+     * Return a handy representation of the query
+     *
+     * @return array
+     */
     public function __debugInfo()
     {
         return [

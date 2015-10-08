@@ -17,6 +17,11 @@ abstract class Webservice implements WebserviceInterface
     protected $_endpoint;
     protected $_nestedResources = [];
 
+    /**
+     * Construct the webservice
+     *
+     * @param array $config The config to use
+     */
     public function __construct(array $config = [])
     {
         if (!empty($config['driver'])) {
@@ -29,13 +34,20 @@ abstract class Webservice implements WebserviceInterface
         $this->initialize();
     }
 
+    /**
+     * Initialize the webservice
+     *
+     * @return void
+     */
     public function initialize()
     {
-
     }
 
     /**
-     * @param AbstractDriver|null $driver
+     * Set the driver to use
+     *
+     * @param AbstractDriver|null $driver The driver to use
+     *
      * @return AbstractDriver|$this
      */
     public function driver(AbstractDriver $driver = null)
@@ -50,7 +62,10 @@ abstract class Webservice implements WebserviceInterface
     }
 
     /**
-     * @param string|null $endpoint
+     * Set the endpoint path to use
+     *
+     * @param string|null $endpoint The endpoint
+     *
      * @return string|$this
      */
     public function endpoint($endpoint = null)
@@ -64,6 +79,14 @@ abstract class Webservice implements WebserviceInterface
         return $this;
     }
 
+    /**
+     * Add a nested resource
+     *
+     * @param string $url The URL to use as base
+     * @param array $requiredFields The required fields
+     *
+     * @return void
+     */
     public function addNestedResource($url, array $requiredFields)
     {
         $this->_nestedResources[$url] = [
@@ -71,6 +94,13 @@ abstract class Webservice implements WebserviceInterface
         ];
     }
 
+    /**
+     * Checks if a set of conditions match a nested resource
+     *
+     * @param array $conditions The conditions in a query
+     *
+     * @return bool|string Either a URL or false in case no nested resource matched
+     */
     public function nestedResource(array $conditions)
     {
         foreach ($this->_nestedResources as $url => $options) {
@@ -84,10 +114,14 @@ abstract class Webservice implements WebserviceInterface
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function execute(Query $query, array $options = [])
     {
         $result = $this->_executeQuery($query, $options);
 
+        // Write to the logger when one has been defined
         if ($this->driver()->logger()) {
             $this->_logQuery($query, $this->driver()->logger());
         }
@@ -95,6 +129,14 @@ abstract class Webservice implements WebserviceInterface
         return $result;
     }
 
+    /**
+     * Execute the appropriate method for a query
+     *
+     * @param Query $query The query to execute
+     * @param array $options The options to use
+     *
+     * @return bool|int|\Muffin\Webservice\ResultSet
+     */
     protected function _executeQuery(Query $query, array $options = [])
     {
         switch ($query->action()) {
@@ -107,8 +149,18 @@ abstract class Webservice implements WebserviceInterface
             case Query::ACTION_DELETE:
                 return $this->_executeDeleteQuery($query, $options);
         }
+
+        return false;
     }
 
+    /**
+     * Executes a query with the create action
+     *
+     * @param Query $query The query to execute
+     * @param array $options The options to use
+     *
+     * @return bool|void
+     */
     protected function _executeCreateQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
@@ -117,6 +169,14 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
+    /**
+     * Executes a query with the read action
+     *
+     * @param Query $query The query to execute
+     * @param array $options The options to use
+     *
+     * @return \Muffin\Webservice\ResultSet|bool|void
+     */
     protected function _executeReadQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
@@ -125,6 +185,14 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
+    /**
+     * Executes a query with the update action
+     *
+     * @param Query $query The query to execute
+     * @param array $options The options to use
+     *
+     * @return int|bool|void
+     */
     protected function _executeUpdateQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
@@ -133,6 +201,14 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
+    /**
+     * Executes a query with the delete action
+     *
+     * @param Query $query The query to execute
+     * @param array $options The options to use
+     *
+     * @return int|bool|void
+     */
     protected function _executeDeleteQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
@@ -142,8 +218,11 @@ abstract class Webservice implements WebserviceInterface
     }
 
     /**
-     * @param string $resourceClass
-     * @param array $properties
+     * Creates a resource with the given class and properties
+     *
+     * @param string $resourceClass The class to use to create the resource
+     * @param array $properties The properties to apply
+     *
      * @return \Muffin\Webservice\Model\Resource
      */
     protected function _createResource($resourceClass, array $properties = [])
@@ -154,6 +233,14 @@ abstract class Webservice implements WebserviceInterface
         ]);
     }
 
+    /**
+     * Logs a query to the specified logger
+     *
+     * @param Query $query The query to log
+     * @param LoggerInterface $logger The logger instance to use
+     *
+     * @return void
+     */
     protected function _logQuery(Query $query, LoggerInterface $logger)
     {
         if (!$this->driver()->logQueries()) {
@@ -161,7 +248,7 @@ abstract class Webservice implements WebserviceInterface
         }
 
         $logger->debug($query->endpoint(), [
-            'params' => $query->conditions()
+            'params' => $query->where()
         ]);
     }
 
@@ -186,8 +273,8 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Turns a single result into a resource
      *
-     * @param array $result
-     * @param string $resourceClass
+     * @param array $result The API result
+     * @param string $resourceClass The resource class to use
      * @return \Muffin\Webservice\Model\Resource
      */
     protected function _transformResource(array $result, $resourceClass)
@@ -201,6 +288,11 @@ abstract class Webservice implements WebserviceInterface
         return $this->_createResource($resourceClass, $properties);
     }
 
+    /**
+     * Creates a handy representation of the webservice
+     *
+     * @return array
+     */
     public function __debugInfo()
     {
         return [

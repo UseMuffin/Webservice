@@ -11,8 +11,8 @@ use Cake\Utility\Inflector;
 use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
-use Muffin\Webservice\Webservice\WebserviceInterface;
 use Muffin\Webservice\Query;
+use Muffin\Webservice\Webservice\WebserviceInterface;
 
 class Endpoint implements RepositoryInterface
 {
@@ -227,7 +227,10 @@ class Endpoint implements RepositoryInterface
     }
 
     /**
-     * @param null $connection
+     * Set the driver to use
+     *
+     * @param AbstractDriver|null $connection The driver to use
+     *
      * @return AbstractDriver
      */
     public function connection($connection = null)
@@ -242,7 +245,8 @@ class Endpoint implements RepositoryInterface
     /**
      * Returns an instance of the Webservice used
      *
-     * @param WebserviceInterface|string|null $webservice
+     * @param WebserviceInterface|string|null $webservice The webservice to use
+     *
      * @return $this|WebserviceInterface
      */
     public function webservice($webservice = null)
@@ -553,8 +557,10 @@ class Endpoint implements RepositoryInterface
      *
      * @param mixed $conditions Conditions to be used, accepts anything Query::where()
      * can take.
+     *
      * @return int Count Returns the affected rows.
-     * @see RepositoryInterface::delete()
+     *
+     * @see Endpoint::delete()
      */
     public function deleteAll($conditions)
     {
@@ -566,6 +572,7 @@ class Endpoint implements RepositoryInterface
      * conditions.
      *
      * @param array|\ArrayAccess $conditions list of conditions to pass to the query
+     *
      * @return bool
      */
     public function exists($conditions)
@@ -580,6 +587,7 @@ class Endpoint implements RepositoryInterface
      *
      * @param \Cake\Datasource\EntityInterface $resource the resource to be saved
      * @param array|\ArrayAccess $options The options to use when saving.
+     *
      * @return \Cake\Datasource\EntityInterface|bool
      */
     public function save(EntityInterface $resource, $options = [])
@@ -648,6 +656,7 @@ class Endpoint implements RepositoryInterface
      *
      * @param array|null $data The data to build an resource with.
      * @param array $options A list of options for the object hydration.
+     *
      * @return \Cake\Datasource\EntityInterface
      */
     public function newEntity($data = null, array $options = [])
@@ -669,6 +678,7 @@ class Endpoint implements RepositoryInterface
      *
      * @param array $data The data to build an resource with.
      * @param array $options A list of options for the objects hydration.
+     *
      * @return array An array of hydrated records.
      */
     public function newEntities(array $data, array $options = [])
@@ -691,6 +701,7 @@ class Endpoint implements RepositoryInterface
      * data merged in
      * @param array $data key value list of fields to be merged into the resource
      * @param array $options A list of options for the object hydration.
+     *
      * @return \Cake\Datasource\EntityInterface
      */
     public function patchEntity(EntityInterface $resource, array $data, array $options = [])
@@ -714,6 +725,7 @@ class Endpoint implements RepositoryInterface
      * data merged in
      * @param array $data list of arrays to be merged into the entities
      * @param array $options A list of options for the objects hydration.
+     *
      * @return array
      */
     public function patchEntities($entities, array $data, array $options = [])
@@ -728,6 +740,7 @@ class Endpoint implements RepositoryInterface
      * @param string $type name of the finder to be called
      * @param \Muffin\Webservice\Query $query The query object to apply the finder options to
      * @param array $options List of options to pass to the finder
+     *
      * @return \Muffin\Webservice\Query
      */
     public function callFinder($type, Query $query, array $options = [])
@@ -782,6 +795,16 @@ class Endpoint implements RepositoryInterface
         return $options;
     }
 
+    /**
+     * Get the default connection name.
+     *
+     * This method is used to get the fallback connection name if an
+     * instance is created through the EndpointRegistry without a connection.
+     *
+     * @return string
+     *
+     * @see \Muffin\Webservice\Model\EndpointRegistry::get()
+     */
     public static function defaultConnectionName()
     {
         $namespaceParts = explode('\\', get_called_class());
@@ -790,6 +813,11 @@ class Endpoint implements RepositoryInterface
         return Inflector::underscore(current($plugin));
     }
 
+    /**
+     * Returns a handy representation of this endpoint
+     *
+     * @return array
+     */
     public function __debugInfo()
     {
         return [

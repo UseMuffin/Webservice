@@ -28,6 +28,7 @@ class EndpointRegistry
      *
      * @param string $alias The alias name you want to get.
      * @param array $options The options you want to build the endpoint with.
+     *
      * @return \Muffin\Webservice\Model\Endpoint
      */
     public static function get($alias, array $options = [])
@@ -62,7 +63,7 @@ class EndpointRegistry
         if (empty($options['connection'])) {
             if ($options['className'] !== 'Muffin\Webservice\Model\Endpoint') {
                 $connectionName = $options['className']::defaultConnectionName();
-            } else{
+            } else {
                 $pluginParts = explode('/', pluginSplit($alias)[0]);
 
                 $connectionName = Inflector::underscore(end($pluginParts));
@@ -81,6 +82,7 @@ class EndpointRegistry
      * Wrapper for creating endpoint instances
      *
      * @param array $options The alias to check for.
+     *
      * @return \Muffin\Webservice\Model\Endpoint
      */
     protected static function _create(array $options)

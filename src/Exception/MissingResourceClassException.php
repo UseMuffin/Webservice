@@ -8,5 +8,4 @@ class MissingResourceClassException extends Exception
 {
 
     protected $_messageTemplate = 'Resource class %s could not be found.';
-
 }
