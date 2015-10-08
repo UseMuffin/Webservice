@@ -63,40 +63,30 @@ abstract class AbstractDriver implements LoggerAwareInterface
 
     public function webservice($name, WebserviceInterface $webservice = null)
     {
-        if ($webservice === null) {
-            if (!isset($this->_webservices[$name])) {
-                $namespaceParts = explode('\\', get_class($this));
+        if ($webservice !== null) {
+            $this->_webservices[$name] = $webservice;
 
-                $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -2)));
-
-                $webserviceClass = $pluginName . '.' . Inflector::camelize($name);
-                $webservice = App::className($webserviceClass, 'Webservice', 'Webservice');
-                if (!$webservice) {
-                    $fallbackWebserviceClass = $pluginName . '.' . end($namespaceParts);
-                    $webservice = App::className($fallbackWebserviceClass, 'Webservice', 'Webservice');
-
-                    if (!$webservice) {
-                        throw new MissingWebserviceClassException([
-                            'class' => $webserviceClass,
-                            'fallbackClass' => $fallbackWebserviceClass
-                        ]);
-                    }
-                }
-
-                $webservice = new $webservice([
-                    'endpoint' => $name,
-                    'driver' => $this,
-                ]);
-
-                $this->_webservices[$name] = $webservice;
-            }
-
-            return $this->_webservices[$name];
+            return $this;
         }
 
-        $this->_webservices[$name] = $webservice;
+        if (!isset($this->_webservices[$name])) {
+            // Split the driver class namespace in chunks
+            $namespaceParts = explode('\\', get_class($this));
 
-        return $this;
+            // Get the plugin name out of the namespace
+            $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -2)));
+
+            $webserviceClass = $pluginName . '.' . Inflector::camelize($name);
+
+            $webservice = $this->_createWebservice($webserviceClass, [
+                'endpoint' => $name,
+                'driver' => $this,
+            ]);
+
+            $this->_webservices[$name] = $webservice;
+        }
+
+        return $this->_webservices[$name];
     }
 
     /**
@@ -116,10 +106,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      */
     public function configName()
     {
-        if (empty($this->_config['name'])) {
-            return '';
-        }
-        return $this->_config['name'];
+        return (string)$this->_config['name'];
     }
 
     /**
@@ -135,6 +122,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
         if ($enable === null) {
             return $this->_logQueries;
         }
+
         $this->_logQueries = $enable;
     }
 
@@ -173,5 +161,38 @@ abstract class AbstractDriver implements LoggerAwareInterface
             'logger' => $this->logger(),
             'webservices' => array_keys($this->_webservices)
         ];
+    }
+
+    /**
+     * Creates a Webservice instance.
+     *
+     * It provides a fallback to PluginNameWebservice.
+     *
+     * @param string $className Class name of the webservice to initialize
+     * @param array $options Set of options to pass to the constructor
+     *
+     * @return WebserviceInterface
+     */
+    protected function _createWebservice($className, array $options = [])
+    {
+        $namespaceParts = explode('\\', get_class($this));
+
+        $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -2)));
+
+        $webservice = App::className($className, 'Webservice', 'Webservice');
+        if ($webservice) {
+            return new $webservice($options);
+        }
+
+        $fallbackWebserviceClass = $pluginName . '.' . end($namespaceParts);
+        $fallbackWebservice = App::className($fallbackWebserviceClass, 'Webservice', 'Webservice');
+        if ($fallbackWebservice) {
+            return new $fallbackWebservice($options);
+        }
+
+        throw new MissingWebserviceClassException([
+            'class' => $className,
+            'fallbackClass' => $fallbackWebserviceClass
+        ]);
     }
 }
