@@ -2,6 +2,7 @@
 
 namespace Muffin\Webservice;
 
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\QueryTrait;
 use Cake\Utility\Hash;
 use Muffin\Webservice\Model\Endpoint;
@@ -111,6 +112,25 @@ class Query
         $this->repository($endpoint);
 
         return $this;
+    }
+
+    /**
+     * Get the first result from the executing query or raise an exception.
+     *
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When there is no first record.
+     *
+     * @return mixed The first result from the ResultSet.
+     */
+    public function firstOrFail()
+    {
+        $entity = $this->first();
+        if ($entity) {
+            return $entity;
+        }
+        throw new RecordNotFoundException(sprintf(
+            'Record not found in endpoint "%s"',
+            $this->repository()->endpoint()
+        ));
     }
 
     public function aliasField($field)
