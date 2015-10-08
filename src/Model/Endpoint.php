@@ -8,12 +8,15 @@ use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\RepositoryInterface;
 use Cake\Network\Exception\NotImplementedException;
 use Cake\Utility\Inflector;
+use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use Muffin\Webservice\Query;
 
 class Endpoint implements RepositoryInterface
 {
+
+    protected $_connection;
 
     /**
      * The schema object containing a description of this endpoint fields
@@ -214,6 +217,10 @@ class Endpoint implements RepositoryInterface
         return $this->_resourceClass;
     }
 
+    /**
+     * @param null $connection
+     * @return AbstractDriver
+     */
     public function connection($connection = null)
     {
         if ($connection === null) {
