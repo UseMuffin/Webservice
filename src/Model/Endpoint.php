@@ -157,6 +157,8 @@ class Endpoint implements RepositoryInterface
         if ($this->_endpoint === null) {
             $endpoint = namespaceSplit(get_class($this));
             $endpoint = substr(end($endpoint), 0, -8);
+
+            // In case someone constructs the Endpoint class directly
             if (empty($endpoint)) {
                 $endpoint = $this->alias();
             }
@@ -238,6 +240,8 @@ class Endpoint implements RepositoryInterface
     }
 
     /**
+     * Returns an instance of the Webservice used
+     *
      * @param WebserviceInterface|string|null $webservice
      * @return $this|WebserviceInterface
      */
