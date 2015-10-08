@@ -10,6 +10,7 @@ use Cake\Network\Exception\NotImplementedException;
 use Cake\Utility\Inflector;
 use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Exception\MissingResourceClassException;
+use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use Muffin\Webservice\Query;
 
@@ -247,7 +248,12 @@ class Endpoint implements RepositoryInterface
                 $webservice = $this->endpoint();
             }
 
-            $this->_webservice = $this->connection()->webservice($webservice);
+            $connection = $this->connection();
+            if (!$connection) {
+                throw new UnexpectedDriverException(__('No connection has been defined for this endpoint'));
+            }
+
+            $this->_webservice = $connection->webservice($webservice);
 
             return $this->_webservice;
         }
@@ -285,7 +291,11 @@ class Endpoint implements RepositoryInterface
             $this->_primaryKey = $key;
         }
         if ($this->_primaryKey === null) {
-            $key = (array)$this->schema()->primaryKey();
+            $schema = $this->schema();
+            if (!$schema) {
+                throw new UnexpectedDriverException(__('No schema has been defined for this endpoint'));
+            }
+            $key = (array)$schema->primaryKey();
             if (count($key) === 1) {
                 $key = $key[0];
             }
@@ -306,9 +316,13 @@ class Endpoint implements RepositoryInterface
             $this->_displayField = $key;
         }
         if ($this->_displayField === null) {
-            $schema = $this->schema();
             $primary = (array)$this->primaryKey();
             $this->_displayField = array_shift($primary);
+
+            $schema = $this->schema();
+            if (!$schema) {
+                throw new UnexpectedDriverException(__('No schema has been defined for this endpoint'));
+            }
             if ($schema->column('title')) {
                 $this->_displayField = 'title';
             }
