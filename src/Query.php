@@ -254,6 +254,10 @@ class Query
         return $this->all()->first();
     }
 
+    public function execute()
+    {
+        return $this->_execute();
+    }
 
     /**
      * Executes this query and returns a traversable object containing the results
@@ -277,7 +281,7 @@ class Query
             'set' => $this->set(),
             'sort' => $this->order(),
             'extraOptions' => $this->getOptions(),
-            'conditions' => $this->conditions(),
+            'conditions' => $this->where(),
             'repository' => $this->endpoint(),
             'webservice' => $this->_webservice
         ];
