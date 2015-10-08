@@ -231,6 +231,10 @@ class Query
 
     public function count()
     {
+        if ($this->action() !== self::ACTION_READ) {
+            return false;
+        }
+
         if (!$this->_resultSet) {
             $this->_execute();
         }
