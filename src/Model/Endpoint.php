@@ -80,11 +80,17 @@ class Endpoint implements RepositoryInterface
         if (!empty($config['alias'])) {
             $this->alias($config['alias']);
         }
+        if (!empty($config['connection'])) {
+            $this->connection($config['connection']);
+        }
+        if (!empty($config['displayField'])) {
+            $this->displayField($config['displayField']);
+        }
         if (!empty($config['endpoint'])) {
             $this->endpoint($config['endpoint']);
         }
-        if (!empty($config['connection'])) {
-            $this->connection($config['connection']);
+        if (!empty($config['primaryKey'])) {
+            $this->primaryKey($config['primaryKey']);
         }
         if (!empty($config['schema'])) {
             $this->schema($config['schema']);
