@@ -51,7 +51,8 @@ class Query
     private $_conditions = [];
     private $_page;
     private $_limit;
-    private $_sort = [];
+    private $_fields = [];
+    private $_order = [];
 
     /**
      * @var \Muffin\Webservice\Webservice\WebserviceInterface
@@ -168,13 +169,32 @@ class Query
         return $this;
     }
 
-    public function sort(array $fields = null)
+    /**
+     * @param null $fields
+     * @return $this|array
+     */
+    public function set($fields = null)
     {
-        if ($fields === null) {
-            return $this->_sort;
+        if (!in_array($this->action(), [self::ACTION_CREATE, self::ACTION_UPDATE])) {
+            throw new \UnexpectedValueException(__('The action of this query needs to be either create update'));
         }
 
-        $this->_sort = $fields;
+        if ($fields === null) {
+            return $this->_fields;
+        }
+
+        $this->_fields = $fields;
+
+        return $this;
+    }
+
+    public function order(array $fields = null)
+    {
+        if ($fields === null) {
+            return $this->_order;
+        }
+
+        $this->_order = $fields;
 
         return $this;
     }
@@ -199,12 +219,14 @@ class Query
             unset($options['limit']);
         }
         if (isset($options['order'])) {
-            $this->sort($options['order']);
+            $this->order($options['order']);
 
             unset($options['order']);
         }
 
         $this->_options = Hash::merge($this->_options, $options);
+
+        return $this;
     }
 
     public function count()
@@ -248,7 +270,8 @@ class Query
             'action' => $this->action(),
             'page' => $this->page(),
             'limit' => $this->limit(),
-            'sort' => $this->sort(),
+            'set' => $this->set(),
+            'sort' => $this->order(),
             'extraOptions' => $this->getOptions(),
             'conditions' => $this->conditions(),
             'repository' => $this->endpoint(),
