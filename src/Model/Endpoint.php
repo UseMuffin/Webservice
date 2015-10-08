@@ -534,7 +534,7 @@ class Endpoint implements RepositoryInterface
      */
     public function updateAll($fields, $conditions)
     {
-        // TODO: Implement updateAll() method.
+        return $this->query()->update()->where($conditions)->set($fields)->execute();
     }
 
     /**
@@ -566,7 +566,7 @@ class Endpoint implements RepositoryInterface
      */
     public function exists($conditions)
     {
-        // TODO: Implement exists() method.
+        return ($this->find()->where($conditions)->count() > 0);
     }
 
     /**
@@ -580,7 +580,35 @@ class Endpoint implements RepositoryInterface
      */
     public function save(EntityInterface $resource, $options = [])
     {
-        // TODO: Implement save() method.
+        if ($resource->isNew()) {
+            $query = $this->query()->create()->set($resource->toArray());
+        } else {
+            $query = $this->query()->update()->where([
+                $this->primaryKey() => $resource->get($this->primaryKey())
+            ]);
+
+            $fieldsToUpdate = [];
+            foreach ($resource as $field => $value) {
+                if (!$resource->dirty($field)) {
+                    continue;
+                }
+
+                $fieldsToUpdate[$field] = $value;
+            }
+
+            $query->set($fieldsToUpdate);
+        }
+
+        $result = $query->execute();
+        if (!$result) {
+            return false;
+        }
+
+        $className = get_class($resource);
+        return new $className($resource->toArray(), [
+            'markNew' => false,
+            'markClean' => true
+        ]);
     }
 
     /**
@@ -595,7 +623,9 @@ class Endpoint implements RepositoryInterface
      */
     public function delete(EntityInterface $resource, $options = [])
     {
-        // TODO: Implement delete() method.
+        return (bool)$this->query()->delete()->where([
+            $this->primaryKey() => $resource->get($this->primaryKey())
+        ])->execute();
     }
 
     /**
