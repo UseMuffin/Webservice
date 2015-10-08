@@ -41,6 +41,31 @@ Until an official documentation is written, [David Yell][1] wrote a good [post t
 
 ### As an ORM
 
+#### Create driver
+
+```php
+<?php
+
+namespace App\Webservice\Driver;
+
+use Cake\Network\Http\Client;
+use Muffin\Webservice\AbstractDriver;
+
+class Articles extends AbstractDriver
+{
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initialize()
+    {
+        $this->client(new Client([
+            'host' => 'example.com'
+        ]));
+    }
+}
+```
+
 #### Create a webservice
 
 ```php
@@ -48,53 +73,30 @@ Until an official documentation is written, [David Yell][1] wrote a good [post t
 
 namespace App\Webservice;
 
-use App\Model\Resource\Article;
 use Cake\Network\Http\Client;
-use Muffin\Webservice\QueryLogger;
-use Muffin\Webservice\ResultSet;
-use Muffin\Webservice\WebserviceInterface;
 use Muffin\Webservice\Query;
+use Muffin\Webservice\Webservice\Webservice;
 
-class ArticlesWebservice implements WebserviceInterface
+class ArticlesWebservice extends Webservice
 {
 
-    public function logger(QueryLogger $logger = null)
+    /**
+     * {@inheritDoc}
+     */
+    protected function _executeReadQuery(Query $query, array $options = [])
     {
-        return new QueryLogger();
-    }
+        $response = $this->driver()->client()->get('/articles.json');
 
-    public function execute(Query $query)
-    {
-        switch ($query->action()) {
-            case Query::ACTION_READ:
-                $client = new Client();
-                $response = $client->get('http://example.com/articles.json');
-
-                if (!$response->isOk()) {
-                    return false;
-                }
-
-                $resources = [];
-                foreach ($response->articles as $article) {
-                    $resources[] = new Article([
-                        'id' => $article->id,
-                        'title' => $article->title,
-                        'body' => $article->body
-                    ], [
-                        'markClean' => true,
-                        'markNew' => false,
-                    ]);
-                }
-
-                return new ResultSet($resources, $response->total);
+        if (!$response->isOk()) {
+            return false;
         }
 
-        return false;
+        return $this->_transformResults($response->json['articles'], $options['resourceClass']);
     }
 }
 ```
 
-#### Create an endpoint
+#### Create an endpoint (optional)
 
 ```php
 <?php
@@ -107,14 +109,10 @@ use Muffin\Webservice\Model\Endpoint;
 class ArticlesEndpoint extends Endpoint
 {
 
-    public function initialize(array $config)
-    {
-        $this->webservice(ConnectionManager::get('ArticlesWebservice')->webservice());
-    }
 }
 ```
 
-#### Create a resource
+#### Create a resource (optional)
 
 ```php
 <?php
