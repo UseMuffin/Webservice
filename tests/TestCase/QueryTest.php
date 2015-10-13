@@ -12,7 +12,7 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 class TestWebservice implements WebserviceInterface
 {
 
-    public function execute(Query $query)
+    public function execute(Query $query, array $options = [])
     {
         return new ResultSet([
             new Resource([
