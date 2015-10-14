@@ -102,7 +102,7 @@ class EndpointTestWebservice extends Webservice
             ], 1);
         }
 
-        return new ResultSet($this->resources, 6);
+        return new ResultSet($this->resources, count($this->resources));
     }
 
     protected function _executeUpdateQuery(Query $query, array $options = [])
@@ -116,9 +116,30 @@ class EndpointTestWebservice extends Webservice
 
     protected function _executeDeleteQuery(Query $query, array $options = [])
     {
-        unset($this->resources[$this->conditionsToIndex($query->where())]);
+        $conditions = $query->where();
 
-        return true;
+        if (is_int($conditions['id'])) {
+            $exists = isset($this->resources[$this->conditionsToIndex($conditions)]);
+
+            unset($this->resources[$this->conditionsToIndex($conditions)]);
+
+            return ($exists) ? 1 : 0;
+        } elseif (is_array($conditions['id'])) {
+            $deleted = 0;
+
+            foreach ($conditions['id'] as $id) {
+                if (!isset($this->resources[$id - 1])) {
+                    continue;
+                }
+
+                $deleted++;
+                unset($this->resources[$id - 1]);
+            }
+
+            return $deleted;
+        }
+
+        return 0;
     }
 
     public function conditionsToIndex(array $conditions)
@@ -253,5 +274,16 @@ class EndpointTest extends TestCase
         $this->assertTrue($this->endpoint->delete($resource));
 
         $this->endpoint->get(2);
+    }
+
+    public function testDeleteAll()
+    {
+        $amount = $this->endpoint->deleteAll([
+            'id' => [1, 2, 3]
+        ]);
+
+        $this->assertEquals(3, $amount);
+
+        $this->assertEquals(0, $this->endpoint->find()->count());
     }
 }

@@ -128,6 +128,34 @@ class Query implements QueryInterface
     }
 
     /**
+     * Returns any data that was stored in the specified clause.
+     *
+     * - where: QueryExpression, returns null when not set
+     * - order: OrderByExpression, returns null when not set
+     * - limit: integer or QueryExpression, null when not set
+     * - offset: integer or QueryExpression, null when not set
+     *
+     * @param string $name name of the clause to be returned
+     *
+     * @return mixed
+     */
+    public function clause($name)
+    {
+        switch ($name) {
+            case 'limit':
+                return $this->_limit;
+            case 'offset':
+                return $this->_offset;
+            case 'order':
+                return $this->_order;
+            case 'where':
+                return $this->_conditions;
+        }
+
+        return null;
+    }
+
+    /**
      * Set the endpoint to be used
      *
      * @param Endpoint|null $endpoint The endpoint to use
@@ -176,9 +204,11 @@ class Query implements QueryInterface
      * Alias a field with the endpoint's current alias.
      *
      * @param string $field The field to alias.
+     * @param null $alias Not being used
+     *
      * @return string The field prefixed with the endpoint alias.
      */
-    public function aliasField($field)
+    public function aliasField($field, $alias = null)
     {
         return [$field => $field];
     }
@@ -192,7 +222,7 @@ class Query implements QueryInterface
      *
      * @return $this|array
      */
-    public function where(array $conditions = null, $types = [], $overwrite = false)
+    public function where($conditions = null, $types = [], $overwrite = false)
     {
         if ($conditions === null) {
             return $this->_conditions;
@@ -310,19 +340,15 @@ class Query implements QueryInterface
     }
 
     /**
-     * Set the order in which results should be
-     *
-     * @param array|null $fields The array of fields and their direction
-     *
-     * @return $this|array
+     * {@inheritDoc}
      */
-    public function order(array $fields = null)
+    public function order($fields, $overwrite = false)
     {
         if ($fields === null) {
             return $this->_order;
         }
 
-        $this->_order = $fields;
+        $this->_order = (!$overwrite) ? Hash::merge($this->_order, $fields) : $fields;
 
         return $this;
     }

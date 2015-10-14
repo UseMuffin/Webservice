@@ -564,7 +564,7 @@ class Endpoint implements RepositoryInterface
      */
     public function deleteAll($conditions)
     {
-        // TODO: Implement deleteAll() method.
+        return $this->query()->delete()->where($conditions)->execute();
     }
 
     /**
@@ -641,49 +641,29 @@ class Endpoint implements RepositoryInterface
     }
 
     /**
-     * Create a new resource + associated entities from an array.
+     * {@inheritDoc}
      *
-     * This is most useful when hydrating request data back into entities.
-     * For example, in your controller code:
-     *
-     * ```
-     * $article = $this->Articles->newEntity($this->request->data());
-     * ```
-     *
-     * The hydrated resource will correctly do an insert/update based
-     * on the primary key data existing in the webservice when the resource
-     * is saved. Until the resource is saved, it will be a detached record.
-     *
-     * @param array|null $data The data to build an resource with.
-     * @param array $options A list of options for the object hydration.
-     *
-     * @return \Cake\Datasource\EntityInterface
+     * @return \Muffin\Webservice\Model\Resource
      */
     public function newEntity($data = null, array $options = [])
     {
-        // TODO: Implement newEntity() method.
+        $resourceClass = $this->resourceClass();
+
+        return new $resourceClass($data, $options);
     }
 
     /**
-     * Create a list of entities + associated entities from an array.
-     *
-     * This is most useful when hydrating request data back into entities.
-     * For example, in your controller code:
-     *
-     * ```
-     * $articles = $this->Articles->newEntities($this->request->data());
-     * ```
-     *
-     * The hydrated entities can then be iterated and saved.
-     *
-     * @param array $data The data to build an resource with.
-     * @param array $options A list of options for the objects hydration.
-     *
-     * @return array An array of hydrated records.
+     * {@inheritDoc}
      */
     public function newEntities(array $data, array $options = [])
     {
-        // TODO: Implement newEntities() method.
+        $resources = [];
+
+        foreach ($data as $resourceData) {
+            $resources[] = $this->newEntity($resourceData, $options);
+        }
+
+        return $resources;
     }
 
     /**

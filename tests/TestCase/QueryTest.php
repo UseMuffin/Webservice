@@ -106,7 +106,7 @@ class QueryTest extends TestCase
         $this->assertEquals(2, $this->query->limit());
         $this->assertEquals([
             'field' => 'ASC'
-        ], $this->query->order());
+        ], $this->query->clause('order'));
         $this->assertEquals([
             'customOption' => 'value'
         ], $this->query->getOptions());
