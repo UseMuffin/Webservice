@@ -3,12 +3,13 @@
 namespace Muffin\Webservice;
 
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Datasource\QueryInterface;
 use Cake\Datasource\QueryTrait;
 use Cake\Utility\Hash;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 
-class Query
+class Query implements QueryInterface
 {
 
     use QueryTrait;
@@ -53,6 +54,7 @@ class Query
     private $_page;
     private $_limit;
     private $_fields = [];
+    private $_offset = [];
     private $_order = [];
 
     /**
@@ -141,6 +143,14 @@ class Query
         $this->repository($endpoint);
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function find($finder, array $options = [])
+    {
+        return $this->repository()->callFinder($finder, $this, $options);
     }
 
     /**
@@ -285,6 +295,16 @@ class Query
         }
 
         $this->_fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function offset($num)
+    {
+        $this->_offset = $num;
 
         return $this;
     }
