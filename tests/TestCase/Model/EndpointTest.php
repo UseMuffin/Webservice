@@ -22,7 +22,6 @@ class TestDriver extends AbstractDriver
      */
     public function initialize()
     {
-        // TODO: Implement initialize() method.
     }
 
     /**

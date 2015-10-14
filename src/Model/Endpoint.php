@@ -682,7 +682,7 @@ class Endpoint implements RepositoryInterface
      * @param array $data key value list of fields to be merged into the resource
      * @param array $options A list of options for the object hydration.
      *
-     * @return \Cake\Datasource\EntityInterface
+     * @return void
      */
     public function patchEntity(EntityInterface $resource, array $data, array $options = [])
     {
@@ -706,7 +706,7 @@ class Endpoint implements RepositoryInterface
      * @param array $data list of arrays to be merged into the entities
      * @param array $options A list of options for the objects hydration.
      *
-     * @return array
+     * @return void
      */
     public function patchEntities($entities, array $data, array $options = [])
     {

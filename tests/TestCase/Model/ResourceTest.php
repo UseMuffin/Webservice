@@ -25,5 +25,4 @@ class ResourceTest extends TestCase
         ]);
         $this->assertEquals($endpoint, $resource->source());
     }
-
 }
