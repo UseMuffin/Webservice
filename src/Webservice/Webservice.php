@@ -10,11 +10,33 @@ use Muffin\Webservice\Query;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Basic implementation of a webservice
+ *
+ * @package Muffin\Webservice\Webservice
+ */
 abstract class Webservice implements WebserviceInterface
 {
 
+    /**
+     * The driver to use to communicate with the webservice
+     *
+     * @var \Muffin\Webservice\AbstractDriver
+     */
     protected $_driver;
+
+    /**
+     * The webservice to call
+     *
+     * @var string
+     */
     protected $_endpoint;
+
+    /**
+     * A list of nested resources with their path and needed conditions
+     *
+     * @var array
+     */
     protected $_nestedResources = [];
 
     /**
@@ -46,9 +68,9 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Set the driver to use
      *
-     * @param AbstractDriver|null $driver The driver to use
+     * @param \Muffin\Webservice\AbstractDriver|null $driver The driver to use
      *
-     * @return AbstractDriver|$this
+     * @return \Muffin\Webservice\AbstractDriver|$this
      */
     public function driver(AbstractDriver $driver = null)
     {
@@ -132,7 +154,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Execute the appropriate method for a query
      *
-     * @param Query $query The query to execute
+     * @param \Muffin\Webservice\Query $query The query to execute
      * @param array $options The options to use
      *
      * @return bool|int|\Muffin\Webservice\ResultSet
@@ -156,7 +178,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the create action
      *
-     * @param Query $query The query to execute
+     * @param \Muffin\Webservice\Query $query The query to execute
      * @param array $options The options to use
      *
      * @return bool|void
@@ -172,7 +194,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the read action
      *
-     * @param Query $query The query to execute
+     * @param \Muffin\Webservice\Query $query The query to execute
      * @param array $options The options to use
      *
      * @return \Muffin\Webservice\ResultSet|bool|void
@@ -188,7 +210,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the update action
      *
-     * @param Query $query The query to execute
+     * @param \Muffin\Webservice\Query $query The query to execute
      * @param array $options The options to use
      *
      * @return int|bool|void
@@ -204,7 +226,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the delete action
      *
-     * @param Query $query The query to execute
+     * @param \Muffin\Webservice\Query $query The query to execute
      * @param array $options The options to use
      *
      * @return int|bool|void
@@ -236,8 +258,8 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Logs a query to the specified logger
      *
-     * @param Query $query The query to log
-     * @param LoggerInterface $logger The logger instance to use
+     * @param \Muffin\Webservice\Query $query The query to log
+     * @param \Psr\Log\LoggerInterface $logger The logger instance to use
      *
      * @return void
      */

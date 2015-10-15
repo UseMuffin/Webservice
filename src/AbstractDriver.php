@@ -21,8 +21,18 @@ abstract class AbstractDriver implements LoggerAwareInterface
 
     protected $_defaultConfig = [];
 
+    /**
+     * Whatever queries should be logged
+     *
+     * @var bool
+     */
     protected $_logQueries = false;
 
+    /**
+     * The list of webservices to be used
+     *
+     * @var array
+     */
     protected $_webservices = [];
 
     /**

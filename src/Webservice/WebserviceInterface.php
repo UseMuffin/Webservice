@@ -4,6 +4,11 @@ namespace Muffin\Webservice\Webservice;
 
 use Muffin\Webservice\Query;
 
+/**
+ * Describes a webservice used to call a API
+ *
+ * @package Muffin\Webservice\Webservice
+ */
 interface WebserviceInterface
 {
 

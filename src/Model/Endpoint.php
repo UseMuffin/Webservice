@@ -14,6 +14,11 @@ use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 
+/**
+ * The table equivalent of a webservice endpoint
+ *
+ * @package Muffin\Webservice\Model
+ */
 class Endpoint implements RepositoryInterface
 {
 
@@ -33,6 +38,11 @@ class Endpoint implements RepositoryInterface
      */
     protected $_resourceClass;
 
+    /**
+     * The name of the endpoint to contact
+     *
+     * @var string
+     */
     protected $_endpoint;
 
     /**
@@ -50,9 +60,17 @@ class Endpoint implements RepositoryInterface
     protected $_displayField;
 
     /**
+     * The webservice instance to call
+     *
      * @var \Muffin\Webservice\Webservice\WebserviceInterface
      */
     protected $_webservice;
+
+    /**
+     * The alias to use for the endpoint
+     *
+     * @var string
+     */
     protected $_alias;
 
     /**
@@ -60,19 +78,13 @@ class Endpoint implements RepositoryInterface
      *
      * The $config array understands the following keys:
      *
-     * - endpoint: Name of the endpoint to represent
      * - alias: Alias to be assigned to this endpoint (default to endpoint name)
      * - connection: The connection instance to use
+     * - endpoint: Name of the endpoint to represent
      * - resourceClass: The fully namespaced class name of the resource class that will
      *   represent rows in this endpoint.
      * - schema: A \Muffin\Webservice\Schema object or an array that can be
      *   passed to it.
-     * - eventManager: An instance of an event manager to use for internal events
-     * - behaviors: A BehaviorRegistry. Generally not used outside of tests.
-     * - associations: An AssociationCollection instance.
-     * - validator: A Validator instance which is assigned as the "default"
-     *   validation set, or an associative array, where key is the name of the
-     *   validation set and value the Validator instance.
      *
      * @param array $config List of options for this endpoint
      */
@@ -177,6 +189,7 @@ class Endpoint implements RepositoryInterface
      * out of it and used as the schema for this endpoint.
      *
      * @param array|\Muffin\Webservice\Schema|null $schema New schema to be used for this endpoint
+     *
      * @return \Muffin\Webservice\Schema
      */
     public function schema($schema = null)
@@ -229,9 +242,9 @@ class Endpoint implements RepositoryInterface
     /**
      * Set the driver to use
      *
-     * @param AbstractDriver|null $connection The driver to use
+     * @param \Muffin\Webservice\AbstractDriver|null $connection The driver to use
      *
-     * @return AbstractDriver
+     * @return \Muffin\Webservice\AbstractDriver
      */
     public function connection($connection = null)
     {
@@ -245,9 +258,9 @@ class Endpoint implements RepositoryInterface
     /**
      * Returns an instance of the Webservice used
      *
-     * @param WebserviceInterface|string|null $webservice The webservice to use
+     * @param \Muffin\Webservice\Webservice\WebserviceInterface|string|null $webservice The webservice to use
      *
-     * @return $this|WebserviceInterface
+     * @return $this|\Muffin\Webservice\Webservice\WebserviceInterface
      */
     public function webservice($webservice = null)
     {
@@ -472,7 +485,7 @@ class Endpoint implements RepositoryInterface
      * @throws \Cake\Datasource\Exception\RecordNotFoundException if the record with such id
      * could not be found
      * @return \Cake\Datasource\EntityInterface
-     * @see RepositoryInterface::find()
+     * @see \Cake\Datasource\RepositoryInterface::find()
      */
     public function get($primaryKey, $options = [])
     {
@@ -521,7 +534,7 @@ class Endpoint implements RepositoryInterface
     /**
      * Creates a new Query instance for this repository
      *
-     * @return Query
+     * @return \Muffin\Webservice\Query
      */
     public function query()
     {
@@ -560,7 +573,7 @@ class Endpoint implements RepositoryInterface
      *
      * @return int Count Returns the affected rows.
      *
-     * @see Endpoint::delete()
+     * @see \\Muffin\Webservice\Endpoint::delete()
      */
     public function deleteAll($conditions)
     {

@@ -158,9 +158,9 @@ class Query implements QueryInterface
     /**
      * Set the endpoint to be used
      *
-     * @param Endpoint|null $endpoint The endpoint to use
+     * @param \Muffin\Webservice\Model\Endpoint|null $endpoint The endpoint to use
      *
-     * @return Endpoint|$this
+     * @return \Muffin\Webservice\Model\Endpoint|$this
      */
     public function endpoint(Endpoint $endpoint = null)
     {
