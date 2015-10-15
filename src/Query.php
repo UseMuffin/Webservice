@@ -49,23 +49,30 @@ class Query implements QueryInterface
      */
     protected $_dirty = false;
 
-    private $_action;
-    private $_conditions = [];
-    private $_page;
-    private $_limit;
-    private $_fields = [];
-    private $_offset = [];
-    private $_order = [];
+    /**
+     * Parts being used to in the query
+     *
+     * @var array
+     */
+    protected $_parts = [
+        'order' => [],
+        'set' => [],
+        'where' => []
+    ];
 
     /**
+     * Instance of the webservice to use
+     *
      * @var \Muffin\Webservice\Webservice\WebserviceInterface
      */
     protected $_webservice;
 
     /**
+     * The results from the webservice
+     *
      * @var ResultSet
      */
-    protected $_resultSet;
+    protected $__resultSet;
 
     /**
      * Construct the query
@@ -141,15 +148,8 @@ class Query implements QueryInterface
      */
     public function clause($name)
     {
-        switch ($name) {
-            case 'limit':
-                return $this->_limit;
-            case 'offset':
-                return $this->_offset;
-            case 'order':
-                return $this->_order;
-            case 'where':
-                return $this->_conditions;
+        if (isset($this->_parts[$name])) {
+            return $this->_parts[$name];
         }
 
         return null;
@@ -225,10 +225,10 @@ class Query implements QueryInterface
     public function where($conditions = null, $types = [], $overwrite = false)
     {
         if ($conditions === null) {
-            return $this->_conditions;
+            return $this->clause('where');
         }
 
-        $this->_conditions = (!$overwrite) ? Hash::merge($this->_conditions, $conditions) : $conditions;
+        $this->_parts['where'] = (!$overwrite) ? Hash::merge($this->clause('where'), $conditions) : $conditions;
 
         return $this;
     }
@@ -243,10 +243,10 @@ class Query implements QueryInterface
     public function action($action = null)
     {
         if ($action === null) {
-            return $this->_action;
+            return $this->clause('action');
         }
 
-        $this->_action = $action;
+        $this->_parts['action'] = $action;
 
         return $this;
     }
@@ -269,13 +269,13 @@ class Query implements QueryInterface
     public function page($page = null, $limit = null)
     {
         if ($page === null) {
-            return $this->_page;
+            return $this->clause('page');
         }
         if ($limit !== null) {
             $this->limit($limit);
         }
 
-        $this->_page = $page;
+        $this->_parts['page'] = $page;
 
         return $this;
     }
@@ -299,10 +299,10 @@ class Query implements QueryInterface
     public function limit($limit = null)
     {
         if ($limit === null) {
-            return $this->_limit;
+            return $this->clause('limit');
         }
 
-        $this->_limit = $limit;
+        $this->_parts['limit'] = $limit;
 
         return $this;
     }
@@ -316,15 +316,15 @@ class Query implements QueryInterface
      */
     public function set($fields = null)
     {
+        if ($fields === null) {
+            return $this->clause('set');
+        }
+
         if (!in_array($this->action(), [self::ACTION_CREATE, self::ACTION_UPDATE])) {
             throw new \UnexpectedValueException(__('The action of this query needs to be either create update'));
         }
 
-        if ($fields === null) {
-            return $this->_fields;
-        }
-
-        $this->_fields = $fields;
+        $this->_parts['set'] = $fields;
 
         return $this;
     }
@@ -334,7 +334,7 @@ class Query implements QueryInterface
      */
     public function offset($num)
     {
-        $this->_offset = $num;
+        $this->_parts['offset'] = $num;
 
         return $this;
     }
@@ -345,10 +345,10 @@ class Query implements QueryInterface
     public function order($fields, $overwrite = false)
     {
         if ($fields === null) {
-            return $this->_order;
+            return $this->clause('order');
         }
 
-        $this->_order = (!$overwrite) ? Hash::merge($this->_order, $fields) : $fields;
+        $this->_parts['order'] = (!$overwrite) ? Hash::merge($this->clause('order'), $fields) : $fields;
 
         return $this;
     }
@@ -395,11 +395,11 @@ class Query implements QueryInterface
             return false;
         }
 
-        if (!$this->_resultSet) {
+        if (!$this->__resultSet) {
             $this->_execute();
         }
 
-        return $this->_resultSet->total();
+        return $this->__resultSet->total();
     }
 
     /**
@@ -416,7 +416,7 @@ class Query implements QueryInterface
      */
     public function first()
     {
-        if (!$this->_resultSet) {
+        if (!$this->__resultSet) {
             $this->limit(1);
         }
 
@@ -440,7 +440,7 @@ class Query implements QueryInterface
      */
     protected function _execute()
     {
-        return $this->_resultSet = $this->_webservice->execute($this, [
+        return $this->__resultSet = $this->_webservice->execute($this, [
             'resourceClass' => $this->endpoint()->resourceClass()
         ]);
     }
@@ -458,7 +458,7 @@ class Query implements QueryInterface
             'page' => $this->page(),
             'limit' => $this->limit(),
             'set' => $this->set(),
-            'sort' => $this->order(),
+            'sort' => $this->clause('order'),
             'extraOptions' => $this->getOptions(),
             'conditions' => $this->where(),
             'repository' => $this->endpoint(),
