@@ -25,4 +25,16 @@ class ResourceTest extends TestCase
         ]);
         $this->assertEquals($endpoint, $resource->source());
     }
+
+    public function testConstructUseSettersOff()
+    {
+        $resource = new Resource([
+            'field' => 'text'
+        ], [
+            'markClean' => true,
+            'useSetters' => false
+        ]);
+
+        $this->assertEquals('text', $resource->get('field'));
+    }
 }

@@ -72,6 +72,11 @@ class QueryTest extends TestCase
         $this->assertEquals(Query::ACTION_DELETE, $this->query->action());
     }
 
+    public function testAliasField()
+    {
+        $this->assertEquals(['field' => 'field'], $this->query->aliasField('field'));
+    }
+
     public function testCountNonReadAction()
     {
         $this->assertEquals(false, $this->query->count());
@@ -112,6 +117,18 @@ class QueryTest extends TestCase
         ], $this->query->getOptions());
     }
 
+    public function testFind()
+    {
+        $this->query->endpoint()->primaryKey('id');
+        $this->query->endpoint()->displayField('title');
+
+        $this->assertEquals($this->query, $this->query->find('list'));
+
+        $debugInfo = $this->query->__debugInfo();
+
+        $this->assertInternalType('callable', $debugInfo['formatters'][0]);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */
@@ -132,6 +149,56 @@ class QueryTest extends TestCase
         $this->assertEquals([
             'field' => 'value'
         ], $this->query->set());
+    }
+
+    public function testPage()
+    {
+        $this->assertEquals($this->query, $this->query->page(10));
+
+        $this->assertEquals(10, $this->query->clause('page'));
+    }
+
+    public function testPageWithLimit()
+    {
+        $this->assertEquals($this->query, $this->query->page(10, 20));
+
+        $this->assertEquals(10, $this->query->clause('page'));
+        $this->assertEquals(20, $this->query->clause('limit'));
+    }
+
+    public function testOffset()
+    {
+        $this->assertEquals($this->query, $this->query->offset(10));
+
+        $this->assertEquals(10, $this->query->clause('offset'));
+    }
+
+    public function testOrder()
+    {
+        $this->assertEquals($this->query, $this->query->order([
+            'field' => 'ASC'
+        ]));
+
+        $this->assertEquals([
+            'field' => 'ASC'
+        ], $this->query->clause('order'));
+    }
+
+    public function testDebugInfo()
+    {
+        $this->assertEquals([
+            '(help)' => 'This is a Query object, to get the results execute or iterate it.',
+            'action' => null,
+            'formatters' => [],
+            'page' => null,
+            'limit' => null,
+            'set' => [],
+            'sort' => [],
+            'extraOptions' => [],
+            'conditions' => [],
+            'repository' => new Endpoint(),
+            'webservice' => new TestWebservice()
+        ], $this->query->__debugInfo());
     }
 
     /**

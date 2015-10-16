@@ -344,10 +344,6 @@ class Query implements QueryInterface
      */
     public function order($fields, $overwrite = false)
     {
-        if ($fields === null) {
-            return $this->clause('order');
-        }
-
         $this->_parts['order'] = (!$overwrite) ? Hash::merge($this->clause('order'), $fields) : $fields;
 
         return $this;
@@ -455,6 +451,7 @@ class Query implements QueryInterface
         return [
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
             'action' => $this->action(),
+            'formatters' => $this->_formatters,
             'page' => $this->page(),
             'limit' => $this->limit(),
             'set' => $this->set(),

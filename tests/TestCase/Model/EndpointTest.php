@@ -1,7 +1,26 @@
 <?php
 
+namespace App\Model\Endpoint;
+
+use Muffin\Webservice\Model\Endpoint;
+
+class AppEndpoint extends Endpoint
+{
+
+}
+
+namespace SomeVendor\SomePlugin\Model\Endpoint;
+
+use Muffin\Webservice\Model\Endpoint;
+
+class PluginEndpoint extends Endpoint
+{
+
+}
+
 namespace Muffin\Webservice\Test\TestCase\Model;
 
+use App\Model\Endpoint\AppEndpoint;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\AbstractDriver;
@@ -11,6 +30,7 @@ use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Webservice\Webservice;
+use SomeVendor\SomePlugin\Model\Endpoint\PluginEndpoint;
 
 class TestDriver extends AbstractDriver
 {
@@ -284,5 +304,11 @@ class EndpointTest extends TestCase
         $this->assertEquals(3, $amount);
 
         $this->assertEquals(0, $this->endpoint->find()->count());
+    }
+
+    public function testDefaultConnectionName()
+    {
+        $this->assertEquals('app', AppEndpoint::defaultConnectionName());
+        $this->assertEquals('some_plugin', PluginEndpoint::defaultConnectionName());
     }
 }

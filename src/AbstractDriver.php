@@ -75,7 +75,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * Set or get a instance of a webservice
      *
      * @param string $name The name of the webservice
-     * @param WebserviceInterface|null $webservice The instance of the webservice you'd like to set
+     * @param \Muffin\Webservice\Webservice\WebserviceInterface|null $webservice The instance of the webservice you'd like to set
      *
      * @return $this
      */

@@ -143,6 +143,10 @@ abstract class Webservice implements WebserviceInterface
     {
         $result = $this->_executeQuery($query, $options);
 
+        if ($this->driver() === null) {
+            throw new \UnexpectedValueException(__('No driver has been defined'));
+        }
+
         // Write to the logger when one has been defined
         if ($this->driver()->logger()) {
             $this->_logQuery($query, $this->driver()->logger());

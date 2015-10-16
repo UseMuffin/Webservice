@@ -47,6 +47,18 @@ class ResultSetTest extends TestCase
         $this->assertEquals(6, $this->resultSet->total());
     }
 
+    public function testSerialize()
+    {
+        $this->assertInternalType('string', serialize($this->resultSet));
+    }
+
+    public function testUnserialize()
+    {
+        $unserialized = unserialize(serialize($this->resultSet));
+
+        $this->assertInstanceOf('\Muffin\Webservice\ResultSet', $unserialized);
+    }
+
     /**
      * @inheritDoc
      */
