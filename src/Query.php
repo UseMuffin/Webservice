@@ -382,6 +382,11 @@ class Query implements QueryInterface
 
             unset($options['order']);
         }
+        if (isset($options['conditions'])) {
+            $this->where($options['conditions']);
+
+            unset($options['conditions']);
+        }
 
         $this->_options = Hash::merge($this->_options, $options);
 

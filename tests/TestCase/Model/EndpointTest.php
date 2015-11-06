@@ -121,6 +121,19 @@ class EndpointTestWebservice extends Webservice
                 $this->resources[$index]
             ], 1);
         }
+        if (isset($query->where()[$query->endpoint()->aliasField('title')])) {
+            $resources = [];
+
+            foreach ($this->resources as $resource) {
+                if ($resource->title !== $query->where()[$query->endpoint()->aliasField('title')]) {
+                    continue;
+                }
+
+                $resources[] = $resource;
+            }
+
+            return new ResultSet($resources, count($resources));
+        }
 
         return new ResultSet($this->resources, count($this->resources));
     }
@@ -222,6 +235,18 @@ class EndpointTest extends TestCase
         $query = $this->endpoint->find();
 
         $this->assertInstanceOf('\Muffin\Webservice\Query', $query);
+    }
+
+    public function testFindByTitle()
+    {
+        $this->assertEquals(new Resource([
+            'id' => 3,
+            'title' => 'Webservices',
+            'body' => 'Even more text'
+        ], [
+            'markNew' => false,
+            'markClean' => true
+        ]), $this->endpoint->findByTitle('Webservices')->first());
     }
 
     public function testFindList()
