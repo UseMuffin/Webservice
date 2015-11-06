@@ -2,6 +2,7 @@
 
 namespace Muffin\Webservice;
 
+use ArrayObject;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\QueryInterface;
 use Cake\Datasource\QueryTrait;
@@ -39,6 +40,13 @@ class Query implements QueryInterface
      * @var bool
      */
     const OVERWRITE = true;
+
+    /**
+     * True if the beforeFind event has already been triggered for this query
+     *
+     * @var bool
+     */
+    protected $_beforeFindFired = false;
 
     /**
      * Indicates whether internal state of this query was changed, this is used to
@@ -420,6 +428,26 @@ class Query implements QueryInterface
     }
 
     /**
+     * Trigger the beforeFind event on the query's repository object.
+     *
+     * Will not trigger more than once, and only for select queries.
+     *
+     * @return void
+     */
+    public function triggerBeforeFind()
+    {
+        if (!$this->_beforeFindFired && $this->action() === self::ACTION_READ) {
+            $table = $this->repository();
+            $this->_beforeFindFired = true;
+            $table->dispatchEvent('Model.beforeFind', [
+                $this,
+                new ArrayObject($this->_options),
+                !$this->eagerLoaded()
+            ]);
+        }
+    }
+
+    /**
      * Execute the query
      *
      * @return \Traversable
@@ -436,6 +464,11 @@ class Query implements QueryInterface
      */
     protected function _execute()
     {
+        $this->triggerBeforeFind();
+        if ($this->__resultSet) {
+            $decorator = $this->_decoratorClass();
+            return new $decorator($this->__resultSet);
+        }
         return $this->__resultSet = $this->_webservice->execute($this, [
             'resourceClass' => $this->endpoint()->resourceClass()
         ]);
