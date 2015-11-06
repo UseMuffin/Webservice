@@ -19,6 +19,7 @@ use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
 use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
+use Muffin\Webservice\Marshaller;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\StreamQuery;
 
@@ -135,7 +136,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if (!empty($config['endpoint'])) {
             $this->endpoint($config['endpoint']);
         }
-        $eventManager = $behaviors = $associations = null;
+        $eventManager = null;
         if (!empty($config['eventManager'])) {
             $eventManager = $config['eventManager'];
         }
@@ -180,14 +181,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Initialize a endpoint instance. Called after the constructor.
      *
-     * You can use this method to define associations, attach behaviors
-     * define validation and do any other initialization logic you need.
+     * You can use this method to define validation and do any other initialization logic you need.
      *
      * ```
      *  public function initialize(array $config)
      *  {
-     *      $this->belongsTo('Users');
-     *      $this->belongsToMany('Tagging.Tags');
      *      $this->primaryKey('something_else');
      *  }
      * ```
@@ -394,7 +392,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                 return $this->_resourceClass = $default;
             }
 
-            $alias = Inflector::singularize(substr(arrayRegistry_pop($parts), 0, -8));
+            $alias = Inflector::singularize(substr(array_pop($parts), 0, -8));
             $name = implode('\\', array_slice($parts, 0, -1)) . '\Resource\\' . $alias;
             if (!class_exists($name)) {
                 return $this->_resourceClass = $default;
@@ -728,8 +726,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * This method will *not* trigger beforeDelete/afterDelete events. If you
      * need those first load a collection of records and delete them.
      *
-     * This method will *not* execute on associations' `cascade` attribute.
-     *
      * @param mixed $conditions Conditions to be used, accepts anything Query::where()
      * can take.
      *
@@ -809,9 +805,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
     /**
      * Delete a single resource.
-     *
-     * Deletes an resource and possibly related associations from the webservice
-     * based on the 'dependent' option used when defining the association.
      *
      * @param \Cake\Datasource\EntityInterface $resource The resource to remove.
      * @param array|\ArrayAccess $options The options for the delete.
@@ -925,7 +918,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Handles behavior delegation + dynamic finders.
+     * Handles dynamic finders.
      *
      * @param string $method name of the method to be invoked
      * @param array $args List of arguments passed to the function
@@ -944,15 +937,34 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
+     * Get the object used to marshal/convert array data into objects.
+     *
+     * Override this method if you want a endpoint object to use custom
+     * marshalling logic.
+     *
+     * @return \Muffin\Webservice\Marshaller
+     *
+     * @see \Muffin\Webservice\Marshaller
+     */
+    public function marshaller()
+    {
+        return new Marshaller($this);
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @return \Muffin\Webservice\Model\Resource
      */
     public function newEntity($data = null, array $options = [])
     {
-        $resourceClass = $this->resourceClass();
-
-        return new $resourceClass($data, $options);
+        if ($data === null) {
+            $class = $this->resourceClass();
+            $entity = new $class([], ['source' => $this->registryAlias()]);
+            return $entity;
+        }
+        $marshaller = $this->marshaller();
+        return $marshaller->one($data, $options);
     }
 
     /**
@@ -960,13 +972,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function newEntities(array $data, array $options = [])
     {
-        $resources = [];
-
-        foreach ($data as $resourceData) {
-            $resources[] = $this->newEntity($resourceData, $options);
-        }
-
-        return $resources;
+        $marshaller = $this->marshaller();
+        return $marshaller->many($data, $options);
     }
 
     /**
@@ -985,11 +992,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array $data key value list of fields to be merged into the resource
      * @param array $options A list of options for the object hydration.
      *
-     * @return void
+     * @return \Cake\Datasource\EntityInterface
      */
-    public function patchEntity(EntityInterface $resource, array $data, array $options = [])
+    public function patchEntity(EntityInterface $entity, array $data, array $options = [])
     {
-        throw new NotImplementedException('patchEntity has not been implemented yet');
+        $marshaller = $this->marshaller();
+        return $marshaller->merge($entity, $data, $options);
     }
 
     /**
@@ -1009,11 +1017,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array $data list of arrays to be merged into the entities
      * @param array $options A list of options for the objects hydration.
      *
-     * @return void
+     * @return array
      */
     public function patchEntities($entities, array $data, array $options = [])
     {
-        throw new NotImplementedException('patchEntities has not been implemented yet');
+        $marshaller = $this->marshaller();
+        return $marshaller->mergeMany($entities, $data, $options);
     }
 
     /**

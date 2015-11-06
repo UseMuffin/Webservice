@@ -23,6 +23,7 @@ namespace Muffin\Webservice\Test\TestCase\Model;
 use App\Model\Endpoint\AppEndpoint;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\TestSuite\TestCase;
+use Cake\Validation\Validator;
 use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Model\Endpoint;
@@ -167,6 +168,30 @@ class EndpointTestWebservice extends Webservice
     }
 }
 
+class TestEndpoint extends Endpoint
+{
+
+
+    /**
+     * Returns the default validator object. Subclasses can override this function
+     * to add a default validation set to the validator object.
+     *
+     * @param \Cake\Validation\Validator $validator The validator that can be modified to
+     * add some rules to it.
+     *
+     * @return \Cake\Validation\Validator
+     */
+    public function validationDefault(Validator $validator)
+    {
+        $validator->requirePresence('title')
+            ->notEmpty('title')
+            ->requirePresence('body')
+            ->notEmpty('body');
+
+        return $validator;
+    }
+}
+
 class EndpointTest extends TestCase
 {
 
@@ -182,7 +207,7 @@ class EndpointTest extends TestCase
     {
         parent::setUp();
 
-        $this->endpoint = new Endpoint([
+        $this->endpoint = new TestEndpoint([
             'connection' => new Connection([
                 'name' => 'test',
                 'driver' => '\Muffin\Webservice\Test\TestCase\Model\TestDriver'
@@ -304,6 +329,40 @@ class EndpointTest extends TestCase
         $this->assertEquals(3, $amount);
 
         $this->assertEquals(0, $this->endpoint->find()->count());
+    }
+
+    public function testNewEntity()
+    {
+        $this->assertEquals(new Resource([
+            'title' => 'New entity',
+            'body' => 'New entity body'
+        ]), $this->endpoint->newEntity([
+           'title' => 'New entity',
+            'body' => 'New entity body'
+        ]));
+    }
+
+    public function testNewEntities()
+    {
+        $this->assertEquals([
+            new Resource([
+                'title' => 'New entity',
+                'body' => 'New entity body'
+            ]),
+            new Resource([
+                'title' => 'Second new entity',
+                'body' => 'Second new entity body'
+            ])
+        ], $this->endpoint->newEntities([
+            [
+                'title' => 'New entity',
+                'body' => 'New entity body'
+            ],
+            [
+                'title' => 'Second new entity',
+                'body' => 'Second new entity body'
+            ]
+        ]));
     }
 
     public function testDefaultConnectionName()

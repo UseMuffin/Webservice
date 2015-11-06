@@ -289,9 +289,9 @@ class Query implements QueryInterface
     }
 
     /**
-     * Sets the number of records that should be retrieved from database,
+     * Sets the number of records that should be retrieved from the webservice,
      * accepts an integer or an expression object that evaluates to an integer.
-     * In some databases, this operation might not be supported or will require
+     * In some webservices, this operation might not be supported or will require
      * the query to be transformed in order to limit the result set size.
      *
      * ### Examples
@@ -437,9 +437,9 @@ class Query implements QueryInterface
     public function triggerBeforeFind()
     {
         if (!$this->_beforeFindFired && $this->action() === self::ACTION_READ) {
-            $table = $this->repository();
+            $endpoint = $this->repository();
             $this->_beforeFindFired = true;
-            $table->dispatchEvent('Model.beforeFind', [
+            $endpoint->dispatchEvent('Model.beforeFind', [
                 $this,
                 new ArrayObject($this->_options),
                 !$this->eagerLoaded()
