@@ -7,10 +7,11 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\QueryInterface;
 use Cake\Datasource\QueryTrait;
 use Cake\Utility\Hash;
+use IteratorAggregate;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 
-class Query implements QueryInterface
+class Query implements QueryInterface, IteratorAggregate
 {
 
     use QueryTrait;
