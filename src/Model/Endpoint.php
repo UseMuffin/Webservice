@@ -796,6 +796,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return false;
         }
 
+        if (($resource->isNew()) && ($result instanceof EntityInterface)) {
+            return $result;
+        }
+
         $className = get_class($resource);
         return new $className($resource->toArray(), [
             'markNew' => false,
