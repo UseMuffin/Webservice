@@ -509,6 +509,7 @@ class Query implements QueryInterface, IteratorAggregate
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
             'action' => $this->action(),
             'formatters' => $this->_formatters,
+            'offset' => $this->clause('offset'),
             'page' => $this->page(),
             'limit' => $this->limit(),
             'set' => $this->set(),
