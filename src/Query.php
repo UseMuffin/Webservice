@@ -91,7 +91,7 @@ class Query implements QueryInterface, IteratorAggregate
      */
     public function __construct(WebserviceInterface $webservice, Endpoint $endpoint)
     {
-        $this->_webservice = $webservice;
+        $this->webservice($webservice);
         $this->endpoint($endpoint);
     }
 
@@ -178,6 +178,24 @@ class Query implements QueryInterface, IteratorAggregate
         }
 
         $this->repository($endpoint);
+
+        return $this;
+    }
+
+    /**
+     * Set the webservice to be used
+     *
+     * @param null|\Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice to use
+     *
+     * @return \Muffin\Webservice\Webservice\WebserviceInterface|self
+     */
+    public function webservice(WebserviceInterface $webservice = null)
+    {
+        if ($webservice === null) {
+            return $this->_webservice;
+        }
+
+        $this->_webservice = $webservice;
 
         return $this;
     }
