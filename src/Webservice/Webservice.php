@@ -284,7 +284,7 @@ abstract class Webservice implements WebserviceInterface
      * @param array $results Array of results from the API
      * @param string $resourceClass The resource class to use
      *
-     * @return array Array of resource objects
+     * @return Resource[] Array of resource objects
      */
     protected function _transformResults(array $results, $resourceClass)
     {
@@ -301,6 +301,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param array $result The API result
      * @param string $resourceClass The resource class to use
+     *
      * @return \Muffin\Webservice\Model\Resource
      */
     protected function _transformResource(array $result, $resourceClass)
