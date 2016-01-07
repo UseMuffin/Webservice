@@ -38,7 +38,7 @@ $loader = new \Cake\Core\ClassLoader;
 $loader->register();
 
 $loader->addNamespace('TestApp', APP);
-$loader->addNamespace('SomeVendor\SomePlugin', APP . 'plugins' . DS . 'SomeVendor'. DS . 'SomePlugin'. DS . 'src');
+$loader->addNamespace('SomeVendor\SomePlugin', APP . 'plugins' . DS . 'SomeVendor' . DS . 'SomePlugin' . DS . 'src');
 
 require_once CORE_PATH . 'config/bootstrap.php';
 

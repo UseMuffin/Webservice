@@ -517,7 +517,7 @@ class Query implements QueryInterface, IteratorAggregate
             'extraOptions' => $this->getOptions(),
             'conditions' => $this->where(),
             'repository' => $this->endpoint(),
-            'webservice' => $this->_webservice
+            'webservice' => $this->webservice()
         ];
     }
 }

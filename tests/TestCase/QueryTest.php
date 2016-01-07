@@ -6,6 +6,7 @@ use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
+use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Test\test_app\Webservice\StaticWebservice;
 
 class QueryTest extends TestCase
@@ -161,13 +162,43 @@ class QueryTest extends TestCase
         ], $this->query->clause('order'));
     }
 
+    public function testExecuteTwice()
+    {
+        $mockWebservice = $this
+            ->getMock('\Muffin\Webservice\Test\test_app\Webservice\StaticWebservice', [
+                'execute'
+            ]);
+        $mockWebservice->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue(new ResultSet([
+                new Resource([
+                    'id' => 1,
+                    'title' => 'Hello World'
+                ]),
+                new Resource([
+                    'id' => 2,
+                    'title' => 'New ORM'
+                ]),
+                new Resource([
+                    'id' => 3,
+                    'title' => 'Webservices'
+                ])
+            ], 3)));
+        $this->query->webservice($mockWebservice);
+
+        $this->query->execute();
+
+        // This webservice shouldn't be called a second time
+        $this->query->execute();
+    }
+
     public function testDebugInfo()
     {
         $this->assertEquals([
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
             'action' => null,
             'formatters' => [],
-            'offset'  => null,
+            'offset' => null,
             'page' => null,
             'limit' => null,
             'set' => [],
