@@ -190,6 +190,7 @@ class QueryTest extends TestCase
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
             'action' => null,
             'formatters' => [],
+            'offset'  => null,
             'page' => null,
             'limit' => null,
             'set' => [],
