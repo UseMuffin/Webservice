@@ -6,22 +6,8 @@ use Cake\Log\Engine\ConsoleLog;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
-use Muffin\Webservice\Test\TestCase\Model\TestDriver;
-use Muffin\Webservice\Webservice\Webservice;
-
-class TestWebservice extends Webservice
-{
-
-    public function createResource($resourceClass, array $properties = [])
-    {
-        return $this->_createResource($resourceClass, $properties);
-    }
-
-    public function transformResults(array $results, $resourceClass)
-    {
-        return $this->_transformResults($results, $resourceClass);
-    }
-}
+use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
+use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
 
 class WebserviceTest extends TestCase
 {
@@ -39,13 +25,13 @@ class WebserviceTest extends TestCase
         parent::setUp();
 
         $this->webservice = new TestWebservice([
-            'driver' => new TestDriver([])
+            'driver' => new Test([])
         ]);
     }
 
     public function testConstructor()
     {
-        $testDriver = new TestDriver([]);
+        $testDriver = new Test([]);
 
         $webservice = new TestWebservice([
             'driver' => $testDriver,
@@ -117,7 +103,7 @@ class WebserviceTest extends TestCase
 
     /**
      * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\TestCase\Webservice\TestWebservice does not implement _executeCreateQuery
+     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeCreateQuery
      */
     public function testExecuteWithoutCreate()
     {
@@ -129,7 +115,7 @@ class WebserviceTest extends TestCase
 
     /**
      * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\TestCase\Webservice\TestWebservice does not implement _executeReadQuery
+     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeReadQuery
      */
     public function testExecuteWithoutRead()
     {
@@ -141,7 +127,7 @@ class WebserviceTest extends TestCase
 
     /**
      * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\TestCase\Webservice\TestWebservice does not implement _executeUpdateQuery
+     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeUpdateQuery
      */
     public function testExecuteWithoutUpdate()
     {
@@ -153,7 +139,7 @@ class WebserviceTest extends TestCase
 
     /**
      * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\TestCase\Webservice\TestWebservice does not implement _executeDeleteQuery
+     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeDeleteQuery
      */
     public function testExecuteWithoutDelete()
     {

@@ -1,209 +1,14 @@
 <?php
 
-namespace App\Model\Endpoint;
-
-use Muffin\Webservice\Model\Endpoint;
-
-class AppEndpoint extends Endpoint
-{
-
-}
-
-namespace SomeVendor\SomePlugin\Model\Endpoint;
-
-use Muffin\Webservice\Model\Endpoint;
-
-class PluginEndpoint extends Endpoint
-{
-
-}
-
 namespace Muffin\Webservice\Test\TestCase\Model;
 
-use App\Model\Endpoint\AppEndpoint;
-use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\TestSuite\TestCase;
-use Cake\Validation\Validator;
-use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\Query;
-use Muffin\Webservice\ResultSet;
-use Muffin\Webservice\Webservice\Webservice;
+use Muffin\Webservice\Test\test_app\Model\Endpoint\AppEndpoint;
+use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 use SomeVendor\SomePlugin\Model\Endpoint\PluginEndpoint;
-
-class TestDriver extends AbstractDriver
-{
-
-    /**
-     * Initialize is used to easily extend the constructor.
-     *
-     * @return void
-     */
-    public function initialize()
-    {
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function _createWebservice($className, array $options = [])
-    {
-        return new EndpointTestWebservice($options);
-    }
-}
-
-class EndpointTestWebservice extends Webservice
-{
-
-    public $resources;
-
-    public function initialize()
-    {
-        parent::initialize();
-
-        $this->resources = [
-            new Resource([
-                'id' => 1,
-                'title' => 'Hello World',
-                'body' => 'Some text'
-            ], [
-                'markNew' => false,
-                'markClean' => true
-            ]),
-            new Resource([
-                'id' => 2,
-                'title' => 'New ORM',
-                'body' => 'Some more text'
-            ], [
-                'markNew' => false,
-                'markClean' => true
-            ]),
-            new Resource([
-                'id' => 3,
-                'title' => 'Webservices',
-                'body' => 'Even more text'
-            ], [
-                'markNew' => false,
-                'markClean' => true
-            ])
-        ];
-    }
-
-
-    protected function _executeCreateQuery(Query $query, array $options = [])
-    {
-        $fields = $query->set();
-
-        if (!is_numeric($fields['id'])) {
-            return false;
-        }
-
-        $this->resources[] = new Resource($fields, [
-            'markNew' => false,
-            'markClean' => true
-        ]);
-
-        return true;
-    }
-
-    protected function _executeReadQuery(Query $query, array $options = [])
-    {
-        if (!empty($query->where()['id'])) {
-            $index = $this->conditionsToIndex($query->where());
-
-            if (!isset($this->resources[$index])) {
-                return new ResultSet([], 0);
-            }
-
-            return new ResultSet([
-                $this->resources[$index]
-            ], 1);
-        }
-        if (isset($query->where()[$query->endpoint()->aliasField('title')])) {
-            $resources = [];
-
-            foreach ($this->resources as $resource) {
-                if ($resource->title !== $query->where()[$query->endpoint()->aliasField('title')]) {
-                    continue;
-                }
-
-                $resources[] = $resource;
-            }
-
-            return new ResultSet($resources, count($resources));
-        }
-
-        return new ResultSet($this->resources, count($this->resources));
-    }
-
-    protected function _executeUpdateQuery(Query $query, array $options = [])
-    {
-        $this->resources[$this->conditionsToIndex($query->where())]->set($query->set());
-
-        $this->resources[$this->conditionsToIndex($query->where())]->clean();
-
-        return 1;
-    }
-
-    protected function _executeDeleteQuery(Query $query, array $options = [])
-    {
-        $conditions = $query->where();
-
-        if (is_int($conditions['id'])) {
-            $exists = isset($this->resources[$this->conditionsToIndex($conditions)]);
-
-            unset($this->resources[$this->conditionsToIndex($conditions)]);
-
-            return ($exists) ? 1 : 0;
-        } elseif (is_array($conditions['id'])) {
-            $deleted = 0;
-
-            foreach ($conditions['id'] as $id) {
-                if (!isset($this->resources[$id - 1])) {
-                    continue;
-                }
-
-                $deleted++;
-                unset($this->resources[$id - 1]);
-            }
-
-            return $deleted;
-        }
-
-        return 0;
-    }
-
-    public function conditionsToIndex(array $conditions)
-    {
-        return $conditions['id'] - 1;
-    }
-}
-
-class TestEndpoint extends Endpoint
-{
-
-
-    /**
-     * Returns the default validator object. Subclasses can override this function
-     * to add a default validation set to the validator object.
-     *
-     * @param \Cake\Validation\Validator $validator The validator that can be modified to
-     * add some rules to it.
-     *
-     * @return \Cake\Validation\Validator
-     */
-    public function validationDefault(Validator $validator)
-    {
-        $validator->requirePresence('title')
-            ->notEmpty('title')
-            ->requirePresence('body')
-            ->notEmpty('body');
-
-        return $validator;
-    }
-}
 
 class EndpointTest extends TestCase
 {
@@ -223,7 +28,7 @@ class EndpointTest extends TestCase
         $this->endpoint = new TestEndpoint([
             'connection' => new Connection([
                 'name' => 'test',
-                'driver' => '\Muffin\Webservice\Test\TestCase\Model\TestDriver'
+                'service' => 'Test'
             ]),
             'primaryKey' => 'id',
             'displayField' => 'title'
@@ -392,7 +197,7 @@ class EndpointTest extends TestCase
 
     public function testDefaultConnectionName()
     {
-        $this->assertEquals('app', AppEndpoint::defaultConnectionName());
+        $this->assertEquals('test_app', AppEndpoint::defaultConnectionName());
         $this->assertEquals('some_plugin', PluginEndpoint::defaultConnectionName());
     }
 }

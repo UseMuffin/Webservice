@@ -6,30 +6,7 @@ use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
-use Muffin\Webservice\ResultSet;
-use Muffin\Webservice\Webservice\WebserviceInterface;
-
-class TestWebservice implements WebserviceInterface
-{
-
-    public function execute(Query $query, array $options = [])
-    {
-        return new ResultSet([
-            new Resource([
-                'id' => 1,
-                'title' => 'Hello World'
-            ]),
-            new Resource([
-                'id' => 2,
-                'title' => 'New ORM'
-            ]),
-            new Resource([
-                'id' => 3,
-                'title' => 'Webservices'
-            ])
-        ], 3);
-    }
-}
+use Muffin\Webservice\Test\test_app\Webservice\StaticWebservice;
 
 class QueryTest extends TestCase
 {
@@ -46,7 +23,7 @@ class QueryTest extends TestCase
     {
         parent::setUp();
 
-        $this->query = new Query(new TestWebservice(), new Endpoint());
+        $this->query = new Query(new StaticWebservice(), new Endpoint());
     }
 
     public function testAction()
@@ -198,7 +175,7 @@ class QueryTest extends TestCase
             'extraOptions' => [],
             'conditions' => [],
             'repository' => new Endpoint(),
-            'webservice' => new TestWebservice()
+            'webservice' => new StaticWebservice()
         ], $this->query->__debugInfo());
     }
 
