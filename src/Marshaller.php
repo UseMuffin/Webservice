@@ -52,7 +52,7 @@ class Marshaller
 
         $primaryKey = $this->_endpoint->primaryKey();
         $resourceClass = $this->_endpoint->resourceClass();
-        /** @var \Muffin\Webservice\Model\Resource $entity */
+        /* @var \Muffin\Webservice\Model\Resource $entity */
         $entity = new $resourceClass();
         $entity->source($this->_endpoint->registryAlias());
 

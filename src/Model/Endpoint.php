@@ -981,7 +981,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Merges the passed `$data` into `$resource` respecting the accessible
+     * Merges the passed `$data` into `$entity` respecting the accessible
      * fields configured on the resource. Returns the same resource after being
      * altered.
      *
@@ -991,7 +991,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * $article = $this->Articles->patchEntity($article, $this->request->data());
      * ```
      *
-     * @param \Cake\Datasource\EntityInterface $resource the resource that will get the
+     * @param \Cake\Datasource\EntityInterface $entity the resource that will get the
      * data merged in
      * @param array $data key value list of fields to be merged into the resource
      * @param array $options A list of options for the object hydration.
