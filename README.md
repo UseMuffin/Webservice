@@ -24,18 +24,133 @@ bin/cake plugin load Muffin/Webservice
 or by manually adding statement shown below to `boostrap.php`:
 
 ```php
-Plugin::load('Muffin/Webservice');
+Plugin::load('Muffin/Webservice', ['bootstrap' => true]);
 ```
 
 ## Usage
+
+### As base for a driver
 
 You can only use this plugin as a base to a separate plugin or to manage custom webservice
 drivers connections.
 
 Until an official documentation is written, [David Yell][1] wrote a good [post to get you started][2].
 
-[1]:https://github.com/davidyell 
+[1]:https://github.com/davidyell
 [2]:http://jedistirfry.co.uk/blog/2015-09/connecting-to-a-web-service/
+
+### As an ORM
+
+#### Create driver
+
+```php
+<?php
+
+namespace App\Webservice\Driver;
+
+use Cake\Network\Http\Client;
+use Muffin\Webservice\AbstractDriver;
+
+class Articles extends AbstractDriver
+{
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initialize()
+    {
+        $this->client(new Client([
+            'host' => 'example.com'
+        ]));
+    }
+}
+```
+
+#### Create a webservice
+
+```php
+<?php
+
+namespace App\Webservice;
+
+use Cake\Network\Http\Client;
+use Muffin\Webservice\Query;
+use Muffin\Webservice\Webservice\Webservice;
+
+class ArticlesWebservice extends Webservice
+{
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function _executeReadQuery(Query $query, array $options = [])
+    {
+        $response = $this->driver()->client()->get('/articles.json');
+
+        if (!$response->isOk()) {
+            return false;
+        }
+
+        return $this->_transformResults($response->json['articles'], $options['resourceClass']);
+    }
+}
+```
+
+#### Create an endpoint (optional)
+
+```php
+<?php
+
+namespace App\Model\Endpoint;
+
+use Cake\Datasource\ConnectionManager;
+use Muffin\Webservice\Model\Endpoint;
+
+class ArticlesEndpoint extends Endpoint
+{
+
+}
+```
+
+#### Create a resource (optional)
+
+```php
+<?php
+
+namespace App\Model\Resource;
+
+use Muffin\Webservice\Model\Resource;
+
+class Article extends Resource
+{
+
+}
+```
+
+#### Use it
+
+```php
+<?php
+
+namespace App\Controller;
+
+use Cake\Event\Event;
+
+class ArticlesController extends AppController
+{
+
+    public function beforeFilter(Event $event)
+    {
+        $this->loadModel('Articles', 'Endpoint');
+    }
+
+    public function index()
+    {
+        $articles = $this->Articles->find();
+    }
+
+}
+```
 
 ## Patches & Features
 
