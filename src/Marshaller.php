@@ -43,7 +43,7 @@ class Marshaller
      *
      * @param array $data The data to hydrate.
      * @param array $options List of options
-     * @return \Cake\ORM\Entity
+     * @return \Muffin\Webservice\Model\Resource
      * @see \Muffin\Webservice\Model\Endpoint::newEntity()
      */
     public function one(array $data, array $options = [])
