@@ -1,7 +1,7 @@
 # Webservice
 
 [![Build Status](https://img.shields.io/travis/UseMuffin/Webservice/master.svg?style=flat-square)](https://travis-ci.org/UseMuffin/Webservice)
-[![Coverage](https://img.shields.io/coveralls/UseMuffin/Webservice/master.svg?style=flat-square)](https://coveralls.io/r/UseMuffin/Webservice)
+[![Coverage](https://img.shields.io/codecov/c/github/UseMuffin/Webservice/master.svg?style=flat-square)](https://codecov.io/github/UseMuffin/Webservice)
 [![Total Downloads](https://img.shields.io/packagist/dt/muffin/webservice.svg?style=flat-square)](https://packagist.org/packages/muffin/webservice)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
