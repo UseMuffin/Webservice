@@ -2,6 +2,7 @@
 
 namespace Muffin\Webservice\Test\test_app\Webservice;
 
+use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Webservice\Webservice;
 
 class TestWebservice extends Webservice
@@ -12,8 +13,8 @@ class TestWebservice extends Webservice
         return $this->_createResource($resourceClass, $properties);
     }
 
-    public function transformResults(array $results, $resourceClass)
+    public function transformResults(Endpoint $endpoint, array $results)
     {
-        return $this->_transformResults($results, $resourceClass);
+        return $this->_transformResults($endpoint, $results);
     }
 }

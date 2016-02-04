@@ -10,6 +10,7 @@ use Cake\Utility\Text;
 use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
+use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -305,16 +306,16 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Loops through the results and turns them into resource objects
      *
+     * @param \Muffin\Webservice\Model\Endpoint $endpoint The endpoint class to use
      * @param array $results Array of results from the API
-     * @param string $resourceClass The resource class to use
      *
-     * @return Resource[] Array of resource objects
+     * @return \Muffin\Webservice\Model\Resource[] Array of resource objects
      */
-    protected function _transformResults(array $results, $resourceClass)
+    protected function _transformResults(Endpoint $endpoint, array $results)
     {
         $resources = [];
         foreach ($results as $result) {
-            $resources[] = $this->_transformResource($result, $resourceClass);
+            $resources[] = $this->_transformResource($endpoint, $result);
         }
 
         return $resources;
@@ -323,12 +324,12 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Turns a single result into a resource
      *
+     * @param \Muffin\Webservice\Model\Endpoint $endpoint The endpoint class to use
      * @param array $result The API result
-     * @param string $resourceClass The resource class to use
      *
      * @return \Muffin\Webservice\Model\Resource
      */
-    protected function _transformResource(array $result, $resourceClass)
+    protected function _transformResource(Endpoint $endpoint, array $result)
     {
         $properties = [];
 
@@ -336,7 +337,7 @@ abstract class Webservice implements WebserviceInterface
             $properties[$property] = $value;
         }
 
-        return $this->_createResource($resourceClass, $properties);
+        return $this->_createResource($endpoint->resourceClass(), $properties);
     }
 
     /**

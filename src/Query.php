@@ -493,9 +493,7 @@ class Query implements QueryInterface, IteratorAggregate
             $decorator = $this->_decoratorClass();
             return new $decorator($this->__resultSet);
         }
-        return $this->__resultSet = $this->_webservice->execute($this, [
-            'resourceClass' => $this->endpoint()->resourceClass()
-        ]);
+        return $this->__resultSet = $this->_webservice->execute($this);
     }
 
     /**
