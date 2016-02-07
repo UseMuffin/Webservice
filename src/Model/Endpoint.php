@@ -780,7 +780,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             ]);
 
             $fieldsToUpdate = [];
-            foreach ($resource as $field => $value) {
+            foreach ($resource->toArray() as $field => $value) {
                 if (!$resource->dirty($field)) {
                     continue;
                 }
