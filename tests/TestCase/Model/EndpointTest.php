@@ -111,7 +111,8 @@ class EndpointTest extends TestCase
         $this->assertEquals([
             'id' => 4,
             'title' => 'Loads of fun',
-            'body' => 'Woot'
+            'body' => 'Woot',
+            '_className' => 'Muffin\Webservice\Model\Resource'
         ], $newResource->toArray());
 
         $invalidResource = new Resource([
