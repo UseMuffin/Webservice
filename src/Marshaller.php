@@ -68,7 +68,7 @@ class Marshaller
             if (!empty($errors[$key])) {
                 continue;
             }
-            if ($value === '' && in_array($key, $primaryKey, true)) {
+            if (($value === '') && ($key === $primaryKey)) {
                 // Skip marshalling '' for pk fields.
                 continue;
             }
