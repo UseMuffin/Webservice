@@ -2,7 +2,6 @@
 
 namespace Muffin\Webservice\Test\TestCase\Webservice;
 
-use Cake\Log\Engine\ConsoleLog;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
@@ -84,7 +83,16 @@ class WebserviceTest extends TestCase
 
     public function testExecuteLoggingWithLogger()
     {
-        $this->webservice->driver()->setLogger(new ConsoleLog());
+        $logger = $this->getMockBuilder('Cake\Log\Engine\ConsoleLog')
+            ->setMethods([
+                'debug'
+            ])
+            ->getMock();
+        $logger
+            ->expects($this->never())
+            ->method('debug');
+
+        $this->webservice->driver()->setLogger($logger);
 
         $query = new Query($this->webservice, new Endpoint());
 
@@ -93,8 +101,17 @@ class WebserviceTest extends TestCase
 
     public function testExecuteLoggingWithLoggerEnabled()
     {
+        $logger = $this->getMockBuilder('Cake\Log\Engine\ConsoleLog')
+            ->setMethods([
+                'debug'
+            ])
+            ->getMock();
+        $logger
+            ->expects($this->once())
+            ->method('debug');
+
         $this->webservice->driver()->logQueries(true);
-        $this->webservice->driver()->setLogger(new ConsoleLog());
+        $this->webservice->driver()->setLogger($logger);
 
         $query = new Query($this->webservice, new Endpoint());
 
