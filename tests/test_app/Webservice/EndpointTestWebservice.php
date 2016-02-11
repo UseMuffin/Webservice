@@ -5,6 +5,7 @@ namespace Muffin\Webservice\Test\test_app\Webservice;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
+use Muffin\Webservice\Schema;
 use Muffin\Webservice\Webservice\Webservice;
 
 class EndpointTestWebservice extends Webservice
