@@ -92,7 +92,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
             $namespaceParts = explode('\\', get_class($this));
 
             // Get the plugin name out of the namespace
-            $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -2)));
+            $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -1)));
 
             $webserviceClass = $pluginName . '.' . Inflector::camelize($name);
 
@@ -202,7 +202,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     {
         $namespaceParts = explode('\\', get_class($this));
 
-        $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -2)));
+        $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -1)));
 
         $webservice = App::className($className, 'Webservice', 'Webservice');
         if ($webservice) {
