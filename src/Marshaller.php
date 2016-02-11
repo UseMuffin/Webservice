@@ -50,7 +50,7 @@ class Marshaller
     {
         list($data, $options) = $this->_prepareDataAndOptions($data, $options);
 
-        $primaryKey = $this->_endpoint->primaryKey();
+        $primaryKey = (array)$this->_endpoint->primaryKey();
         $resourceClass = $this->_endpoint->resourceClass();
         /* @var \Muffin\Webservice\Model\Resource $entity */
         $entity = new $resourceClass();
