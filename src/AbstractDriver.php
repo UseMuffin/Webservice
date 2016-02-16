@@ -6,6 +6,7 @@ use Cake\Core\InstanceConfigTrait;
 use Cake\Utility\Inflector;
 use Muffin\Webservice\Exception\MissingWebserviceClassException;
 use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
+use Muffin\Webservice\Webservice\Webservice;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -88,13 +89,9 @@ abstract class AbstractDriver implements LoggerAwareInterface
         }
 
         if (!isset($this->_webservices[$name])) {
-            // Split the driver class namespace in chunks
-            $namespaceParts = explode('\\', get_class($this));
+            list($pluginName) = pluginSplit(Webservice::shortName(get_class($this), 'Webservice/Driver'));
 
-            // Get the plugin name out of the namespace
-            $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -2)));
-
-            $webserviceClass = $pluginName . '.' . Inflector::camelize($name);
+            $webserviceClass = implode('.', array_filter([$pluginName, Inflector::camelize($name)]));
 
             $webservice = $this->_createWebservice($webserviceClass, [
                 'endpoint' => $name,
