@@ -2,7 +2,7 @@
 
 namespace Muffin\Webservice\Test\test_app\Model\Endpoint\Schema;
 
-use Muffin\Webservice\Schema;
+use Muffin\Webservice\Model\Schema;
 
 class TestSchema extends Schema
 {
