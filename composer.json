@@ -33,7 +33,7 @@
     "require": {
     },
     "require-dev": {
-        "cakephp/cakephp": "dev-master",
+        "cakephp/cakephp": "<3.2",
         "cakephp/cakephp-codesniffer": "2.*",
         "phpunit/phpunit": "4.1.*"
     },
