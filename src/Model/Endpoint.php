@@ -21,6 +21,7 @@ use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Marshaller;
 use Muffin\Webservice\Query;
+use Muffin\Webservice\Schema;
 use Muffin\Webservice\StreamQuery;
 
 /**
@@ -298,10 +299,45 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function schema($schema = null)
     {
         if ($schema === null) {
+            if ($this->_schema === null) {
+                $this->_schema = $this->_initializeSchema(
+                    $this->webservice()
+                        ->describe($this->endpoint())
+                );
+            }
             return $this->_schema;
         }
-
+        if (is_array($schema)) {
+            $schema = new Schema($this->table(), $schema);
+        }
         return $this->_schema = $schema;
+    }
+
+    /**
+     * Override this function in order to alter the schema used by this endpoint.
+     * This function is only called after fetching the schema out of the webservice.
+     * If you wish to provide your own schema to this table without touching the
+     * database, you can override schema() or inject the definitions though that
+     * method.
+     *
+     * ### Example:
+     *
+     * ```
+     * protected function _initializeSchema(\Muffin\Webservice\Schema $schema) {
+     *  $schema->addColumn('preferences', [
+     *   'type' => 'string'
+     *  ]);
+     *  return $schema;
+     * }
+     * ```
+     *
+     * @param \Muffin\Webservice\Schema $schema The schema definition fetched from webservice.
+     * @return \Muffin\Webservice\Schema the altered schema
+     * @api
+     */
+    protected function _initializeSchema(Schema $schema)
+    {
+        return $schema;
     }
 
     /**
@@ -772,24 +808,16 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return false;
         }
 
+        $data = $resource->extract($this->schema()->columns(), true);
+
         if ($resource->isNew()) {
-            $query = $this->query()->create()->set($resource->toArray());
+            $query = $this->query()->create();
         } else {
             $query = $this->query()->update()->where([
                 $this->primaryKey() => $resource->get($this->primaryKey())
             ]);
-
-            $fieldsToUpdate = [];
-            foreach ($resource as $field => $value) {
-                if (!$resource->dirty($field)) {
-                    continue;
-                }
-
-                $fieldsToUpdate[$field] = $value;
-            }
-
-            $query->set($fieldsToUpdate);
         }
+        $query->set($data);
 
         $result = $query->execute();
         if (!$result) {

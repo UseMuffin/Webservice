@@ -2,9 +2,13 @@
 
 namespace Muffin\Webservice\Webservice;
 
+use Cake\Core\App;
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
+use Cake\Utility\Inflector;
 use Cake\Utility\Text;
 use Muffin\Webservice\AbstractDriver;
+use Muffin\Webservice\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Query;
 use Psr\Log\LoggerAwareInterface;
@@ -153,6 +157,26 @@ abstract class Webservice implements WebserviceInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function describe($endpoint)
+    {
+        $shortName = self::shortName(get_class($this), 'Webservice', 'Webservice');
+        list($plugin, $name) = pluginSplit($shortName);
+
+        $schemaShortName = implode('.', array_filter([$plugin, Inflector::classify($endpoint)]));
+        $schemaClassName = App::className($schemaShortName, 'Model/Endpoint/Schema', 'Schema');
+        if ($schemaClassName) {
+            return new $schemaClassName($endpoint);
+        }
+
+        throw new MissingEndpointSchemaException([
+            'schema' => $schemaShortName,
+            'webservice' => $shortName
+        ]);
     }
 
     /**
@@ -326,5 +350,65 @@ abstract class Webservice implements WebserviceInterface
             'driver' => $this->driver(),
             'endpoint' => $this->endpoint(),
         ];
+    }
+
+    /**
+     * Returns the plugin split name of a class
+     *
+     * Examples:
+     *
+     * ```
+     * App::shortName(
+     *     'SomeVendor\SomePlugin\Controller\Component\TestComponent',
+     *     'Controller/Component',
+     *     'Component'
+     * )
+     * ```
+     *
+     * Returns: SomeVendor/SomePlugin.Test
+     *
+     * ```
+     * App::shortName(
+     *     'SomeVendor\SomePlugin\Controller\Component\Subfolder\TestComponent',
+     *     'Controller/Component',
+     *     'Component'
+     * )
+     * ```
+     *
+     * Returns: SomeVendor/SomePlugin.Subfolder/Test
+     *
+     * ```
+     * App::shortName(
+     *     'Cake\Controller\Component\AuthComponent',
+     *     'Controller/Component',
+     *     'Component'
+     * )
+     * ```
+     *
+     * Returns: Auth
+     *
+     * @param string $class Class name
+     * @param string $type Type of class
+     * @param string $suffix Class name suffix
+     * @return string Plugin split name of class
+     */
+    public static function shortName($class, $type, $suffix = '')
+    {
+        $class = str_replace('\\', '/', $class);
+        $type = '/' . $type . '/';
+        $pos = strrpos($class, $type);
+        $pluginName = substr($class, 0, $pos);
+        $name = substr($class, $pos + strlen($type));
+        if ($suffix) {
+            $name = substr($name, 0, -strlen($suffix));
+        }
+        $nonPluginNamespaces = [
+            'Cake',
+            str_replace('\\', '/', Configure::read('App.namespace'))
+        ];
+        if (in_array($pluginName, $nonPluginNamespaces)) {
+            return $name;
+        }
+        return $pluginName . '.' . $name;
     }
 }
