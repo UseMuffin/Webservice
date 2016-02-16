@@ -178,7 +178,7 @@ class WebserviceTest extends TestCase
 
     public function testTransformResults()
     {
-        $resources = $this->webservice->transformResults([
+        $resources = $this->webservice->transformResults(new Endpoint(), [
             [
                 'id' => 1,
                 'title' => 'Hello World',
@@ -194,7 +194,7 @@ class WebserviceTest extends TestCase
                 'title' => 'Webservices',
                 'body' => 'Even more text'
             ]
-        ], '\Muffin\Webservice\Model\Resource');
+        ]);
 
         $this->assertInternalType('array', $resources);
         $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resources[0]);
