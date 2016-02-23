@@ -89,7 +89,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
         }
 
         if (!isset($this->_webservices[$name])) {
-            list($pluginName) = pluginSplit(Webservice::shortName(get_class($this), 'Webservice/Driver'));
+            list($pluginName) = pluginSplit(App::shortName(get_class($this), 'Webservice/Driver'));
 
             $webserviceClass = implode('.', array_filter([$pluginName, Inflector::camelize($name)]));
 
