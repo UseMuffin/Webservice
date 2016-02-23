@@ -4,8 +4,9 @@ namespace Muffin\Webservice\Model;
 
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\EntityTrait;
+use Cake\Datasource\InvalidPropertyInterface;
 
-class Resource implements EntityInterface
+class Resource implements EntityInterface, InvalidPropertyInterface
 {
 
     use EntityTrait;

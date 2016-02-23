@@ -66,6 +66,7 @@ class Marshaller
         $properties = [];
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
+                $entity->invalid($key, $value);
                 continue;
             }
             if ($value === '' && in_array($key, $primaryKey, true)) {
@@ -207,6 +208,9 @@ class Marshaller
         $properties = [];
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
+                if (method_exists($entity, 'invalid')) {
+                    $entity->invalid($key, $value);
+                }
                 continue;
             }
 
