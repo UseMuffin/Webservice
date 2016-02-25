@@ -91,7 +91,9 @@ class ArticlesWebservice extends Webservice
             return false;
         }
 
-        return $this->_transformResults($response->json['articles'], $options['resourceClass']);
+        $resources = $this->_transformResults($query->endpoint(), $response->json['articles']);
+
+        return new ResultSet($resources, count($resources));
     }
 }
 ```
