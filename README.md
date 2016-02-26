@@ -5,7 +5,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/muffin/webservice.svg?style=flat-square)](https://packagist.org/packages/muffin/webservice)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-Extremely simplistic webservices for CakePHP 3.
+Bringing the power of the CakePHP ORM to your favourite webservices.
 
 ## Install
 
@@ -28,16 +28,6 @@ Plugin::load('Muffin/Webservice', ['bootstrap' => true]);
 ```
 
 ## Usage
-
-### As base for a driver
-
-You can only use this plugin as a base to a separate plugin or to manage custom webservice
-drivers connections.
-
-Until an official documentation is written, [David Yell][1] wrote a good [post to get you started][2].
-
-[1]:https://github.com/davidyell
-[2]:http://jedistirfry.co.uk/blog/2015-09/connecting-to-a-web-service/
 
 ### As an ORM
 
@@ -153,6 +143,35 @@ class ArticlesController extends AppController
 
 }
 ```
+
+### As base for a driver
+
+You can also use this plugin as a base to a separate plugin or to manage custom webservice
+drivers connections.
+
+Until an official documentation is written, [David Yell][1] wrote a good [post to get you started][2].
+
+[1]:https://github.com/davidyell
+[2]:http://jedistirfry.co.uk/blog/2015-09/connecting-to-a-web-service/
+
+## Implementations of webservices
+
+### As an ORM
+
+The following plugins use the Webservice ORM to give you easy access to all kinds of webservices:
+
+- [GitHub plugin](https://github.com/cvo-technologies/cakephp-github) - Provides access to the GitHub REST APIs.
+- [NS plugin](https://github.com/Qarox/cakephp-nsapi) - Provides access to the NS (Nederlandse Spoorwegen) APIs.
+- [Stagemarkt plugin](https://github.com/ICT-College/cakephp-stagemarkt) - Provides access to the SBB Stagemarkt REST APIs.
+- [Twitter plugin](https://github.com/cvo-technologies/cakephp-twitter) - Provides access to the Twitter REST and streaming APIs.
+
+### As a driver
+
+The following plugins implement a Webservice driver with their own methods:
+
+- [GitHub plugin](https://github.com/UseMuffn/Github) - Provides access to the GitHub REST APIs.
+- [Pusher plugin](https://github.com/UseMuffin/Pusher) - Provides access to the Pusher APIs.
+- [TMDB plugin](https://github.com/drmonkeyninja/cakephp-tmdb) - Provides access to the TMDB APIs.
 
 ## Patches & Features
 
