@@ -95,7 +95,6 @@ class ArticlesWebservice extends Webservice
 
 namespace App\Model\Endpoint;
 
-use Cake\Datasource\ConnectionManager;
 use Muffin\Webservice\Model\Endpoint;
 
 class ArticlesEndpoint extends Endpoint
