@@ -236,9 +236,6 @@ class Schema
             return null;
         }
 
-        if (Type::map($type)) {
-            $type = Type::build($type)->getBaseType();
-        }
         return $this->_columns[$column]['baseType'] = $type;
     }
 

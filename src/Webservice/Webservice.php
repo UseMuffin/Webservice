@@ -271,16 +271,18 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Creates a resource with the given class and properties
      *
+     * @param Endpoint $endpoint
      * @param string $resourceClass The class to use to create the resource
      * @param array $properties The properties to apply
      *
      * @return \Muffin\Webservice\Model\Resource
      */
-    protected function _createResource($resourceClass, array $properties = [])
+    protected function _createResource(Endpoint $endpoint, $resourceClass, array $properties = [])
     {
         return new $resourceClass($properties, [
             'markClean' => true,
             'markNew' => false,
+            'source' => App::shortName(get_class($endpoint), 'Model/Endpoint', 'Endpoint')
         ]);
     }
 
@@ -337,7 +339,7 @@ abstract class Webservice implements WebserviceInterface
             $properties[$property] = $value;
         }
 
-        return $this->_createResource($endpoint->resourceClass(), $properties);
+        return $this->_createResource($endpoint, $endpoint->resourceClass(), $properties);
     }
 
     /**
