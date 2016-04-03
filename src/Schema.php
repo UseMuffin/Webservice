@@ -75,6 +75,7 @@ class Schema
         'null' => null,
         'default' => null,
         'comment' => null,
+        'primaryKey' => null
     ];
 
     /**
@@ -306,7 +307,7 @@ class Schema
             $primaryKeys[] = $name;
         }
 
-        return [];
+        return $primaryKeys;
     }
 
     /**
