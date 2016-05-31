@@ -22,6 +22,12 @@
             "role": "Author"
         },
         {
+            "name": "Marlin Cremers",
+            "homepage": "https://cvo-technologies.com",
+            "email": "m.cremers@cvo-technologies.com",
+            "role": "Author"
+        },
+        {
             "name": "Others",
             "homepage": "https://github.com/usemuffin/webservice/graphs/contributors"
         }
