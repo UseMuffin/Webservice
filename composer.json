@@ -6,7 +6,8 @@
         "cakephp",
         "muffin",
         "webservice",
-        "api"
+        "api",
+        "orm"
     ],
     "homepage": "https://github.com/usemuffin/webservice",
     "license": "MIT",
@@ -34,7 +35,8 @@
     ],
     "support": {
         "issues": "https://github.com/usemuffin/webservice/issues",
-        "source": "https://github.com/usemuffin/webservice"
+        "source": "https://github.com/usemuffin/webservice",
+        "irc": "irc://irc.freenode.org/muffin"
     },
     "require": {
     },
