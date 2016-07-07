@@ -59,7 +59,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param object $client The client to use
      *
-     * @return $this
+     * @return object
      */
     public function client($client = null)
     {
