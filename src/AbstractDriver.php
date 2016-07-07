@@ -69,7 +69,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
 
         $this->_client = $client;
 
-        return $this;
+        return $this->_client;
     }
 
     /**
