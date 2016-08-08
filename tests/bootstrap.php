@@ -91,13 +91,14 @@ if (!getenv('db_dsn')) {
 }
 
 $config = [
-    'url' => getenv('db_dsn'),
-    'timezone' => 'UTC',
+    'className' => 'Muffin\Webservice\Connection',
+    'service' => 'Test',
 ];
 
 // Use the test connection for 'debug_kit' as well.
 ConnectionManager::config('test', $config);
-ConnectionManager::config('test_webservice', $config);
+ConnectionManager::alias('test', 'app');
+ConnectionManager::alias('test', 'test_plugin');
 
 
 Log::config([

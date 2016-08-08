@@ -5,6 +5,7 @@ namespace Muffin\Webservice\Model;
 use ArrayObject;
 use BadMethodCallException;
 use Cake\Core\App;
+use Cake\Datasource\AssociationCollection;
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\RepositoryInterface;
@@ -17,15 +18,19 @@ use Cake\Event\EventManager;
 use Cake\Network\Exception\NotImplementedException;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
+use InvalidArgumentException;
+use Muffin\Webservice\Association\BelongsTo;
+use Muffin\Webservice\Association\BelongsToMany;
+use Muffin\Webservice\Association\HasMany;
 use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Marshaller;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Schema;
-use Muffin\Webservice\StreamQuery;
+use RuntimeException;
 
 /**
- * The table equivalent of a webservice endpoint
+ * The endpoint equivalent of a webservice endpoint
  *
  * @package Muffin\Webservice\Model
  */
@@ -95,6 +100,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     protected $_displayField;
 
     /**
+     * The associations container for this Endpoint.
+     *
+     * @var \Cake\Datasource\AssociationCollection
+     */
+    protected $_associations;
+
+    /**
      * The webservice instance to call
      *
      * @var \Muffin\Webservice\Webservice\WebserviceInterface
@@ -115,6 +127,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * - alias: Alias to be assigned to this endpoint (default to endpoint name)
      * - connection: The connection instance to use
+     * - webservice: The webservice instance to use
      * - endpoint: Name of the endpoint to represent
      * - resourceClass: The fully namespaced class name of the resource class that will
      *   represent rows in this endpoint.
@@ -131,13 +144,16 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if (!empty($config['connection'])) {
             $this->connection($config['connection']);
         }
+        if (!empty($config['webservice'])) {
+            $this->webservice($config['webservice']);
+        }
         if (!empty($config['displayField'])) {
             $this->displayField($config['displayField']);
         }
         if (!empty($config['endpoint'])) {
             $this->endpoint($config['endpoint']);
         }
-        $eventManager = null;
+        $eventManager = $associations = null;
         if (!empty($config['eventManager'])) {
             $eventManager = $config['eventManager'];
         }
@@ -153,12 +169,258 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if (!empty($config['resourceClass'])) {
             $this->resourceClass($config['resourceClass']);
         }
+        if (!empty($config['associations'])) {
+            $associations = $config['associations'];
+        }
 
         $this->_eventManager = $eventManager ?: new EventManager();
+        $this->_associations = $associations ?: new AssociationCollection();
+
 
         $this->initialize($config);
         $this->_eventManager->on($this);
         $this->dispatchEvent('Model.initialize');
+    }
+
+    /**
+     * Returns an association object configured for the specified alias if any
+     *
+     * @param string $name the alias used for the association.
+     * @return \Muffin\Webservice\\Association|null Either the association or null.
+     */
+    public function association($name)
+    {
+        return $this->_associations->get($name);
+    }
+
+    /**
+     * Get the associations collection for this endpoint.
+     *
+     * @return \Cake\Datasource\AssociationCollection The collection of association objects.
+     */
+    public function associations()
+    {
+        return $this->_associations;
+    }
+
+    /**
+     * Setup multiple associations.
+     *
+     * It takes an array containing set of table names indexed by association type
+     * as argument:
+     *
+     * ```
+     * $this->Posts->addAssociations([
+     *   'belongsTo' => [
+     *     'Users' => ['className' => 'App\Model\Table\UsersTable']
+     *   ],
+     *   'hasMany' => ['Comments'],
+     *   'belongsToMany' => ['Tags']
+     * ]);
+     * ```
+     *
+     * Each association type accepts multiple associations where the keys
+     * are the aliases, and the values are association config data. If numeric
+     * keys are used the values will be treated as association aliases.
+     *
+     * @param array $params Set of associations to bind (indexed by association type)
+     * @return void
+     * @see \Cake\ORM\Table::belongsTo()
+     * @see \Cake\ORM\Table::hasOne()
+     * @see \Cake\ORM\Table::hasMany()
+     * @see \Cake\ORM\Table::belongsToMany()
+     */
+    public function addAssociations(array $params)
+    {
+        foreach ($params as $assocType => $tables) {
+            foreach ($tables as $associated => $options) {
+                if (is_numeric($associated)) {
+                    $associated = $options;
+                    $options = [];
+                }
+                $this->{$assocType}($associated, $options);
+            }
+        }
+    }
+
+    /**
+     * Creates a new BelongsTo association between this endpoint and a target
+     * endpoint. A "belongs to" association is a N-1 relationship where this endpoint
+     * is the N side, and where there is a single associated record in the target
+     * endpoint for each one in this endpoint.
+     *
+     * Target endpoint can be inferred by its name, which is provided in the
+     * first argument, or you can either pass the to be instantiated or
+     * an instance of it directly.
+     *
+     * The options array accept the following keys:
+     *
+     * - className: The class name of the target endpoint object
+     * - targetRepository: An instance of a endpoint object to be used as the target endpoint
+     * - foreignKey: The name of the field to use as foreign key, if false none
+     *   will be used
+     * - conditions: array with a list of conditions to filter the join with
+     * - joinType: The type of join to be used (e.g. INNER)
+     * - strategy: The loading strategy to use. 'join' and 'select' are supported.
+     * - finder: The finder method to use when loading records from this association.
+     *   Defaults to 'all'. When the strategy is 'join', only the fields, containments,
+     *   and where conditions will be used from the finder.
+     *
+     * This method will return the association object that was built.
+     *
+     * @param string $associated the alias for the target endpoint. This is used to
+     * uniquely identify the association
+     * @param array $options list of options to configure the association definition
+     * @return \Muffin\Webservice\Association\BelongsTo
+     */
+    public function belongsTo($associated, array $options = [])
+    {
+        $options += ['sourceRepository' => $this];
+        $association = new BelongsTo($associated, $options);
+        return $this->_associations->add($association->name(), $association);
+    }
+
+    /**
+     * Creates a new HasOne association between this endpoint and a target
+     * endpoint. A "has one" association is a 1-1 relationship.
+     *
+     * Target endpoint can be inferred by its name, which is provided in the
+     * first argument, or you can either pass the class name to be instantiated or
+     * an instance of it directly.
+     *
+     * The options array accept the following keys:
+     *
+     * - className: The class name of the target endpoint object
+     * - targetRepository: An instance of a endpoint object to be used as the target endpoint
+     * - foreignKey: The name of the field to use as foreign key, if false none
+     *   will be used
+     * - dependent: Set to true if you want CakePHP to cascade deletes to the
+     *   associated endpoint when an entity is removed on this endpoint. The delete operation
+     *   on the associated endpoint will not cascade further. To get recursive cascades enable
+     *   `cascadeCallbacks` as well. Set to false if you don't want CakePHP to remove
+     *   associated data, or when you are using webservice constraints.
+     * - cascadeCallbacks: Set to true if you want CakePHP to fire callbacks on
+     *   cascaded deletes. If false the ORM will use deleteAll() to remove data.
+     *   When true records will be loaded and then deleted.
+     * - conditions: array with a list of conditions to filter the join with
+     * - joinType: The type of join to be used (e.g. LEFT)
+     * - strategy: The loading strategy to use. 'join' and 'select' are supported.
+     * - finder: The finder method to use when loading records from this association.
+     *   Defaults to 'all'. When the strategy is 'join', only the fields, containments,
+     *   and where conditions will be used from the finder.
+     *
+     * This method will return the association object that was built.
+     *
+     * @param string $associated the alias for the target endpoint. This is used to
+     * uniquely identify the association
+     * @param array $options list of options to configure the association definition
+     * @return \Muffin\Webservice\Association\HasOne
+     */
+    public function hasOne($associated, array $options = [])
+    {
+        $options += ['sourceRepository' => $this];
+        $association = new HasOne($associated, $options);
+        return $this->_associations->add($association->name(), $association);
+    }
+
+    /**
+     * Creates a new HasMany association between this endpoint and a target
+     * endpoint. A "has many" association is a 1-N relationship.
+     *
+     * Target endpoint can be inferred by its name, which is provided in the
+     * first argument, or you can either pass the class name to be instantiated or
+     * an instance of it directly.
+     *
+     * The options array accept the following keys:
+     *
+     * - className: The class name of the target endpoint object
+     * - targetRepository: An instance of a endpoint object to be used as the target endpoint
+     * - foreignKey: The name of the field to use as foreign key, if false none
+     *   will be used
+     * - dependent: Set to true if you want CakePHP to cascade deletes to the
+     *   associated endpoint when an entity is removed on this endpoint. The delete operation
+     *   on the associated endpoint will not cascade further. To get recursive cascades enable
+     *   `cascadeCallbacks` as well. Set to false if you don't want CakePHP to remove
+     *   associated data, or when you are using webservice constraints.
+     * - cascadeCallbacks: Set to true if you want CakePHP to fire callbacks on
+     *   cascaded deletes. If false the ORM will use deleteAll() to remove data.
+     *   When true records will be loaded and then deleted.
+     * - conditions: array with a list of conditions to filter the join with
+     * - sort: The order in which results for this association should be returned
+     * - saveStrategy: Either 'append' or 'replace'. When 'append' the current records
+     *   are appended to any records in the webservice. When 'replace' associated records
+     *   not in the current set will be removed. If the foreign key is a null able column
+     *   or if `dependent` is true records will be orphaned.
+     * - strategy: The strategy to be used for selecting results Either 'select'
+     *   or 'subquery'. If subquery is selected the query used to return results
+     *   in the source endpoint will be used as conditions for getting rows in the
+     *   target endpoint.
+     * - finder: The finder method to use when loading records from this association.
+     *   Defaults to 'all'.
+     *
+     * This method will return the association object that was built.
+     *
+     * @param string $associated the alias for the target endpoint. This is used to
+     * uniquely identify the association
+     * @param array $options list of options to configure the association definition
+     * @return \Muffin\Webservice\Association\HasMany
+     */
+    public function hasMany($associated, array $options = [])
+    {
+        $options += ['sourceRepository' => $this];
+        $association = new HasMany($associated, $options);
+        return $this->_associations->add($association->name(), $association);
+    }
+
+    /**
+     * Creates a new BelongsToMany association between this table and a target
+     * table. A "belongs to many" association is a M-N relationship.
+     *
+     * Target table can be inferred by its name, which is provided in the
+     * first argument, or you can either pass the class name to be instantiated or
+     * an instance of it directly.
+     *
+     * The options array accept the following keys:
+     *
+     * - className: The class name of the target table object.
+     * - targetTable: An instance of a table object to be used as the target table.
+     * - foreignKey: The name of the field to use as foreign key.
+     * - targetForeignKey: The name of the field to use as the target foreign key.
+     * - joinTable: The name of the table representing the link between the two
+     * - through: If you choose to use an already instantiated link table, set this
+     *   key to a configured Table instance containing associations to both the source
+     *   and target tables in this association.
+     * - dependent: Set to false, if you do not want junction table records removed
+     *   when an owning record is removed.
+     * - cascadeCallbacks: Set to true if you want CakePHP to fire callbacks on
+     *   cascaded deletes. If false the ORM will use deleteAll() to remove data.
+     *   When true join/junction table records will be loaded and then deleted.
+     * - conditions: array with a list of conditions to filter the join with.
+     * - sort: The order in which results for this association should be returned.
+     * - strategy: The strategy to be used for selecting results Either 'select'
+     *   or 'subquery'. If subquery is selected the query used to return results
+     *   in the source table will be used as conditions for getting rows in the
+     *   target table.
+     * - saveStrategy: Either 'append' or 'replace'. Indicates the mode to be used
+     *   for saving associated entities. The former will only create new links
+     *   between both side of the relation and the latter will do a wipe and
+     *   replace to create the links between the passed entities when saving.
+     * - strategy: The loading strategy to use. 'select' and 'subquery' are supported.
+     * - finder: The finder method to use when loading records from this association.
+     *   Defaults to 'all'.
+     *
+     * This method will return the association object that was built.
+     *
+     * @param string $associated the alias for the target table. This is used to
+     * uniquely identify the association
+     * @param array $options list of options to configure the association definition
+     * @return \Cake\ORM\Association\BelongsToMany
+     */
+    public function belongsToMany($associated, array $options = [])
+    {
+        $options += ['sourceRepository' => $this];
+        $association = new BelongsToMany($associated, $options);
+        return $this->_associations->add($association->name(), $association);
     }
 
     /**
@@ -173,10 +435,15 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public static function defaultConnectionName()
     {
-        $namespaceParts = explode('\\', get_called_class());
-        $plugin = array_slice(array_reverse($namespaceParts), 3, 2);
+        list($plugin) = pluginSplit(App::shortName(get_called_class(), 'Model/Endpoint', 'Endpoint'));
+        $pluginParts = explode('/', $plugin);
 
-        return Inflector::underscore(current($plugin));
+        $connectionName = end($pluginParts);
+        if (!$connectionName) {
+            $connectionName = 'app';
+        }
+
+        return Inflector::underscore($connectionName);
     }
 
     /**
@@ -308,7 +575,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return $this->_schema;
         }
         if (is_array($schema)) {
-            $schema = new Schema($this->table(), $schema);
+            $schema = new Schema($this->endpoint(), $schema);
         }
         return $this->_schema = $schema;
     }
@@ -316,8 +583,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Override this function in order to alter the schema used by this endpoint.
      * This function is only called after fetching the schema out of the webservice.
-     * If you wish to provide your own schema to this table without touching the
-     * database, you can override schema() or inject the definitions though that
+     * If you wish to provide your own schema to this endpoint without touching the
+     * webservice, you can override schema() or inject the definitions though that
      * method.
      *
      * ### Example:
@@ -341,10 +608,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Test to see if a Table has a specific field/column.
+     * Test to see if a Endpoint has a specific field/column.
      *
      * Delegates to the schema object and checks for column presence
-     * using the Schema\Table instance.
+     * using the Schema instance.
      *
      * @param string $field The field to check for.
      * @return bool True if the field exists, false if it does not.
@@ -456,6 +723,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function webservice($webservice = null)
     {
+        if (is_object($webservice)) {
+            $this->_webservice = $webservice;
+
+            return $this;
+        }
+
         if ((is_string($webservice)) || ($this->_webservice === null)) {
             if ($webservice === null) {
                 $webservice = $this->endpoint();
@@ -470,13 +743,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
             return $this->_webservice;
         }
-        if ($webservice === null) {
-            return $this->_webservice;
-        }
 
-        $this->_webservice = $webservice;
-
-        return $this;
+        return $this->_webservice;
     }
 
     /**
@@ -800,39 +1068,234 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function save(EntityInterface $resource, $options = [])
     {
         $options = new ArrayObject($options + [
+            'associated' => true,
             'checkRules' => true,
+            'checkExisting' => true,
+            '_primary' => true
         ]);
 
-        $mode = $resource->isNew() ? RulesChecker::CREATE : RulesChecker::UPDATE;
-        if ($options['checkRules'] && !$this->checkRules($resource, $mode, $options)) {
+        if ($resource->errors()) {
             return false;
         }
 
-        $data = $resource->extract($this->schema()->columns(), true);
+        if ($resource->isNew() === false && !$resource->dirty()) {
+            return $resource;
+        }
 
-        if ($resource->isNew()) {
-            $query = $this->query()->create();
+        $success = $this->_processSave($resource, $options);
+
+        if ($success) {
+            if ($options['_primary']) {
+                $resource->isNew(false);
+                $resource->source($this->registryAlias());
+            }
+        }
+
+        return $success;
+    }
+
+    /**
+     * Performs the actual saving of an entity based on the passed options.
+     *
+     * @param \Cake\Datasource\EntityInterface $entity the entity to be saved
+     * @param \ArrayObject $options the options to use for the save operation
+     * @return \Cake\Datasource\EntityInterface|bool
+     * @throws \RuntimeException When an entity is missing some of the primary keys.
+     */
+    protected function _processSave($entity, $options)
+    {
+        $primaryColumns = (array)$this->primaryKey();
+
+        if ($options['checkExisting'] && $primaryColumns && $entity->isNew() && $entity->has($primaryColumns)) {
+            $alias = $this->alias();
+            $conditions = [];
+            foreach ($entity->extract($primaryColumns) as $k => $v) {
+                $conditions["$alias.$k"] = $v;
+            }
+            $entity->isNew(!$this->exists($conditions));
+        }
+
+        $mode = $entity->isNew() ? RulesChecker::CREATE : RulesChecker::UPDATE;
+        if ($options['checkRules'] && !$this->checkRules($entity, $mode, $options)) {
+            return false;
+        }
+
+        $options['associated'] = $this->_associations->normalizeKeys($options['associated']);
+        $event = $this->dispatchEvent('Model.beforeSave', compact('entity', 'options'));
+
+        if ($event->isStopped()) {
+            return $event->result;
+        }
+
+        $saved = $this->_associations->saveParents(
+            $this,
+            $entity,
+            $options['associated'],
+            ['_primary' => false] + $options->getArrayCopy()
+        );
+
+        if (!$saved && $options['atomic']) {
+            return false;
+        }
+
+        $data = $entity->extract($this->schema()->columns(), true);
+        $isNew = $entity->isNew();
+
+        if ($isNew) {
+            $success = $this->_create($entity, $data);
         } else {
-            $query = $this->query()->update()->where([
-                $this->primaryKey() => $resource->get($this->primaryKey())
-            ]);
-        }
-        $query->set($data);
-
-        $result = $query->execute();
-        if (!$result) {
-            return false;
+            $success = $this->_update($entity, $data);
         }
 
-        if (($resource->isNew()) && ($result instanceof EntityInterface)) {
-            return $result;
+        if ($success) {
+            $success = $this->_associations->saveChildren(
+                $this,
+                $entity,
+                $options['associated'],
+                ['_primary' => false] + $options->getArrayCopy()
+            );
+            if ($success) {
+                $this->dispatchEvent('Model.afterSave', compact('entity', 'options'));
+                $entity->clean();
+                if (!$options['_primary']) {
+                    $entity->isNew(false);
+                    $entity->source($this->registryAlias());
+                }
+                $success = true;
+            }
         }
 
-        $className = get_class($resource);
-        return new $className($resource->toArray(), [
-            'markNew' => false,
-            'markClean' => true
-        ]);
+        if (!$success && $isNew) {
+            $entity->unsetProperty($this->primaryKey());
+            $entity->isNew(true);
+        }
+        if ($success) {
+            return $entity;
+        }
+        return false;
+    }
+
+    /**
+     * Auxiliary function to handle the insert of an entity's data in the table
+     *
+     * @param \Cake\Datasource\EntityInterface $entity the subject entity from were $data was extracted
+     * @param array $data The actual data that needs to be saved
+     * @return \Cake\Datasource\EntityInterface|bool
+     * @throws \RuntimeException if not all the primary keys where supplied or could
+     * be generated when the table has composite primary keys. Or when the table has no primary key.
+     */
+    protected function _create($entity, $data)
+    {
+        $primary = (array)$this->primaryKey();
+        if (empty($primary)) {
+            $msg = sprintf(
+                'Cannot insert row in "%s" endpoint, it has no primary key.',
+                $this->endpoint()
+            );
+            throw new RuntimeException($msg);
+        }
+        $keys = array_fill(0, count($primary), null);
+        $id = (array)$this->_newId($primary) + $keys;
+
+        // Generate primary keys preferring values in $data.
+        $primary = array_combine($primary, $id);
+        $primary = array_intersect_key($data, $primary) + $primary;
+
+        $filteredKeys = array_filter($primary, 'strlen');
+        $data = $data + $filteredKeys;
+
+        if (count($primary) > 1) {
+            $schema = $this->schema();
+            foreach ($primary as $k => $v) {
+                if (!isset($data[$k]) && empty($schema->column($k)['autoIncrement'])) {
+                    $msg = 'Cannot insert row, some of the primary key values are missing. ';
+                    $msg .= sprintf(
+                        'Got (%s), expecting (%s)',
+                        implode(', ', $filteredKeys + $entity->extract(array_keys($primary))),
+                        implode(', ', array_keys($primary))
+                    );
+                    throw new RuntimeException($msg);
+                }
+            }
+        }
+
+        $success = false;
+        if (empty($data)) {
+            return $success;
+        }
+
+        $resultSet = $this->query()->create()
+            ->set($data)
+            ->execute();
+        if ($resultSet->total() !== 0) {
+            $result = $resultSet->first();
+            $success = $entity;
+            $entity->set($filteredKeys, ['guard' => false]);
+            foreach ($primary as $key => $v) {
+                if (!isset($data[$key])) {
+                    $id = $result->get($key);
+                    $entity->set($key, $id);
+                    break;
+                }
+            }
+        }
+
+        return $success;
+    }
+
+    /**
+     * Generate a primary key value for a new record.
+     *
+     * By default, this uses the type system to generate a new primary key
+     * value if possible. You can override this method if you have specific requirements
+     * for id generation.
+     *
+     * @param array $primary The primary key columns to get a new ID for.
+     * @return mixed Either null or the new primary key value.
+     */
+    protected function _newId($primary)
+    {
+        if (!$primary || count((array)$primary) > 1) {
+            return null;
+        }
+        return null;
+    }
+
+    /**
+     * Auxiliary function to handle the update of an entity's data in the table
+     *
+     * @param \Cake\Datasource\EntityInterface $entity the subject entity from were $data was extracted
+     * @param array $data The actual data that needs to be saved
+     * @return \Cake\Datasource\EntityInterface|bool
+     * @throws \InvalidArgumentException When primary key data is missing.
+     */
+    protected function _update($entity, $data)
+    {
+        $primaryColumns = (array)$this->primaryKey();
+        $primaryKey = $entity->extract($primaryColumns);
+
+        $data = array_diff_key($data, $primaryKey);
+        if (empty($data)) {
+            return $entity;
+        }
+
+        if (!$entity->has($primaryColumns)) {
+            $message = 'All primary key value(s) are needed for updating';
+            throw new InvalidArgumentException($message);
+        }
+
+        $query = $this->query();
+        $statement = $query->update()
+            ->set($data)
+            ->where($primaryKey)
+            ->execute();
+
+        $success = false;
+        if ($statement->errorCode() === '00000') {
+            $success = $entity;
+        }
+        $statement->closeCursor();
+        return $success;
     }
 
     /**
@@ -969,6 +1432,40 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
+     * Returns the association named after the passed value if exists, otherwise
+     * throws an exception.
+     *
+     * @param string $property the association name
+     * @return \Cake\Datasource\AssociationInterface
+     * @throws \RuntimeException if no association with such name exists
+     */
+    public function __get($property)
+    {
+        $association = $this->_associations->get($property);
+        if (!$association) {
+            throw new RuntimeException(sprintf(
+                'Endpoint "%s" is not associated with "%s"',
+                get_class($this),
+                $property
+            ));
+        }
+        return $association;
+    }
+
+    /**
+     * Returns whether an association named after the passed value
+     * exists for this endpoint.
+     *
+     * @param string $property the association name
+     * @return bool
+     */
+    public function __isset($property)
+    {
+        return $this->_associations->has($property);
+    }
+
+
+    /**
      * Get the object used to marshal/convert array data into objects.
      *
      * Override this method if you want a endpoint object to use custom
@@ -995,6 +1492,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $entity = new $class([], ['source' => $this->registryAlias()]);
             return $entity;
         }
+        if (!isset($options['associated'])) {
+            $options['associated'] = $this->_associations->keys();
+        }
         $marshaller = $this->marshaller();
         return $marshaller->one($data, $options);
     }
@@ -1004,6 +1504,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function newEntities(array $data, array $options = [])
     {
+        if (!isset($options['associated'])) {
+            $options['associated'] = $this->_associations->keys();
+        }
         $marshaller = $this->marshaller();
         return $marshaller->many($data, $options);
     }
@@ -1028,6 +1531,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function patchEntity(EntityInterface $entity, array $data, array $options = [])
     {
+        if (!isset($options['associated'])) {
+            $options['associated'] = $this->_associations->keys();
+        }
         $marshaller = $this->marshaller();
         return $marshaller->merge($entity, $data, $options);
     }
@@ -1053,6 +1559,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function patchEntities($entities, array $data, array $options = [])
     {
+        if (!isset($options['associated'])) {
+            $options['associated'] = $this->_associations->keys();
+        }
         $marshaller = $this->marshaller();
         return $marshaller->mergeMany($entities, $data, $options);
     }
@@ -1131,7 +1640,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             'endpoint' => $this->endpoint(),
             'resourceClass' => $this->resourceClass(),
             'defaultConnection' => $this->defaultConnectionName(),
-            'connectionName' => $conn ? $conn->configName() : null
+            'connectionName' => $conn ? $conn->configName() : null,
         ];
     }
 }

@@ -3,7 +3,7 @@
 namespace Muffin\Webservice;
 
 /**
- * Represents a single endpoint in a database schema.
+ * Represents a single endpoint in a webservice.
  *
  * Can either be populated using the reflection API's
  * or by incrementally building an instance using
@@ -69,6 +69,7 @@ class Schema
      */
     protected static $_columnKeys = [
         'type' => null,
+        'primaryKey' => null,
         'baseType' => null,
         'length' => null,
         'precision' => null,
@@ -147,7 +148,7 @@ class Schema
      *   This is only present/valid for integer, decimal, float columns.
      *
      * In addition to the above keys, the following keys are
-     * implemented in some database dialects, but not all:
+     * implemented in some webservice dialects, but not all:
      *
      * - `comment` The comment for the column.
      *
@@ -236,9 +237,6 @@ class Schema
             return null;
         }
 
-        if (Type::map($type)) {
-            $type = Type::build($type)->getBaseType();
-        }
         return $this->_columns[$column]['baseType'] = $type;
     }
 
@@ -306,7 +304,7 @@ class Schema
             $primaryKeys[] = $name;
         }
 
-        return [];
+        return $primaryKeys;
     }
 
     /**

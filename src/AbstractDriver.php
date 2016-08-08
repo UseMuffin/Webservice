@@ -154,6 +154,8 @@ abstract class AbstractDriver implements LoggerAwareInterface
      */
     public function __call($method, $args)
     {
+        stackTrace();
+        debug($method);exit();
         if (!is_object($this->client())) {
             throw new RuntimeException(sprintf(
                 'The `%s` client has not been initialized',

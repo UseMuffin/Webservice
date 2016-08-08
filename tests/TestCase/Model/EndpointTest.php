@@ -7,12 +7,11 @@ use Muffin\Webservice\Connection;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\AppEndpoint;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
+use Muffin\Webservice\Test\test_app\Model\Endpoint\PostsEndpoint;
 use SomeVendor\SomePlugin\Model\Endpoint\PluginEndpoint;
 
 class EndpointTest extends TestCase
 {
-
     /**
      * @var Endpoint
      */
@@ -25,13 +24,14 @@ class EndpointTest extends TestCase
     {
         parent::setUp();
 
-        $this->endpoint = new TestEndpoint([
+        $this->endpoint = new PostsEndpoint([
             'connection' => new Connection([
                 'name' => 'test',
                 'service' => 'Test'
             ]),
             'primaryKey' => 'id',
-            'displayField' => 'title'
+            'displayField' => 'title',
+            'alias' => 'Posts'
         ]);
     }
 
@@ -50,7 +50,8 @@ class EndpointTest extends TestCase
             'body' => 'Even more text'
         ], [
             'markNew' => false,
-            'markClean' => true
+            'markClean' => true,
+            'source' => 'Posts'
         ]), $this->endpoint->findByTitle('Webservices')->first());
     }
 
@@ -166,6 +167,8 @@ class EndpointTest extends TestCase
         $this->assertEquals(new Resource([
             'title' => 'New entity',
             'body' => 'New entity body'
+        ], [
+            'source' => 'Posts'
         ]), $this->endpoint->newEntity([
            'title' => 'New entity',
             'body' => 'New entity body'
@@ -178,10 +181,14 @@ class EndpointTest extends TestCase
             new Resource([
                 'title' => 'New entity',
                 'body' => 'New entity body'
+            ], [
+                'source' => 'Posts'
             ]),
             new Resource([
                 'title' => 'Second new entity',
                 'body' => 'Second new entity body'
+            ], [
+                'source' => 'Posts'
             ])
         ], $this->endpoint->newEntities([
             [
@@ -197,7 +204,7 @@ class EndpointTest extends TestCase
 
     public function testDefaultConnectionName()
     {
-        $this->assertEquals('test_app', AppEndpoint::defaultConnectionName());
+        $this->assertEquals('app', AppEndpoint::defaultConnectionName());
         $this->assertEquals('some_plugin', PluginEndpoint::defaultConnectionName());
     }
 }

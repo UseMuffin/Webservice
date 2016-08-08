@@ -8,6 +8,7 @@ use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Test\test_app\Webservice\StaticWebservice;
+use Muffin\Webservice\WebserviceResultSet;
 
 class QueryTest extends TestCase
 {
@@ -24,7 +25,11 @@ class QueryTest extends TestCase
     {
         parent::setUp();
 
-        $this->query = new Query(new StaticWebservice(), new Endpoint());
+        $webservice = new StaticWebservice();
+        $this->query = new Query($webservice, new Endpoint([
+            'webservice' => $webservice,
+            'alias' => 'Tests'
+        ]));
     }
 
     public function testAction()
@@ -52,7 +57,7 @@ class QueryTest extends TestCase
 
     public function testAliasField()
     {
-        $this->assertEquals(['field' => 'field'], $this->query->aliasField('field'));
+        $this->assertEquals(['Tests__field' => 'Tests.field'], $this->query->aliasField('field'));
     }
 
     public function testCountNonReadAction()
@@ -72,6 +77,10 @@ class QueryTest extends TestCase
         $this->assertEquals(new Resource([
             'id' => 1,
             'title' => 'Hello World'
+        ], [
+            'markNew' => false,
+            'markClean' => true,
+            'source' => 'Tests'
         ]), $this->query->first());
     }
 
@@ -170,19 +179,19 @@ class QueryTest extends TestCase
             ]);
         $mockWebservice->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue(new ResultSet([
-                new Resource([
-                    'id' => 1,
-                    'title' => 'Hello World'
-                ]),
-                new Resource([
-                    'id' => 2,
-                    'title' => 'New ORM'
-                ]),
-                new Resource([
-                    'id' => 3,
-                    'title' => 'Webservices'
-                ])
+            ->will($this->returnValue(new WebserviceResultSet([
+                [
+                    $this->query->endpoint()->alias() . '__id' => 1,
+                    $this->query->endpoint()->alias() . '__title' => 'Hello World'
+                ],
+                [
+                    $this->query->endpoint()->alias() . '__id' => 2,
+                    $this->query->endpoint()->alias() . '__title' => 'New ORM'
+                ],
+                [
+                    $this->query->endpoint()->alias() . '__id' => 3,
+                    $this->query->endpoint()->alias() . '__title' => 'Webservices'
+                ]
             ], 3)));
         $this->query->webservice($mockWebservice);
 
@@ -194,10 +203,15 @@ class QueryTest extends TestCase
 
     public function testDebugInfo()
     {
+        $webservice = new StaticWebservice();
+
         $this->assertEquals([
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
             'action' => null,
             'formatters' => [],
+            'mapReducers' => 0,
+            'contain' => [],
+            'matching' => [],
             'offset' => null,
             'page' => null,
             'limit' => null,
@@ -205,8 +219,11 @@ class QueryTest extends TestCase
             'sort' => [],
             'extraOptions' => [],
             'conditions' => [],
-            'repository' => new Endpoint(),
-            'webservice' => new StaticWebservice()
+            'repository' => new Endpoint([
+                'webservice' => $webservice,
+                'alias' => 'Tests'
+            ]),
+            'webservice' => $webservice
         ], $this->query->__debugInfo());
     }
 

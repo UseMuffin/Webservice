@@ -7,25 +7,26 @@ use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Schema;
 use Muffin\Webservice\Webservice\WebserviceInterface;
+use Muffin\Webservice\WebserviceResultSet;
 
 class StaticWebservice implements WebserviceInterface
 {
 
     public function execute(Query $query, array $options = [])
     {
-        return new ResultSet([
-            new Resource([
-                'id' => 1,
-                'title' => 'Hello World'
-            ]),
-            new Resource([
-                'id' => 2,
-                'title' => 'New ORM'
-            ]),
-            new Resource([
-                'id' => 3,
-                'title' => 'Webservices'
-            ])
+        return new WebserviceResultSet([
+            [
+                $query->endpoint()->alias() . '__id' => 1,
+                $query->endpoint()->alias() . '__title' => 'Hello World'
+            ],
+            [
+                $query->endpoint()->alias() . '__id' => 2,
+                $query->endpoint()->alias() . '__title' => 'New ORM'
+            ],
+            [
+                $query->endpoint()->alias() . '__id' => 3,
+                $query->endpoint()->alias() . '__title' => 'Webservices'
+            ]
         ], 3);
     }
 

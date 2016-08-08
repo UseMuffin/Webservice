@@ -5,10 +5,8 @@ namespace Muffin\Webservice\Test\test_app\Model\Endpoint;
 use Cake\Validation\Validator;
 use Muffin\Webservice\Model\Endpoint;
 
-class TestEndpoint extends Endpoint
+class PostsEndpoint extends Endpoint
 {
-
-
     /**
      * Returns the default validator object. Subclasses can override this function
      * to add a default validation set to the validator object.

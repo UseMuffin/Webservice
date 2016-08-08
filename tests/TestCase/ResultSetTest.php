@@ -2,13 +2,16 @@
 
 namespace Muffin\Webservice\Test\TestCase;
 
+use ArrayIterator;
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
+use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
+use Muffin\Webservice\Test\test_app\Webservice\StaticWebservice;
 
 class ResultSetTest extends TestCase
 {
-
     /**
      * @var ResultSet
      */
@@ -21,20 +24,26 @@ class ResultSetTest extends TestCase
     {
         parent::setUp();
 
-        $this->resultSet = new ResultSet([
-            new Resource([
-                'id' => 1,
-                'title' => 'Hello World'
-            ]),
-            new Resource([
-                'id' => 2,
-                'title' => 'New ORM'
-            ]),
-            new Resource([
-                'id' => 3,
-                'title' => 'Webservices'
-            ])
-        ], 6);
+        $webservice = new StaticWebservice();
+        $query = new Query($webservice, new Endpoint([
+            'webservice' => $webservice,
+            'alias' => 'Test'
+        ]));
+
+        $this->resultSet = new ResultSet($query, new ArrayIterator([
+            [
+                $query->endpoint()->alias() . '__id' => 1,
+                $query->endpoint()->alias() . '__title' => 'Hello World'
+            ],
+            [
+                $query->endpoint()->alias() . '__id' => 2,
+                $query->endpoint()->alias() . '__title' => 'New ORM'
+            ],
+            [
+                $query->endpoint()->alias() . '__id' => 3,
+                $query->endpoint()->alias() . '__title' => 'Webservices'
+            ]
+        ]), 6);
     }
 
     public function testCount()

@@ -3,10 +3,12 @@
 namespace Muffin\Webservice\Test\TestCase\Webservice;
 
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
 use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
+use RuntimeException;
 
 class WebserviceTest extends TestCase
 {
@@ -70,6 +72,7 @@ class WebserviceTest extends TestCase
         $webservice = new TestWebservice();
 
         $query = new Query($webservice, new Endpoint());
+        $query->read();
 
         $webservice->execute($query);
     }
@@ -78,7 +81,10 @@ class WebserviceTest extends TestCase
     {
         $query = new Query($this->webservice, new Endpoint());
 
-        $this->webservice->execute($query);
+        try {
+            $this->webservice->execute($query);
+        } catch (RuntimeException $exception) {
+        }
     }
 
     public function testExecuteLoggingWithLogger()
@@ -96,7 +102,10 @@ class WebserviceTest extends TestCase
 
         $query = new Query($this->webservice, new Endpoint());
 
-        $this->webservice->execute($query);
+        try{
+            $this->webservice->execute($query);
+        } catch (RuntimeException $exception) {
+        }
     }
 
     public function testExecuteLoggingWithLoggerEnabled()
@@ -115,7 +124,10 @@ class WebserviceTest extends TestCase
 
         $query = new Query($this->webservice, new Endpoint());
 
-        $this->webservice->execute($query);
+        try{
+            $this->webservice->execute($query);
+        } catch (RuntimeException $exception) {
+        }
     }
 
     /**
@@ -166,19 +178,24 @@ class WebserviceTest extends TestCase
         $this->webservice->execute($query);
     }
 
-    public function testCreateResource()
+    public function testCreateResult()
     {
-        /* @var \Muffin\Webservice\Model\Resource $resource */
-        $resource = $this->webservice->createResource('\Muffin\Webservice\Model\Resource', []);
+        $query = new Query($this->webservice, new Endpoint([
+            'webservice' => $this->webservice
+        ]));
 
-        $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resource);
-        $this->assertFalse($resource->isNew());
-        $this->assertFalse($resource->dirty());
+        $resource = $this->webservice->createResult($query, []);
+
+        $this->assertInternalType('array', $resource);
     }
 
     public function testTransformResults()
     {
-        $resources = $this->webservice->transformResults(new Endpoint(), [
+        $query = new Query($this->webservice, new Endpoint([
+            'webservice' => $this->webservice
+        ]));
+
+        $resources = $this->webservice->transformResults($query, [
             [
                 'id' => 1,
                 'title' => 'Hello World',
@@ -197,7 +214,7 @@ class WebserviceTest extends TestCase
         ]);
 
         $this->assertInternalType('array', $resources);
-        $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resources[0]);
+        $this->assertInternalType('array', $resources[0]);
     }
 
     public function testDebugInfo()

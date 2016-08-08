@@ -4,13 +4,13 @@ namespace Muffin\Webservice\Test\test_app\Model\Endpoint\Schema;
 
 use Muffin\Webservice\Model\Schema;
 
-class TestSchema extends Schema
+class PostSchema extends Schema
 {
-
     public function initialize()
     {
         $this->addColumn('id', [
-            'type' => 'int'
+            'type' => 'int',
+            'primaryKey' => true
         ]);
         $this->addColumn('title', [
             'type' => 'string'

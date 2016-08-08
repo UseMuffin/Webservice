@@ -2,6 +2,7 @@
 
 namespace Muffin\Webservice\Webservice;
 
+use Cake\Collection\Collection;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
@@ -146,8 +147,6 @@ abstract class Webservice implements WebserviceInterface
      */
     public function execute(Query $query, array $options = [])
     {
-        $result = $this->_executeQuery($query, $options);
-
         if ($this->driver() === null) {
             throw new \UnexpectedValueException(__('No driver has been defined'));
         }
@@ -156,6 +155,8 @@ abstract class Webservice implements WebserviceInterface
         if ($this->driver()->logger()) {
             $this->_logQuery($query, $this->driver()->logger());
         }
+
+        $result = $this->_executeQuery($query, $options);
 
         return $result;
     }
@@ -201,7 +202,7 @@ abstract class Webservice implements WebserviceInterface
                 return $this->_executeDeleteQuery($query, $options);
         }
 
-        return false;
+        throw new \RuntimeException('No query action has been defined');
     }
 
     /**
@@ -269,19 +270,68 @@ abstract class Webservice implements WebserviceInterface
     }
 
     /**
-     * Creates a resource with the given class and properties
+     * Creates a result set compatible result.
      *
-     * @param string $resourceClass The class to use to create the resource
-     * @param array $properties The properties to apply
-     *
-     * @return \Muffin\Webservice\Model\Resource
+     * @param Query $query The query to use.
+     * @param array $data The data to use when creating a result.
+     * @return array A ResultSet compatible result.
      */
-    protected function _createResource($resourceClass, array $properties = [])
+    protected function _createResult(Query $query, array $data)
     {
-        return new $resourceClass($properties, [
-            'markClean' => true,
-            'markNew' => false,
-        ]);
+        $map = $query->eagerLoader()->associationsMap($query->endpoint());
+        $joinedAssociations = collection(array_reverse($map))
+            ->match(['canBeJoined' => true])
+            ->indexBy('alias')
+            ->toArray();
+        foreach ($joinedAssociations as $alias => $association) {
+            /* @var \Muffin\Webservice\Association $associationInstance */
+            $associationInstance = $association['instance'];
+            /* @var \Muffin\Webservice\Schema $schema */
+            $schema = $associationInstance->target()->schema();
+            if (isset($data[$alias])) {
+                continue;
+            }
+
+            foreach ($schema->columns() as $column) {
+                $data[$alias][$column] = null;
+            }
+        }
+
+        $alias = $query->endpoint()->alias();
+        $schema = $query->endpoint()->schema();
+        $defaults = $schema->defaultValues();
+        foreach ($schema->columns() as $column) {
+            if (isset($data[$alias][$column])) {
+                continue;
+            }
+
+            $data[$alias][$column] = array_key_exists($column, $defaults) ? $defaults[$column] : null;
+        }
+
+        foreach ($joinedAssociations as $alias => $association) {
+            /* @var \Muffin\Webservice\Association $instance */
+            $associationInstance = $association['instance'];
+            /* @var \Muffin\Webservice\Schema $schema */
+            $associationSchema = $associationInstance->target()->schema();
+
+            $associationDefaults = $associationSchema->defaultValues();
+            foreach ($associationSchema->columns() as $column) {
+                if (isset($data[$alias][$column])) {
+                    continue;
+                }
+
+                $data[$alias][$column] = array_key_exists($column, $associationDefaults) ? $associationDefaults[$column] : null;
+            }
+        }
+
+        $flattened = [];
+        foreach ($data as $alias => $values) {
+            foreach ($values as $key => $value) {
+                $flattened[$alias . '__' . $key] = $value;
+            }
+        }
+
+        return $flattened;
     }
 
     /**
@@ -306,16 +356,16 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Loops through the results and turns them into resource objects
      *
-     * @param \Muffin\Webservice\Model\Endpoint $endpoint The endpoint class to use
+     * @param \Muffin\Webservice\Query $query The query class to use
      * @param array $results Array of results from the API
      *
-     * @return \Muffin\Webservice\Model\Resource[] Array of resource objects
+     * @return array Array of resources
      */
-    protected function _transformResults(Endpoint $endpoint, array $results)
+    protected function _transformResults(Query $query, array $results)
     {
         $resources = [];
         foreach ($results as $result) {
-            $resources[] = $this->_transformResource($endpoint, $result);
+            $resources[] = $this->_transformResource($query, $result);
         }
 
         return $resources;
@@ -324,20 +374,20 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Turns a single result into a resource
      *
-     * @param \Muffin\Webservice\Model\Endpoint $endpoint The endpoint class to use
+     * @param \Muffin\Webservice\Query $query The query class to use
      * @param array $result The API result
      *
-     * @return \Muffin\Webservice\Model\Resource
+     * @return array
      */
-    protected function _transformResource(Endpoint $endpoint, array $result)
+    protected function _transformResource(Query $query, array $result)
     {
         $properties = [];
 
         foreach ($result as $property => $value) {
-            $properties[$property] = $value;
+            $properties[$query->endpoint()->alias()][$property] = $value;
         }
 
-        return $this->_createResource($endpoint->resourceClass(), $properties);
+        return $this->_createResult($query, $properties);
     }
 
     /**

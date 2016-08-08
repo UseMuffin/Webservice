@@ -43,6 +43,7 @@ class EndpointRegistry
             return self::$_instances[$alias];
         }
 
+        self::$_options[$alias] = $options;
         list(, $classAlias) = pluginSplit($alias);
         $options = ['alias' => $classAlias] + $options;
 
@@ -65,8 +66,10 @@ class EndpointRegistry
                 $connectionName = $options['className']::defaultConnectionName();
             } else {
                 $pluginParts = explode('/', pluginSplit($alias)[0]);
-
                 $connectionName = Inflector::underscore(end($pluginParts));
+                if (!$connectionName) {
+                    $connectionName = 'app';
+                }
             }
 
             $options['connection'] = ConnectionManager::get($connectionName);
@@ -76,6 +79,21 @@ class EndpointRegistry
         self::$_instances[$alias] = self::_create($options);
 
         return self::$_instances[$alias];
+    }
+
+    public static function exists($alias)
+    {
+        return isset(self::$_instances[$alias]);
+    }
+
+    /**
+     * Clears the registry of configuration and instances.
+     *
+     * @return void
+     */
+    public static function clear()
+    {
+        self::$_instances = [];
     }
 
     /**

@@ -3,11 +3,14 @@
 namespace Muffin\Webservice;
 
 use ArrayObject;
+use Cake\Core\App;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\QueryInterface;
 use Cake\Datasource\QueryTrait;
 use Cake\Utility\Hash;
+use DebugKit\DebugTimer;
 use IteratorAggregate;
+use Muffin\Webservice\EagerLoader;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 
@@ -82,6 +85,21 @@ class Query implements QueryInterface, IteratorAggregate
      * @var ResultSet
      */
     protected $__resultSet;
+
+    /**
+     * Whether to hydrate results into entity objects
+     *
+     * @var bool
+     */
+    protected $_hydrate = true;
+
+    /**
+     * Instance of a class responsible for storing association containments and
+     * for eager loading them when this query is executed
+     *
+     * @var \Muffin\Webservice\EagerLoader
+     */
+    protected $_eagerLoader;
 
     /**
      * Construct the query
@@ -209,6 +227,18 @@ class Query implements QueryInterface, IteratorAggregate
     }
 
     /**
+     * Marks a query as dirty, removing any preprocessed information
+     * from in memory caching such as previous results
+     *
+     * @return void
+     */
+    protected function _dirty()
+    {
+        $this->_results = null;
+        $this->_resultsCount = null;
+    }
+
+    /**
      * Get the first result from the executing query or raise an exception.
      *
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When there is no first record.
@@ -227,18 +257,18 @@ class Query implements QueryInterface, IteratorAggregate
         ));
     }
 
-    /**
-     * Alias a field with the endpoint's current alias.
-     *
-     * @param string $field The field to alias.
-     * @param null $alias Not being used
-     *
-     * @return string The field prefixed with the endpoint alias.
-     */
-    public function aliasField($field, $alias = null)
-    {
-        return [$field => $field];
-    }
+//    /**
+//     * Alias a field with the endpoint's current alias.
+//     *
+//     * @param string $field The field to alias.
+//     * @param null $alias Not being used
+//     *
+//     * @return string The field prefixed with the endpoint alias.
+//     */
+//    public function aliasField($field, $alias = null)
+//    {
+//        return [$field => $field];
+//    }
 
     /**
      * Apply conditions to the query
@@ -255,7 +285,30 @@ class Query implements QueryInterface, IteratorAggregate
             return $this->clause('where');
         }
 
-        $this->_parts['where'] = (!$overwrite) ? Hash::merge($this->clause('where'), $conditions) : $conditions;
+        if ($overwrite) {
+            $this->_parts['where'] = $conditions;
+
+            return $this;
+        }
+        if (count($conditions) === 0) {
+            return $this;
+        }
+
+        if (($this->isConditionSet($this->_parts['where'])) && ($this->isConditionSet($conditions))) {
+            $this->_parts['where'] = array_merge($this->_parts['where'], $conditions);
+
+            return $this;
+        }
+        if ((!$this->isConditionSet($this->_parts['where'])) && (!$this->isConditionSet($conditions))) {
+            $this->_parts['where'] = Hash::merge($this->clause('where'), $conditions);
+
+            return $this;
+        }
+
+        $regularConditions = (!$this->isConditionSet($conditions)) ? $conditions : $this->_parts['where'];
+        $conditionSet = ($this->isConditionSet($this->_parts['where'])) ? $this->_parts['where'] : $conditions;
+
+        $this->_parts['where'] = $this->mergeConditionsIntoSet($regularConditions, $conditionSet);
 
         return $this;
     }
@@ -377,38 +430,195 @@ class Query implements QueryInterface, IteratorAggregate
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Populates or adds parts to current query clauses using an array.
-     * This is handy for passing all query clauses at once.
+     * This is handy for passing all query clauses at once. The option array accepts:
      *
-     * @param array $options the options to be applied
+     * - conditions: Maps to the where method
+     * - limit: Maps to the limit method
+     * - order: Maps to the order method
+     * - offset: Maps to the offset method
+     * - group: Maps to the group method
+     * - having: Maps to the having method
+     * - contain: Maps to the contain options for eager loading
+     * - page: Maps to the page method
      *
-     * @return $this This object
+     * ### Example:
+     *
+     * ```
+     * $query->applyOptions([
+     *   'fields' => ['id', 'name'],
+     *   'conditions' => [
+     *     'created >=' => '2013-01-01'
+     *   ],
+     *   'limit' => 10
+     * ]);
+     * ```
+     *
+     * Is equivalent to:
+     *
+     * ```
+     *  $query
+     *  ->select(['id', 'name'])
+     *  ->where(['created >=' => '2013-01-01'])
+     *  ->limit(10)
+     * ```
      */
     public function applyOptions(array $options)
     {
-        if (isset($options['page'])) {
-            $this->page($options['page']);
+        $valid = [
+            'conditions' => 'where',
+            'order' => 'order',
+            'limit' => 'limit',
+            'offset' => 'offset',
+            'group' => 'group',
+            'having' => 'having',
+            'contain' => 'contain',
+            'page' => 'page',
+        ];
 
-            unset($options['page']);
+        ksort($options);
+        foreach ($options as $option => $values) {
+            if (isset($valid[$option], $values)) {
+                $this->{$valid[$option]}($values);
+            } else {
+                $this->_options[$option] = $values;
+            }
         }
-        if (isset($options['limit'])) {
-            $this->limit($options['limit']);
 
-            unset($options['limit']);
+        return $this;
+    }
+
+    /**
+     * Sets the instance of the eager loader class to use for loading associations
+     * and storing containments. If called with no arguments, it will return the
+     * currently configured instance.
+     *
+     * @param \Muffin\Webservice\EagerLoader|null $instance The eager loader to use. Pass null
+     *   to get the current eagerloader.
+     * @return \Muffin\Webservice\EagerLoader|$this
+     */
+    public function eagerLoader(EagerLoader $instance = null)
+    {
+        if ($instance === null) {
+            if ($this->_eagerLoader === null) {
+                $this->_eagerLoader = new EagerLoader;
+            }
+            return $this->_eagerLoader;
         }
-        if (isset($options['order'])) {
-            $this->order($options['order']);
+        $this->_eagerLoader = $instance;
+        return $this;
+    }
 
-            unset($options['order']);
+    /**
+     * Sets the list of associations that should be eagerly loaded along with this
+     * query. The list of associated endpoints passed must have been previously set as
+     * associations using the Endpoint API.
+     *
+     * ### Example:
+     *
+     * ```
+     *  // Bring articles' author information
+     *  $query->contain('Author');
+     *
+     *  // Also bring the category and tags associated to each article
+     *  $query->contain(['Category', 'Tag']);
+     * ```
+     *
+     * Associations can be arbitrarily nested using dot notation or nested arrays,
+     * this allows this object to calculate joins or any additional queries that
+     * must be executed to bring the required associated data.
+     *
+     * ### Example:
+     *
+     * ```
+     *  // Eager load the product info, and for each product load other 2 associations
+     *  $query->contain(['Product' => ['Manufacturer', 'Distributor']);
+     *
+     *  // Which is equivalent to calling
+     *  $query->contain(['Products.Manufactures', 'Products.Distributors']);
+     *
+     *  // For an author query, load his region, state and country
+     *  $query->contain('Regions.States.Countries');
+     * ```
+     *
+     * It is possible to control the conditions and fields selected for each of the
+     * contained associations:
+     *
+     * ### Example:
+     *
+     * ```
+     *  $query->contain(['Tags' => function ($q) {
+     *      return $q->where(['Tags.is_popular' => true]);
+     *  }]);
+     *
+     *  $query->contain(['Products.Manufactures' => function ($q) {
+     *      return $q->select(['name'])->where(['Manufactures.active' => true]);
+     *  }]);
+     * ```
+     *
+     * Each association might define special options when eager loaded, the allowed
+     * options that can be set per association are:
+     *
+     * - foreignKey: Used to set a different field to match both endpoints, if set to false
+     *   no join conditions will be generated automatically. `false` can only be used on
+     *   joinable associations and cannot be used with hasMany or belongsToMany associations.
+     * - fields: An array with the fields that should be fetched from the association
+     * - queryBuilder: Equivalent to passing a callable instead of an options array
+     *
+     * ### Example:
+     *
+     * ```
+     * // Set options for the hasMany articles that will be eagerly loaded for an author
+     * $query->contain([
+     *   'Articles' => [
+     *     'fields' => ['title', 'author_id']
+     *   ]
+     * ]);
+     * ```
+     *
+     * When containing associations, it is important to include foreign key columns.
+     * Failing to do so will trigger exceptions.
+     *
+     * ```
+     * // Use special join conditions for getting an Articles's belongsTo 'authors'
+     * $query->contain([
+     *   'Authors' => [
+     *     'foreignKey' => false,
+     *     'queryBuilder' => function ($q) {
+     *       return $q->where(...); // Add full filtering conditions
+     *     }
+     *   ]
+     * ]);
+     * ```
+     *
+     * If called with no arguments, this function will return an array with
+     * with the list of previously configured associations to be contained in the
+     * result.
+     *
+     * If called with an empty first argument and $override is set to true, the
+     * previous list will be emptied.
+     *
+     * @param array|string|null $associations list of endpoint aliases to be queried
+     * @param bool $override whether override previous list with the one passed
+     * defaults to merging previous list with the new one.
+     * @return array|$this
+     */
+    public function contain($associations = null, $override = false)
+    {
+        $loader = $this->eagerLoader();
+        if ($override === true) {
+            $loader->clearContain();
+            $this->_dirty();
         }
-        if (isset($options['conditions'])) {
-            $this->where($options['conditions']);
 
-            unset($options['conditions']);
+        if ($associations === null) {
+            return $loader->contain();
         }
 
-        $this->_options = Hash::merge($this->_options, $options);
-
+        $result = $loader->contain($associations);
+//        $this->_addAssociationsToTypeMap($this->repository(), $this->typeMap(), $result);
         return $this;
     }
 
@@ -452,6 +662,26 @@ class Query implements QueryInterface, IteratorAggregate
     }
 
     /**
+     * Toggle hydrating entities.
+     *
+     * If set to false array results will be returned
+     *
+     * @param bool|null $enable Use a boolean to set the hydration mode.
+     *   Null will fetch the current hydration mode.
+     * @return bool|$this A boolean when reading, and $this when setting the mode.
+     */
+    public function hydrate($enable = null)
+    {
+        if ($enable === null) {
+            return $this->_hydrate;
+        }
+
+        $this->_dirty();
+        $this->_hydrate = (bool)$enable;
+        return $this;
+    }
+
+    /**
      * Trigger the beforeFind event on the query's repository object.
      *
      * Will not trigger more than once, and only for select queries.
@@ -481,6 +711,24 @@ class Query implements QueryInterface, IteratorAggregate
         return $this->_execute();
     }
 
+    public function isConditionSet($conditions)
+    {
+        if (count($conditions) === 0) {
+            return false;
+        }
+
+        return array_keys($conditions) === range(0, count($conditions) - 1);
+    }
+
+    public function mergeConditionsIntoSet($regularConditions, $set)
+    {
+        foreach ($set as &$conditions) {
+            $conditions = Hash::merge($conditions, $regularConditions);
+        }
+
+        return $set;
+    }
+
     /**
      * Executes this query and returns a traversable object containing the results
      *
@@ -493,7 +741,18 @@ class Query implements QueryInterface, IteratorAggregate
             $decorator = $this->_decoratorClass();
             return new $decorator($this->__resultSet);
         }
-        return $this->__resultSet = $this->_webservice->execute($this);
+
+        $start = microtime(true);
+        $result = $this->_webservice->execute($this);
+        if (!$result instanceof WebserviceResultSetInterface) {
+            return $result;
+        }
+
+        QueryLog::log(clone $this, (microtime(true) - $start) * 1000, $result->total());
+
+        $resultSet = $this->eagerLoader()->loadExternal($this, $result);
+
+        return $this->__resultSet = new ResultSet($this, $resultSet, $resultSet->total());
     }
 
     /**
@@ -503,10 +762,14 @@ class Query implements QueryInterface, IteratorAggregate
      */
     public function __debugInfo()
     {
+        $eagerLoader = $this->eagerLoader();
         return [
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
             'action' => $this->action(),
             'formatters' => $this->_formatters,
+            'mapReducers' => count($this->_mapReduce),
+            'contain' => $eagerLoader ? $eagerLoader->contain() : [],
+            'matching' => $eagerLoader ? $eagerLoader->matching() : [],
             'offset' => $this->clause('offset'),
             'page' => $this->page(),
             'limit' => $this->limit(),
@@ -515,7 +778,7 @@ class Query implements QueryInterface, IteratorAggregate
             'extraOptions' => $this->getOptions(),
             'conditions' => $this->where(),
             'repository' => $this->endpoint(),
-            'webservice' => $this->webservice()
+            'webservice' => $this->webservice(),
         ];
     }
 }
