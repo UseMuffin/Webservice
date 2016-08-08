@@ -165,9 +165,11 @@ class QueryTest extends TestCase
     public function testExecuteTwice()
     {
         $mockWebservice = $this
-            ->getMock('\Muffin\Webservice\Test\test_app\Webservice\StaticWebservice', [
+            ->getMockBuilder('\Muffin\Webservice\Test\test_app\Webservice\StaticWebservice')
+            ->setMethods([
                 'execute'
-            ]);
+            ])
+            ->getMock();
         $mockWebservice->expects($this->once())
             ->method('execute')
             ->will($this->returnValue(new ResultSet([
