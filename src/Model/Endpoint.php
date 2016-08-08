@@ -801,11 +801,37 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     {
         $options = new ArrayObject($options + [
             'checkRules' => true,
+            'checkExisting' => false,
         ]);
+
+        if ($resource->errors()) {
+            return false;
+        }
+
+        if ($resource->isNew() === false && !$resource->dirty()) {
+            return $resource;
+        }
+
+        $primaryColumns = (array)$this->primaryKey();
+
+        if ($options['checkExisting'] && $primaryColumns && $resource->isNew() && $resource->has($primaryColumns)) {
+            $alias = $this->alias();
+            $conditions = [];
+            foreach ($resource->extract($primaryColumns) as $k => $v) {
+                $conditions["$alias.$k"] = $v;
+            }
+            $resource->isNew(!$this->exists($conditions));
+        }
 
         $mode = $resource->isNew() ? RulesChecker::CREATE : RulesChecker::UPDATE;
         if ($options['checkRules'] && !$this->checkRules($resource, $mode, $options)) {
             return false;
+        }
+
+        $event = $this->dispatchEvent('Model.beforeSave', compact('entity', 'options'));
+
+        if ($event->isStopped()) {
+            return $event->result;
         }
 
         $data = $resource->extract($this->schema()->columns(), true);
