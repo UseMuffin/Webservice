@@ -491,8 +491,10 @@ class Query implements QueryInterface, IteratorAggregate
         $this->triggerBeforeFind();
         if ($this->__resultSet) {
             $decorator = $this->_decoratorClass();
+
             return new $decorator($this->__resultSet);
         }
+
         return $this->__resultSet = $this->_webservice->execute($this);
     }
 

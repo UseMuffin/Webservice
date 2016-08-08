@@ -50,6 +50,7 @@ class Resource implements EntityInterface, InvalidPropertyInterface
 
         if (!empty($properties) && $options['markClean'] && !$options['useSetters']) {
             $this->_properties = $properties;
+
             return;
         }
 

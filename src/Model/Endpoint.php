@@ -219,6 +219,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             }
             $this->_endpoint = Inflector::underscore($endpoint);
         }
+
         return $this->_endpoint;
     }
 
@@ -264,6 +265,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if ($this->_registryAlias === null) {
             $this->_registryAlias = $this->alias();
         }
+
         return $this->_registryAlias;
     }
 
@@ -305,11 +307,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                         ->describe($this->endpoint())
                 );
             }
+
             return $this->_schema;
         }
         if (is_array($schema)) {
             $schema = new Schema($this->table(), $schema);
         }
+
         return $this->_schema = $schema;
     }
 
@@ -352,6 +356,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function hasField($field)
     {
         $schema = $this->schema();
+
         return $schema->column($field) !== null;
     }
 
@@ -377,6 +382,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             }
             $this->_primaryKey = $key;
         }
+
         return $this->_primaryKey;
     }
 
@@ -406,6 +412,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                 $this->_displayField = 'name';
             }
         }
+
         return $this->_displayField;
     }
 
@@ -495,6 +502,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function find($type = 'all', $options = [])
     {
         $query = $this->query()->read();
+
         return $this->callFinder($type, $query, $options);
     }
 
@@ -623,6 +631,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                 foreach ($fields as $field) {
                     $matches[] = $row[$field];
                 }
+
                 return implode(';', $matches);
             };
         }
@@ -724,6 +733,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if ($callback) {
             $callback($entity);
         }
+
         return $this->save($entity) ?: $entity;
     }
 
@@ -855,6 +865,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
 
         $className = get_class($resource);
+
         return new $className($resource->toArray(), [
             'markNew' => false,
             'markClean' => true
@@ -949,6 +960,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             foreach ($fields as $field) {
                 $conditions[$this->aliasField($field)] = array_shift($args);
             }
+
             return $conditions;
         };
 
@@ -1019,9 +1031,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if ($data === null) {
             $class = $this->resourceClass();
             $entity = new $class([], ['source' => $this->registryAlias()]);
+
             return $entity;
         }
         $marshaller = $this->marshaller();
+
         return $marshaller->one($data, $options);
     }
 
@@ -1031,6 +1045,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function newEntities(array $data, array $options = [])
     {
         $marshaller = $this->marshaller();
+
         return $marshaller->many($data, $options);
     }
 
@@ -1055,6 +1070,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function patchEntity(EntityInterface $entity, array $data, array $options = [])
     {
         $marshaller = $this->marshaller();
+
         return $marshaller->merge($entity, $data, $options);
     }
 
@@ -1080,6 +1096,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function patchEntities($entities, array $data, array $options = [])
     {
         $marshaller = $this->marshaller();
+
         return $marshaller->mergeMany($entities, $data, $options);
     }
 
@@ -1129,6 +1146,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             }
             $events[$event] = $method;
         }
+
         return $events;
     }
 
@@ -1151,6 +1169,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function __debugInfo()
     {
         $conn = $this->connection();
+
         return [
             'registryAlias' => $this->registryAlias(),
             'alias' => $this->alias(),

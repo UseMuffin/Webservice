@@ -79,6 +79,7 @@ class Marshaller
         if (!isset($options['fieldList'])) {
             $entity->set($properties);
             $entity->errors($errors);
+
             return $entity;
         }
 
@@ -89,6 +90,7 @@ class Marshaller
         }
 
         $entity->errors($errors);
+
         return $entity;
     }
 
@@ -167,6 +169,7 @@ class Marshaller
             }
             $output[] = $this->one($record, $options);
         }
+
         return $output;
     }
 
@@ -231,6 +234,7 @@ class Marshaller
         }
 
         $entity->errors($errors);
+
         return $entity;
     }
 
@@ -264,6 +268,7 @@ class Marshaller
                 foreach ($primary as $key) {
                     $keys[] = isset($el[$key]) ? $el[$key] : '';
                 }
+
                 return implode(';', $keys);
             })
             ->map(function ($element, $key) {

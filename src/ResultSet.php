@@ -69,6 +69,7 @@ class ResultSet implements ResultSetInterface
         while ($this->valid()) {
             $this->next();
         }
+
         return serialize($this->_results);
     }
 

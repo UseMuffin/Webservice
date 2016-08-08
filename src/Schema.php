@@ -168,6 +168,7 @@ class Schema
         $attrs = array_intersect_key($attrs, $valid);
         $this->_columns[$name] = $attrs + $valid;
         $this->_typeMap[$name] = $this->_columns[$name]['type'];
+
         return $this;
     }
 
@@ -194,6 +195,7 @@ class Schema
         }
         $column = $this->_columns[$name];
         unset($column['baseType']);
+
         return $column;
     }
 
@@ -214,6 +216,7 @@ class Schema
             $this->_columns[$name]['type'] = $type;
             $this->_typeMap[$name] = $type;
         }
+
         return $this->_columns[$name]['type'];
     }
 
@@ -240,6 +243,7 @@ class Schema
         if (Type::map($type)) {
             $type = Type::build($type)->getBaseType();
         }
+
         return $this->_columns[$column]['baseType'] = $type;
     }
 
@@ -267,6 +271,7 @@ class Schema
         if (!isset($this->_columns[$name])) {
             return true;
         }
+
         return ($this->_columns[$name]['null'] === true);
     }
 
@@ -287,6 +292,7 @@ class Schema
             }
             $defaults[$name] = $data['default'];
         }
+
         return $defaults;
     }
 
@@ -324,6 +330,7 @@ class Schema
             return $this->_options;
         }
         $this->_options = array_merge($this->_options, $options);
+
         return $this;
     }
 }

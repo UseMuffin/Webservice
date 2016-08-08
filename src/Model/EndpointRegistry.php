@@ -40,6 +40,7 @@ class EndpointRegistry
                     $alias
                 ));
             }
+
             return self::$_instances[$alias];
         }
 
