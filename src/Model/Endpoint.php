@@ -311,7 +311,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return $this->_schema;
         }
         if (is_array($schema)) {
-            $schema = new Schema($this->table(), $schema);
+            $schema = new Schema($this->endpoint(), $schema);
         }
 
         return $this->_schema = $schema;

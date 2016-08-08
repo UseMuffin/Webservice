@@ -12,6 +12,10 @@ use SomeVendor\SomePlugin\Model\Endpoint\PluginEndpoint;
 
 class EndpointTest extends TestCase
 {
+    /**
+     * @var \Muffin\Webservice\Connection
+     */
+    public $connection;
 
     /**
      * @var Endpoint
@@ -25,11 +29,12 @@ class EndpointTest extends TestCase
     {
         parent::setUp();
 
+        $this->connection = new Connection([
+            'name' => 'test',
+            'service' => 'Test'
+        ]);
         $this->endpoint = new TestEndpoint([
-            'connection' => new Connection([
-                'name' => 'test',
-                'service' => 'Test'
-            ]),
+            'connection' => $this->connection,
             'primaryKey' => 'id',
             'displayField' => 'title'
         ]);
@@ -199,5 +204,137 @@ class EndpointTest extends TestCase
     {
         $this->assertEquals('test_app', AppEndpoint::defaultConnectionName());
         $this->assertEquals('some_plugin', PluginEndpoint::defaultConnectionName());
+    }
+
+    /**
+     * Test that aliasField() works.
+     *
+     * @return void
+     */
+    public function testAliasField()
+    {
+        $endpoint = new Endpoint(['alias' => 'Users']);
+        $this->assertEquals('Users.id', $endpoint->aliasField('id'));
+    }
+
+    /**
+     * Tests connection method
+     *
+     * @return void
+     */
+    public function testConnection()
+    {
+        $endpoint = new Endpoint(['endpoint' => 'users']);
+        $this->assertNull($endpoint->connection());
+        $endpoint->connection($this->connection);
+        $this->assertSame($this->connection, $endpoint->connection());
+    }
+
+    /**
+     * Tests primaryKey method
+     *
+     * @return void
+     */
+    public function testPrimaryKey()
+    {
+        $endpoint = new Endpoint([
+            'endpoint' => 'users',
+            'schema' => [
+                'id' => ['type' => 'integer', 'primaryKey' => true],
+            ]
+        ]);
+        $this->assertEquals('id', $endpoint->primaryKey());
+        $endpoint->primaryKey('thingID');
+        $this->assertEquals('thingID', $endpoint->primaryKey());
+
+        $endpoint->primaryKey(['thingID', 'user_id']);
+        $this->assertEquals(['thingID', 'user_id'], $endpoint->primaryKey());
+    }
+
+    /**
+     * Tests that name will be selected as a displayField
+     *
+     * @return void
+     */
+    public function testDisplayFieldName()
+    {
+        $endpoint = new Endpoint([
+            'endpoint' => 'users',
+            'schema' => [
+                'foo' => ['type' => 'string'],
+                'name' => ['type' => 'string']
+            ]
+        ]);
+        $this->assertEquals('name', $endpoint->displayField());
+    }
+
+    /**
+     * Tests that title will be selected as a displayField
+     *
+     * @return void
+     */
+    public function testDisplayFieldTitle()
+    {
+        $endpoint = new Endpoint([
+            'endpoint' => 'users',
+            'schema' => [
+                'foo' => ['type' => 'string'],
+                'title' => ['type' => 'string']
+            ]
+        ]);
+        $this->assertEquals('title', $endpoint->displayField());
+    }
+
+    /**
+     * Tests that no displayField will fallback to primary key
+     *
+     * @return void
+     */
+    public function testDisplayFallback()
+    {
+        $endpoint = new Endpoint([
+            'endpoint' => 'users',
+            'schema' => [
+                'id' => ['type' => 'string', 'primaryKey' => true],
+                'foo' => ['type' => 'string'],
+            ]
+        ]);
+        $this->assertEquals('id', $endpoint->displayField());
+    }
+
+    /**
+     * Tests that displayField can be changed
+     *
+     * @return void
+     */
+    public function testDisplaySet()
+    {
+        $endpoint = new Endpoint([
+            'endpoint' => 'users',
+            'schema' => [
+                'id' => ['type' => 'string', 'primaryKey' => true],
+                'foo' => ['type' => 'string'],
+            ]
+        ]);
+        $this->assertEquals('id', $endpoint->displayField());
+        $endpoint->displayField('foo');
+        $this->assertEquals('foo', $endpoint->displayField());
+    }
+
+
+    /**
+     * Tests schema method
+     *
+     * @return void
+     */
+    public function testSchema()
+    {
+        $endpoint = new Endpoint(['endpoint' => 'another']);
+        $schema = ['id' => ['type' => 'integer']];
+        $endpoint->schema($schema);
+        $this->assertEquals(
+            new \Muffin\Webservice\Schema('another', $schema),
+            $endpoint->schema()
+        );
     }
 }
