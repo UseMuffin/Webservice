@@ -168,7 +168,7 @@ The following plugins use the Webservice ORM to give you easy access to all kind
 
 The following plugins implement a Webservice driver with their own methods:
 
-- [GitHub plugin](https://github.com/UseMuffn/Github) - Provides access to the GitHub REST APIs.
+- [GitHub plugin](https://github.com/UseMuffin/Github) - Provides access to the GitHub REST APIs.
 - [Pusher plugin](https://github.com/UseMuffin/Pusher) - Provides access to the Pusher APIs.
 - [TMDB plugin](https://github.com/drmonkeyninja/cakephp-tmdb) - Provides access to the TMDB APIs.
 
