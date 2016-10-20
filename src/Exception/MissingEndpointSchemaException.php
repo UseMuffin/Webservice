@@ -10,5 +10,5 @@ class MissingEndpointSchemaException extends Exception
     /**
      * {@inheritDoc}
      */
-    protected $_messageTemplate = 'Missing schema %s or webservice %s discribe implementation';
+    protected $_messageTemplate = 'Missing schema %s or webservice %s describe implementation';
 }
