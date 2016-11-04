@@ -41,9 +41,12 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param array $config Custom configuration.
      */
-    public function __construct($config)
+    public function __construct($config = [])
     {
-        $this->config($config);
+        if (!empty($config)) {
+            $this->config($config);            
+        }
+        
         $this->initialize();
     }
 
