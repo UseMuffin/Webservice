@@ -850,7 +850,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $query = $this->query()->create();
         } else {
             $query = $this->query()->update()->where([
-                $this->primaryKey() => $resource->get($this->primaryKey())
+                $resource->extract((array)$this->primaryKey())
             ]);
         }
         $query->set($data);
