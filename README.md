@@ -129,6 +129,11 @@ use Cake\Event\Event;
 
 class ArticlesController extends AppController
 {
+    public function initialize()
+    {
+        // You can also put this in AppController::initialize() itself
+        $this->modelFactory('Endpoint', ['Muffin\Webservice\Model\EndpointRegistry', 'get']);
+    }
 
     public function beforeFilter(Event $event)
     {
