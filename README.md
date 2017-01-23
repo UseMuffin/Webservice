@@ -12,7 +12,7 @@ Bringing the power of the CakePHP ORM to your favourite webservices.
 Using [Composer][composer]:
 
 ```
-composer require muffin/webservice:dev-master
+composer require muffin/webservice
 ```
 
 You then need to load the plugin. You can use the shell command:
