@@ -54,5 +54,10 @@
         "psr-4": {
             "Muffin\\Webservice\\Test\\": "tests"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }
