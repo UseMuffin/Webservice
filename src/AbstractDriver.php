@@ -44,9 +44,9 @@ abstract class AbstractDriver implements LoggerAwareInterface
     public function __construct($config = [])
     {
         if (!empty($config)) {
-            $this->config($config);            
+            $this->config($config);
         }
-        
+
         $this->initialize();
     }
 
@@ -200,16 +200,19 @@ abstract class AbstractDriver implements LoggerAwareInterface
      */
     protected function _createWebservice($className, array $options = [])
     {
-        $namespaceParts = explode('\\', get_class($this));
-
-        $pluginName = implode('/', array_reverse(array_slice(array_reverse($namespaceParts), -2)));
-
         $webservice = App::className($className, 'Webservice', 'Webservice');
         if ($webservice) {
             return new $webservice($options);
         }
 
-        $fallbackWebserviceClass = $pluginName . '.' . end($namespaceParts);
+        $namespaceParts = explode('\\', get_class($this));
+        $fallbackWebserviceClass = end($namespaceParts);
+
+        list($pluginName) = pluginSplit($className);
+        if ($pluginName) {
+            $fallbackWebserviceClass = $pluginName . '.' . $fallbackWebserviceClass;
+        }
+
         $fallbackWebservice = App::className($fallbackWebserviceClass, 'Webservice', 'Webservice');
         if ($fallbackWebservice) {
             return new $fallbackWebservice($options);
