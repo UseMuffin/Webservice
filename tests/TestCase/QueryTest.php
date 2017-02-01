@@ -212,6 +212,17 @@ class QueryTest extends TestCase
         ], $this->query->__debugInfo());
     }
 
+    public function testJsonSerialize()
+    {
+        $expected = [
+            ['id' => 1, 'title' => 'Hello World'],
+            ['id' => 2, 'title' => 'New ORM'],
+            ['id' => 3, 'title' => 'Webservices']
+        ];
+
+        $this->assertEquals(json_encode($expected), json_encode($this->query));
+    }
+
     /**
      * @inheritDoc
      */

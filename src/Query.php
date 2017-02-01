@@ -8,10 +8,11 @@ use Cake\Datasource\QueryInterface;
 use Cake\Datasource\QueryTrait;
 use Cake\Utility\Hash;
 use IteratorAggregate;
+use JsonSerializable;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 
-class Query implements QueryInterface, IteratorAggregate
+class Query implements IteratorAggregate, JsonSerializable, QueryInterface
 {
 
     use QueryTrait;
@@ -519,5 +520,17 @@ class Query implements QueryInterface, IteratorAggregate
             'repository' => $this->endpoint(),
             'webservice' => $this->webservice()
         ];
+    }
+
+    /**
+     * Executes the query and converts the result set into JSON.
+     *
+     * Part of JsonSerializable interface.
+     *
+     * @return \Cake\Datasource\ResultSetInterface The data to convert to JSON.
+     */
+    public function jsonSerialize()
+    {
+        return $this->all();
     }
 }
