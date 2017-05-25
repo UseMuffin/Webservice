@@ -100,7 +100,6 @@ $config = [
 ConnectionManager::config('test', $config);
 ConnectionManager::config('test_webservice', $config);
 
-
 Log::config([
     'debug' => [
         'engine' => 'Cake\Log\Engine\FileLog',

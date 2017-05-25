@@ -321,7 +321,6 @@ class EndpointTest extends TestCase
         $this->assertEquals('foo', $endpoint->displayField());
     }
 
-
     /**
      * Tests schema method
      *

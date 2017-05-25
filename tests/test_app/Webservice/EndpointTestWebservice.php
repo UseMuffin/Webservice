@@ -45,7 +45,6 @@ class EndpointTestWebservice extends Webservice
         ];
     }
 
-
     protected function _executeCreateQuery(Query $query, array $options = [])
     {
         $fields = $query->set();
