@@ -24,6 +24,31 @@ class EndpointRegistry
     protected static $_options = [];
 
     /**
+     * Clear the endpoint registry of all instances
+     *
+     * @return void
+     */
+    public static function clear()
+    {
+        self::$_instances = [];
+        self::$_options = [];
+    }
+
+    /**
+     * Remove a specific endpoint instance from the registry by alias
+     *
+     * @param string $alias String alias of the endpoint
+     * @return void
+     */
+    public static function remove($alias)
+    {
+        unset(
+            self::$_instances[$alias],
+            self::$_options[$alias]
+        );
+    }
+
+    /**
      * Get a endpoint instance from the registry.
      *
      * @param string $alias The alias name you want to get.
