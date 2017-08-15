@@ -31,18 +31,32 @@ class ResultSet implements ResultSetInterface
      */
     protected $_results = [];
 
+    /**
+     * Total number of records
+     *
+     * @var int
+     */
     protected $_total;
+
+    /**
+     * Array of pagination data
+     *
+     * @var array
+     */
+    protected $_pagination;
 
     /**
      * Construct the ResultSet
      *
      * @param array $resources The resources to attach
-     * @param int|null $total The total amount of resources available
+     * @param int $total The total amount of resources available
+     * @param array $pagination Array of pagination data
      */
-    public function __construct(array $resources, $total = null)
+    public function __construct(array $resources, $total = null, array $pagination = [])
     {
         $this->_results = \SplFixedArray::fromArray($resources, false);
         $this->_total = $total;
+        $this->_pagination = $pagination;
     }
 
     /**
@@ -127,5 +141,15 @@ class ResultSet implements ResultSetInterface
     public function total()
     {
         return $this->_total;
+    }
+
+    /**
+     * Return the pagination data array
+     *
+     * @return array
+     */
+    public function pagination()
+    {
+        return $this->_pagination;
     }
 }
