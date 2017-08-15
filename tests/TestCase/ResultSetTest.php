@@ -35,8 +35,8 @@ class ResultSetTest extends TestCase
                     'id' => 3,
                     'title' => 'Webservices'
                 ])
-            ], 
-            6, 
+            ],
+            6,
             ['count' => 6, 'prevPage' => false, 'nextPage' => false]
         );
     }

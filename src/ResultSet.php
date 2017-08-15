@@ -33,14 +33,14 @@ class ResultSet implements ResultSetInterface
 
     /**
      * Total number of records
-     * 
+     *
      * @var int
      */
     protected $_total;
 
     /**
      * Array of pagination data
-     * 
+     *
      * @var array
      */
     protected $_pagination;
@@ -49,8 +49,8 @@ class ResultSet implements ResultSetInterface
      * Construct the ResultSet
      *
      * @param array $resources The resources to attach
-     * @param array $pagination Array of pagination data
-     * @param int|null $total The total amount of resources available
+     * @param array $total Array of pagination data
+     * @param null $pagination The total amount of resources available
      */
     public function __construct(array $resources, $total = null, array $pagination = [])
     {
@@ -145,7 +145,7 @@ class ResultSet implements ResultSetInterface
 
     /**
      * Return the pagination data array
-     * 
+     *
      * @return array
      */
     public function pagination()
