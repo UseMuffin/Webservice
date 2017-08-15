@@ -49,8 +49,8 @@ class ResultSet implements ResultSetInterface
      * Construct the ResultSet
      *
      * @param array $resources The resources to attach
-     * @param array $total Array of pagination data
-     * @param null $pagination The total amount of resources available
+     * @param int $total The total amount of resources available
+     * @param array $pagination Array of pagination data
      */
     public function __construct(array $resources, $total = null, array $pagination = [])
     {
