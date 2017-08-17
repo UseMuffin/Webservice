@@ -4,6 +4,7 @@ namespace Muffin\Webservice;
 use ArrayObject;
 use Cake\Collection\Collection;
 use Cake\Datasource\EntityInterface;
+use Cake\Datasource\InvalidPropertyInterface;
 use Muffin\Webservice\Model\Endpoint;
 use RuntimeException;
 
@@ -211,7 +212,7 @@ class Marshaller
         $properties = [];
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
-                if (method_exists($entity, 'invalid')) {
+                if ($entity instanceof InvalidPropertyInterface) {
                     $entity->invalid($key, $value);
                 }
                 continue;

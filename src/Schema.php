@@ -2,6 +2,8 @@
 
 namespace Muffin\Webservice;
 
+use Cake\Database\Type;
+
 /**
  * Represents a single endpoint in a database schema.
  *
@@ -226,7 +228,7 @@ class Schema
      * based upon.
      *
      * @param string $column The column name to get the base type from
-     * @return string The base type name
+     * @return string|null The base type name
      */
     public function baseColumnType($column)
     {
