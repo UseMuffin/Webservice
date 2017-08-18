@@ -234,7 +234,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param string $field The field to alias.
      * @param null $alias Not being used
      *
-     * @return string The field prefixed with the endpoint alias.
+     * @return array The field prefixed with the endpoint alias.
      */
     public function aliasField($field, $alias = null)
     {

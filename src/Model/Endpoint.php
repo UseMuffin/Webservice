@@ -231,13 +231,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function alias($alias = null)
     {
-        if ($alias === null) {
-            return $this->_alias;
+        if ($alias !== null) {
+            $this->_alias = $alias;
         }
 
-        $this->_alias = $alias;
-
-        return $this;
+        return $this->_alias;
     }
 
     /**
@@ -968,6 +966,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             );
         }
 
+        $conditions = [];
         if ($hasOr === false && $hasAnd === false) {
             $conditions = $makeConditions([$fields], $args);
         } elseif ($hasOr !== false) {

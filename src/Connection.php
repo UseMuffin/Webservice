@@ -9,6 +9,13 @@ use Muffin\Webservice\Exception\UnexpectedDriverException;
 class Connection
 {
     /**
+     * Driver
+     *
+     * @var \Muffin\Webservice\AbstractDriver
+     */
+    protected $_driver;
+
+    /**
      * Constructor
      *
      * @param array $config Custom configuration.
