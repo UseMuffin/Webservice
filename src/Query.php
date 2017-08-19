@@ -428,7 +428,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             $this->_execute();
         }
 
-        return $this->__resultSet->total();
+        if(is_a($this->__resultSet, '\Cake\Datasource\ResultSetInterface')) {
+            return $this->__resultSet->total();
+        } else {
+            return false;
+        }
     }
 
     /**
