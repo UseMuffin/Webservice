@@ -49,6 +49,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @var string
      */
     const VALIDATOR_PROVIDER_NAME = 'endpoint';
+    
+     /**
+     * The name of the event dispatched when a validator has been built.
+     *
+     * @var string
+     */
+    const BUILD_VALIDATOR_EVENT = 'Model.buildValidator';
 
     protected $_connection;
 
