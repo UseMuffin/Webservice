@@ -231,6 +231,19 @@ class EndpointTest extends TestCase
     }
 
     /**
+     * Tests inflect method
+     *
+     * @return void
+     */
+    public function testInflect()
+    {
+        $endpoint = new Endpoint(['endpoint' => 'users']);
+        $this->assertSame('underscore', $endpoint->inflect());
+        $endpoint->inflect('dasherize');
+        $this->assertSame('dasherize', $endpoint->inflect());
+    }
+
+    /**
      * Tests primaryKey method
      *
      * @return void
