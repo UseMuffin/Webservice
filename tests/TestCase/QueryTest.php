@@ -57,7 +57,7 @@ class QueryTest extends TestCase
 
     public function testCountNonReadAction()
     {
-        $this->assertEquals(false, $this->query->count());
+        $this->assertEquals(0, $this->query->count());
     }
 
     public function testCount()

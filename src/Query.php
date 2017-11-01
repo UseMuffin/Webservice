@@ -416,19 +416,23 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Returns the total amount of results for this query
      *
-     * @return bool|int
+     * @return int
      */
     public function count()
     {
         if ($this->action() !== self::ACTION_READ) {
-            return false;
+            return 0;
         }
 
         if (!$this->__resultSet) {
             $this->_execute();
         }
 
-        return $this->__resultSet->total();
+        if ($this->__resultSet) {
+            return $this->__resultSet->total();
+        }
+
+        return 0;
     }
 
     /**
