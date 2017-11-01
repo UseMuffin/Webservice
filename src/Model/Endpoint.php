@@ -109,6 +109,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     protected $_alias;
 
     /**
+     * The inflect method to use for endpoint routes
+     *
+     * @var string
+     */
+    protected $_inflect = 'underscore';
+
+    /**
      * Initializes a new instance
      *
      * The $config array understands the following keys:
@@ -152,6 +159,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
         if (!empty($config['resourceClass'])) {
             $this->resourceClass($config['resourceClass']);
+        }
+        if (!empty($config['inflect'])) {
+            $this->inflect($config['inflect']);
         }
 
         $this->_eventManager = $eventManager ?: new EventManager();
@@ -217,7 +227,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             if (empty($endpoint)) {
                 $endpoint = $this->alias();
             }
-            $this->_endpoint = Inflector::underscore($endpoint);
+            $inflectMethod = $this->inflect();
+            $this->_endpoint = Inflector::$inflectMethod($endpoint);
         }
 
         return $this->_endpoint;
@@ -450,6 +461,22 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
 
         return $this->_resourceClass;
+    }
+
+    /**
+     * Returns the inflect method or sets a new one
+     *
+     * @param null $method
+     *
+     * @return null|string
+     */
+    public function inflect($method = null)
+    {
+        if ($method === null) {
+            return $this->_inflect;
+        }
+
+        return $this->_inflect = $method;
     }
 
     /**
