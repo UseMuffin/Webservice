@@ -40,6 +40,15 @@ class EndpointTest extends TestCase
         ]);
     }
 
+    public function testEndpoint()
+    {
+        $endpoint = new Endpoint(['alias' => 'UserGroups']);
+        $this->assertSame('user_groups', $endpoint->endpoint());
+
+        $endpoint = new Endpoint(['alias' => 'UserGroups', 'inflect' => 'dasherize']);
+        $this->assertSame('user-groups', $endpoint->endpoint());
+    }
+
     public function testFind()
     {
         $query = $this->endpoint->find();
