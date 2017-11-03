@@ -45,7 +45,7 @@ class EndpointTest extends TestCase
         $endpoint = new Endpoint(['alias' => 'UserGroups']);
         $this->assertSame('user_groups', $endpoint->endpoint());
 
-        $endpoint = new Endpoint(['alias' => 'UserGroups', 'inflection' => 'dasherize']);
+        $endpoint = new Endpoint(['alias' => 'UserGroups', 'inflect' => 'dasherize']);
         $this->assertSame('user-groups', $endpoint->endpoint());
     }
 

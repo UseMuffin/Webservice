@@ -113,7 +113,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @var string
      */
-    protected $_inflection = 'underscore';
+    protected $_inflectionMethod = 'underscore';
 
     /**
      * Initializes a new instance
@@ -160,8 +160,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if (!empty($config['resourceClass'])) {
             $this->resourceClass($config['resourceClass']);
         }
-        if (!empty($config['inflection'])) {
-            $this->inflectionMethod($config['inflection']);
+        if (!empty($config['inflect'])) {
+            $this->inflectionMethod($config['inflect']);
         }
 
         $this->_eventManager = $eventManager ?: new EventManager();
@@ -473,10 +473,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function inflectionMethod($method = null)
     {
         if ($method === null) {
-            return $this->_inflection;
+            return $this->_inflectionMethod;
         }
 
-        return $this->_inflection = $method;
+        return $this->_inflectionMethod = $method;
     }
 
     /**
