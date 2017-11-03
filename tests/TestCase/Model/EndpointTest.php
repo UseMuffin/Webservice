@@ -40,6 +40,15 @@ class EndpointTest extends TestCase
         ]);
     }
 
+    public function testEndpoint()
+    {
+        $endpoint = new Endpoint(['alias' => 'UserGroups']);
+        $this->assertSame('user_groups', $endpoint->endpoint());
+
+        $endpoint = new Endpoint(['alias' => 'UserGroups', 'inflect' => 'dasherize']);
+        $this->assertSame('user-groups', $endpoint->endpoint());
+    }
+
     public function testFind()
     {
         $query = $this->endpoint->find();
@@ -172,7 +181,7 @@ class EndpointTest extends TestCase
             'title' => 'New entity',
             'body' => 'New entity body'
         ]), $this->endpoint->newEntity([
-           'title' => 'New entity',
+            'title' => 'New entity',
             'body' => 'New entity body'
         ]));
     }
@@ -228,6 +237,19 @@ class EndpointTest extends TestCase
         $this->assertNull($endpoint->connection());
         $endpoint->connection($this->connection);
         $this->assertSame($this->connection, $endpoint->connection());
+    }
+
+    /**
+     * Tests inflectionMethod method
+     *
+     * @return void
+     */
+    public function testInflectionMethod()
+    {
+        $endpoint = new Endpoint(['endpoint' => 'users']);
+        $this->assertSame('underscore', $endpoint->inflectionMethod());
+        $endpoint->inflectionMethod('dasherize');
+        $this->assertSame('dasherize', $endpoint->inflectionMethod());
     }
 
     /**
