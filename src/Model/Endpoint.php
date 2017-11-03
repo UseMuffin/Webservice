@@ -113,7 +113,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @var string
      */
-    protected $_inflect = 'underscore';
+    protected $_inflection = 'underscore';
 
     /**
      * Initializes a new instance
@@ -160,8 +160,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if (!empty($config['resourceClass'])) {
             $this->resourceClass($config['resourceClass']);
         }
-        if (!empty($config['inflect'])) {
-            $this->inflect($config['inflect']);
+        if (!empty($config['inflection'])) {
+            $this->inflectionMethod($config['inflection']);
         }
 
         $this->_eventManager = $eventManager ?: new EventManager();
@@ -227,7 +227,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             if (empty($endpoint)) {
                 $endpoint = $this->alias();
             }
-            $inflectMethod = $this->inflect();
+            $inflectMethod = $this->inflectionMethod();
             $this->_endpoint = Inflector::$inflectMethod($endpoint);
         }
 
@@ -466,17 +466,17 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Returns the inflect method or sets a new one
      *
-     * @param null $method
+     * @param null|string $method The inflection method to use
      *
      * @return null|string
      */
-    public function inflect($method = null)
+    public function inflectionMethod($method = null)
     {
         if ($method === null) {
-            return $this->_inflect;
+            return $this->_inflection;
         }
 
-        return $this->_inflect = $method;
+        return $this->_inflection = $method;
     }
 
     /**
@@ -835,9 +835,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function save(EntityInterface $resource, $options = [])
     {
         $options = new ArrayObject($options + [
-            'checkRules' => true,
-            'checkExisting' => false,
-        ]);
+                'checkRules' => true,
+                'checkExisting' => false,
+            ]);
 
         if ($resource->errors()) {
             return false;
