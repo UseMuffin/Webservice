@@ -200,6 +200,15 @@ class WebserviceTest extends TestCase
         $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resources[0]);
     }
 
+    public function testDescribe()
+    {
+        $service = new TestWebservice();
+
+        $result = $service->describe('test');
+        $this->assertInstanceOf('\Muffin\Webservice\Model\Schema', $result);
+        $this->assertEquals('Test', $result->name());
+    }
+
     public function testDebugInfo()
     {
         $this->assertEquals([
