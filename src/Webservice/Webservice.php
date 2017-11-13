@@ -168,7 +168,8 @@ abstract class Webservice implements WebserviceInterface
         $shortName = App::shortName(get_class($this), 'Webservice', 'Webservice');
         list($plugin, $name) = pluginSplit($shortName);
 
-        $schemaShortName = implode('.', array_filter([$plugin, Inflector::classify($endpoint)]));
+        $endpoint = Inflector::classify(str_replace('-', '_', $endpoint));
+        $schemaShortName = implode('.', array_filter([$plugin, $endpoint]));
         $schemaClassName = App::className($schemaShortName, 'Model/Endpoint/Schema', 'Schema');
         if ($schemaClassName) {
             return new $schemaClassName($endpoint);
