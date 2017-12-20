@@ -65,6 +65,7 @@ namespace App\Webservice;
 
 use Cake\Network\Http\Client;
 use Muffin\Webservice\Query;
+use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Webservice\Webservice;
 
 class ArticlesWebservice extends Webservice
