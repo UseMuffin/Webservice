@@ -40,13 +40,25 @@ class EndpointTest extends TestCase
         ]);
     }
 
-    public function testEndpoint()
+    public function providerEndpointNames()
     {
-        $endpoint = new Endpoint(['alias' => 'UserGroups']);
-        $this->assertSame('user_groups', $endpoint->endpoint());
+        return [
+            'No inflector' => ['user-groups', null, 'user_groups'],
+            'Dasherize' => ['user-groups', 'dasherize', 'user-groups'],
+            'Variable' => ['user-groups', 'variable', 'userGroups'],
+        ];
+    }
 
-        $endpoint = new Endpoint(['alias' => 'UserGroups', 'inflect' => 'dasherize']);
-        $this->assertSame('user-groups', $endpoint->endpoint());
+    /**
+     * @dataProvider providerEndpointNames
+     * @param string $name
+     * @param string|null $inflector
+     * @param string $expected
+     */
+    public function testEndpointName($name, $inflector, $expected)
+    {
+        $endpoint = new Endpoint(['name' => $name, 'inflect' => $inflector]);
+        $this->assertSame($expected, $endpoint->getName());
     }
 
     public function testFind()
@@ -233,10 +245,10 @@ class EndpointTest extends TestCase
      */
     public function testConnection()
     {
-        $endpoint = new Endpoint(['endpoint' => 'users']);
-        $this->assertNull($endpoint->connection());
-        $endpoint->connection($this->connection);
-        $this->assertSame($this->connection, $endpoint->connection());
+        $endpoint = new Endpoint(['name' => 'users']);
+        $this->assertNull($endpoint->getConnection());
+        $endpoint->setConnection($this->connection);
+        $this->assertSame($this->connection, $endpoint->getConnection());
     }
 
     /**
@@ -246,10 +258,10 @@ class EndpointTest extends TestCase
      */
     public function testInflectionMethod()
     {
-        $endpoint = new Endpoint(['endpoint' => 'users']);
-        $this->assertSame('underscore', $endpoint->inflectionMethod());
-        $endpoint->inflectionMethod('dasherize');
-        $this->assertSame('dasherize', $endpoint->inflectionMethod());
+        $endpoint = new Endpoint(['name' => 'users']);
+        $this->assertSame('underscore', $endpoint->getInflectionMethod());
+        $endpoint->setInflectionMethod('dasherize');
+        $this->assertSame('dasherize', $endpoint->getInflectionMethod());
     }
 
     /**
@@ -265,12 +277,12 @@ class EndpointTest extends TestCase
                 'id' => ['type' => 'integer', 'primaryKey' => true],
             ]
         ]);
-        $this->assertEquals('id', $endpoint->primaryKey());
-        $endpoint->primaryKey('thingID');
-        $this->assertEquals('thingID', $endpoint->primaryKey());
+        $this->assertEquals('id', $endpoint->getPrimaryKey());
+        $endpoint->setPrimaryKey('thingID');
+        $this->assertEquals('thingID', $endpoint->getPrimaryKey());
 
-        $endpoint->primaryKey(['thingID', 'user_id']);
-        $this->assertEquals(['thingID', 'user_id'], $endpoint->primaryKey());
+        $endpoint->setPrimaryKey(['thingID', 'user_id']);
+        $this->assertEquals(['thingID', 'user_id'], $endpoint->getPrimaryKey());
     }
 
     /**
@@ -287,7 +299,7 @@ class EndpointTest extends TestCase
                 'name' => ['type' => 'string']
             ]
         ]);
-        $this->assertEquals('name', $endpoint->displayField());
+        $this->assertEquals('name', $endpoint->getDisplayField());
     }
 
     /**
@@ -304,7 +316,7 @@ class EndpointTest extends TestCase
                 'title' => ['type' => 'string']
             ]
         ]);
-        $this->assertEquals('title', $endpoint->displayField());
+        $this->assertEquals('title', $endpoint->getDisplayField());
     }
 
     /**
@@ -321,7 +333,7 @@ class EndpointTest extends TestCase
                 'foo' => ['type' => 'string'],
             ]
         ]);
-        $this->assertEquals('id', $endpoint->displayField());
+        $this->assertEquals('id', $endpoint->getDisplayField());
     }
 
     /**
@@ -338,9 +350,9 @@ class EndpointTest extends TestCase
                 'foo' => ['type' => 'string'],
             ]
         ]);
-        $this->assertEquals('id', $endpoint->displayField());
-        $endpoint->displayField('foo');
-        $this->assertEquals('foo', $endpoint->displayField());
+        $this->assertEquals('id', $endpoint->getDisplayField());
+        $endpoint->setDisplayField('foo');
+        $this->assertEquals('foo', $endpoint->getDisplayField());
     }
 
     /**
@@ -350,12 +362,12 @@ class EndpointTest extends TestCase
      */
     public function testSchema()
     {
-        $endpoint = new Endpoint(['endpoint' => 'another']);
+        $endpoint = new Endpoint(['name' => 'another']);
         $schema = ['id' => ['type' => 'integer']];
-        $endpoint->schema($schema);
+        $endpoint->setSchema($schema);
         $this->assertEquals(
             new \Muffin\Webservice\Schema('another', $schema),
-            $endpoint->schema()
+            $endpoint->getSchema()
         );
     }
 }

@@ -11,10 +11,10 @@ class AbstractDriverTest extends TestCase
     {
         $driver = new TestPlugin;
 
-        $webservice = $driver->webservice('test_plugin');
+        $webservice = $driver->getWebservice('test_plugin');
         $this->assertInstanceOf('TestPlugin\Webservice\TestPluginWebservice', $webservice);
 
-        $webservice = $driver->webservice('foo');
+        $webservice = $driver->getWebservice('foo');
         $this->assertInstanceOf('TestPlugin\Webservice\TestPluginWebservice', $webservice);
     }
 
@@ -22,10 +22,10 @@ class AbstractDriverTest extends TestCase
     {
         $driver = new SomePlugin;
 
-        $webservice = $driver->webservice('some_plugin');
+        $webservice = $driver->getWebservice('some_plugin');
         $this->assertInstanceOf('SomeVendor\SomePlugin\Webservice\SomePluginWebservice', $webservice);
 
-        $webservice = $driver->webservice('foo');
+        $webservice = $driver->getWebservice('foo');
         $this->assertInstanceOf('SomeVendor\SomePlugin\Webservice\SomePluginWebservice', $webservice);
     }
 }

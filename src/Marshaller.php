@@ -51,11 +51,11 @@ class Marshaller
     {
         list($data, $options) = $this->_prepareDataAndOptions($data, $options);
 
-        $primaryKey = (array)$this->_endpoint->primaryKey();
-        $resourceClass = $this->_endpoint->resourceClass();
+        $primaryKey = (array)$this->_endpoint->getPrimaryKey();
+        $resourceClass = $this->_endpoint->getResourceClass();
         /* @var \Muffin\Webservice\Model\Resource $entity */
         $entity = new $resourceClass();
-        $entity->setSource($this->_endpoint->registryAlias());
+        $entity->setSource($this->_endpoint->getRegistryAlias());
 
         if (isset($options['accessibleFields'])) {
             foreach ((array)$options['accessibleFields'] as $key => $value) {
@@ -135,7 +135,7 @@ class Marshaller
     {
         $options += ['validate' => true];
 
-        $endpointName = $this->_endpoint->alias();
+        $endpointName = $this->_endpoint->getAlias();
         if (isset($data[$endpointName])) {
             $data = $data[$endpointName];
         }
@@ -199,7 +199,7 @@ class Marshaller
         $keys = [];
 
         if (!$isNew) {
-            $keys = $entity->extract((array)$this->_endpoint->primaryKey());
+            $keys = $entity->extract((array)$this->_endpoint->getPrimaryKey());
         }
 
         if (isset($options['accessibleFields'])) {
@@ -261,7 +261,7 @@ class Marshaller
      */
     public function mergeMany($entities, array $data, array $options = [])
     {
-        $primary = (array)$this->_endpoint->primaryKey();
+        $primary = (array)$this->_endpoint->getPrimaryKey();
 
         $indexed = (new Collection($data))
             ->groupBy(function ($el) use ($primary) {
