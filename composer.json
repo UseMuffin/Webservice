@@ -39,9 +39,9 @@
         "irc": "irc://irc.freenode.org/muffin"
     },
     "require": {
+        "cakephp/cakephp": "~3.4"
     },
     "require-dev": {
-        "cakephp/cakephp": "~3.4",
         "cakephp/cakephp-codesniffer": "2.*",
         "phpunit/phpunit": "<6.0"
     },
