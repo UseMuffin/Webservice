@@ -839,11 +839,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                 'checkExisting' => false,
             ]);
 
-        if ($resource->errors()) {
+        if ($resource->getErrors()) {
             return false;
         }
 
-        if ($resource->isNew() === false && !$resource->dirty()) {
+        if ($resource->isNew() === false && !$resource->isDirty()) {
             return $resource;
         }
 

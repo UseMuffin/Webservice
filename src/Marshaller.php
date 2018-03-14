@@ -67,7 +67,7 @@ class Marshaller
         $properties = [];
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
-                $entity->setInvalid($key, $value);
+                $entity->setInvalidField($key, $value);
                 continue;
             }
             if ($value === '' && in_array($key, $primaryKey, true)) {
@@ -110,10 +110,10 @@ class Marshaller
             return [];
         }
         if ($options['validate'] === true) {
-            $options['validate'] = $this->_endpoint->validator('default');
+            $options['validate'] = $this->_endpoint->getValidator('default');
         }
         if (is_string($options['validate'])) {
-            $options['validate'] = $this->_endpoint->validator($options['validate']);
+            $options['validate'] = $this->_endpoint->getValidator($options['validate']);
         }
         if (!is_object($options['validate'])) {
             throw new RuntimeException(
@@ -204,7 +204,7 @@ class Marshaller
 
         if (isset($options['accessibleFields'])) {
             foreach ((array)$options['accessibleFields'] as $key => $value) {
-                $entity->accessible($key, $value);
+                $entity->setAccess($key, $value);
             }
         }
 
@@ -213,7 +213,7 @@ class Marshaller
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
                 if ($entity instanceof InvalidPropertyInterface) {
-                    $entity->invalid($key, $value);
+                    $entity->setInvalidField($key, $value);
                 }
                 continue;
             }
@@ -223,7 +223,7 @@ class Marshaller
 
         if (!isset($options['fieldList'])) {
             $entity->set($properties);
-            $entity->errors($errors);
+            $entity->setErrors($errors);
 
             return $entity;
         }
@@ -234,7 +234,7 @@ class Marshaller
             }
         }
 
-        $entity->errors($errors);
+        $entity->setErrors($errors);
 
         return $entity;
     }
