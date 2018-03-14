@@ -44,7 +44,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     public function __construct($config = [])
     {
         if (!empty($config)) {
-            $this->config($config);
+            $this->setConfig($config);
         }
 
         $this->initialize();
@@ -160,13 +160,13 @@ abstract class AbstractDriver implements LoggerAwareInterface
         if (!is_object($this->client())) {
             throw new RuntimeException(sprintf(
                 'The `%s` client has not been initialized',
-                $this->config('name')
+                $this->getConfig('name')
             ));
         }
 
         if (!method_exists($this->client(), $method)) {
             throw new UnimplementedWebserviceMethodException([
-                'name' => $this->config('name'),
+                'name' => $this->getConfig('name'),
                 'method' => $method
             ]);
         }
