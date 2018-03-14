@@ -245,9 +245,9 @@ class EndpointTest extends TestCase
      */
     public function testConnection()
     {
-        $endpoint = new Endpoint(['endpoint' => 'users']);
+        $endpoint = new Endpoint(['name' => 'users']);
         $this->assertNull($endpoint->getConnection());
-        $endpoint->getConnection($this->connection);
+        $endpoint->setConnection($this->connection);
         $this->assertSame($this->connection, $endpoint->getConnection());
     }
 
@@ -258,7 +258,7 @@ class EndpointTest extends TestCase
      */
     public function testInflectionMethod()
     {
-        $endpoint = new Endpoint(['endpoint' => 'users']);
+        $endpoint = new Endpoint(['name' => 'users']);
         $this->assertSame('underscore', $endpoint->getInflectionMethod());
         $endpoint->setInflectionMethod('dasherize');
         $this->assertSame('dasherize', $endpoint->getInflectionMethod());
@@ -362,9 +362,9 @@ class EndpointTest extends TestCase
      */
     public function testSchema()
     {
-        $endpoint = new Endpoint(['endpoint' => 'another']);
+        $endpoint = new Endpoint(['name' => 'another']);
         $schema = ['id' => ['type' => 'integer']];
-        $endpoint->getSchema($schema);
+        $endpoint->setSchema($schema);
         $this->assertEquals(
             new \Muffin\Webservice\Schema('another', $schema),
             $endpoint->getSchema()

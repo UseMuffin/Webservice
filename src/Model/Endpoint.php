@@ -17,6 +17,7 @@ use Cake\Event\EventManager;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
 use Muffin\Webservice\AbstractDriver;
+use Muffin\Webservice\Connection;
 use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Marshaller;
@@ -329,7 +330,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Set the driver to use
      *
      * @param \Muffin\Webservice\AbstractDriver|null $connection The driver to use
-     * @return \Muffin\Webservice\AbstractDriver
+     * @return \Muffin\Webservice\AbstractDriver|\Muffin\Webservice\Connection
      * @deprecated 2.0.0 Use setConnection() and getConnection() instead.
      */
     public function connection($connection = null)
@@ -344,7 +345,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Sets the connection driver.
      *
-     * @param \Muffin\Webservice\AbstractDriver|\Muffin\Webservice\Connection $connection
+     * @param \Muffin\Webservice\Connection $connection Connection instance
      * @return $this
      */
     public function setConnection($connection)
@@ -357,7 +358,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Returns the connection driver.
      *
-     * @return \Muffin\Webservice\AbstractDriver|\Muffin\Webservice\Connection
+     * @return \Muffin\Webservice\Connection
      */
     public function getConnection()
     {
@@ -397,7 +398,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * If an array is passed, a new \Muffin\Webservice\Schema will be constructed
      * out of it and used as the schema for this endpoint.
      *
-     * @param \Muffin\Webservice\Schema|array $schema
+     * @param \Muffin\Webservice\Schema|array $schema Either an array of fields and config, or a schema object
      * @return \Muffin\Webservice\Schema
      */
     public function setSchema($schema)
@@ -407,6 +408,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
 
         $this->_schema = $schema;
+
         return $this->getSchema();
     }
 
@@ -574,7 +576,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
         return $this->_displayField;
     }
-    
+
     /**
      * Returns the class used to hydrate resources for this endpoint or sets a new one
      *
@@ -693,6 +695,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
 
         $this->_webservice = $webservice;
+
         return $this;
     }
 
@@ -723,7 +726,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function getWebservice()
     {
         if ($this->_webservice === null) {
-            $this->_webservice = $this->getConnection()->webservice($this->getName());
+            $this->_webservice = $this->getConnection()->getWebservice($this->getName());
         }
 
         return $this->_webservice;
@@ -917,7 +920,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
             throw new InvalidPrimaryKeyException(sprintf(
                 'Record not found in endpoint "%s" with primary key [%s]',
-                $this->endpoint(),
+                $this->getName(),
                 implode($primaryKey, ', ')
             ));
         }
@@ -1418,7 +1421,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Set the endpoint elias
      *
-     * @param string $alias
+     * @param string $alias Alias for this endpoint
      * @return void
      */
     public function setAlias($alias)

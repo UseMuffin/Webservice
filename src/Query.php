@@ -153,7 +153,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * - offset: integer or QueryExpression, null when not set
      *
      * @param string $name name of the clause to be returned
-     *
      * @return mixed
      */
     public function clause($name)
@@ -169,7 +168,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Set the endpoint to be used
      *
      * @param \Muffin\Webservice\Model\Endpoint|null $endpoint The endpoint to use
-     *
      * @return \Muffin\Webservice\Model\Endpoint|$this
      */
     public function endpoint(Endpoint $endpoint = null)
@@ -187,7 +185,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Set the webservice to be used
      *
      * @param null|\Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice to use
-     *
      * @return \Muffin\Webservice\Webservice\WebserviceInterface|self
      */
     public function webservice(WebserviceInterface $webservice = null)
@@ -212,9 +209,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Get the first result from the executing query or raise an exception.
      *
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When there is no first record.
-     *
      * @return mixed The first result from the ResultSet.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When there is no first record.
      */
     public function firstOrFail()
     {
@@ -233,7 +229,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @param string $field The field to alias.
      * @param null $alias Not being used
-     *
      * @return array The field prefixed with the endpoint alias.
      */
     public function aliasField($field, $alias = null)
@@ -247,7 +242,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param array|null $conditions The conditions to apply
      * @param array|null $types Not used
      * @param bool $overwrite Whether to overwrite the current conditions
-     *
      * @return $this|array
      */
     public function where($conditions = null, $types = [], $overwrite = false)
@@ -265,7 +259,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Charge this query's action
      *
      * @param int|null $action Action to use
-     *
      * @return $this|int
      */
     public function action($action = null)
@@ -291,7 +284,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param int $page The page number you want.
      * @param int $limit The number of rows you want in the page. If null
      *  the current limit clause will be used.
-     *
      * @return $this
      */
     public function page($page = null, $limit = null)
@@ -321,7 +313,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * ```
      *
      * @param int $limit number of records to be returned
-     *
      * @return $this
      */
     public function limit($limit = null)
@@ -339,7 +330,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Set fields to save in resources
      *
      * @param array|null $fields The field to set
-     *
      * @return $this|array
      */
     public function set($fields = null)
@@ -382,7 +372,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * This is handy for passing all query clauses at once.
      *
      * @param array $options the options to be applied
-     *
      * @return $this This object
      */
     public function applyOptions(array $options)
@@ -536,5 +525,27 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     public function jsonSerialize()
     {
         return $this->all();
+    }
+
+    /**
+     * andWhere method
+     *
+     * @param $conditions
+     * @param array $types
+     * @return $this|void
+     */
+    public function andWhere($conditions, $types = [])
+    {
+    }
+
+    /**
+     * Select method
+     *
+     * @param array $fields
+     * @param bool $overwrite
+     * @return $this|void
+     */
+    public function select($fields = [], $overwrite = false)
+    {
     }
 }
