@@ -24,7 +24,6 @@ class ControllerEndpointFilter extends DispatcherFilter
      * @inheritDoc
      *
      * @param \Cake\Event\Event $event The event to handle
-     *
      * @return void
      */
     public function beforeDispatch(Event $event)

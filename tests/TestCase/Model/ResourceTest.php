@@ -23,7 +23,7 @@ class ResourceTest extends TestCase
         $resource = new Resource([], [
             'source' => $endpoint
         ]);
-        $this->assertEquals($endpoint, $resource->source());
+        $this->assertEquals($endpoint, $resource->getSource());
     }
 
     public function testConstructUseSettersOff()
