@@ -258,8 +258,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Add AND conditions to the query
      *
-     * @param array $conditions
-     * @param array $types
+     * @param array $conditions Array of where conditions
+     * @param array $types Associative array of type names used to bind values to query
      * @return $this
      */
     public function andWhere($conditions, $types = [])
@@ -544,8 +544,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Select the fields to include in the query
      *
-     * @param array $fields
-     * @param bool $overwrite
+     * @param array $fields Array of fields to select
+     * @param bool $overwrite To replace the existing fields
      * @return $this
      */
     public function select($fields = [], $overwrite = false)

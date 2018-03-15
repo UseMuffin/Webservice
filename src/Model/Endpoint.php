@@ -713,7 +713,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             throw new UnexpectedDriverException(__('No driver has been defined for this endpoint'));
         }
 
-        $this->_webservice = $connection->webservice($webservice);
+        $this->_webservice = $connection->getWebservice($webservice);
 
         return $this->getWebservice();
     }
