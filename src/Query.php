@@ -471,7 +471,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             $endpoint->dispatchEvent('Model.beforeFind', [
                 $this,
                 new ArrayObject($this->_options),
-                !$this->eagerLoaded()
+                !$this->isEagerLoaded()
             ]);
         }
     }
