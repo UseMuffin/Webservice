@@ -262,6 +262,20 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     }
 
     /**
+     * Add AND conditions to the query
+     *
+     * @param array $conditions
+     * @param array $types
+     * @return $this
+     */
+    public function andWhere($conditions, $types = [])
+    {
+        $this->where($conditions, $types);
+
+        return $this;
+    }
+
+    /**
      * Charge this query's action
      *
      * @param int|null $action Action to use
@@ -536,5 +550,31 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     public function jsonSerialize()
     {
         return $this->all();
+    }
+
+    /**
+     * Select the fields to include in the query
+     *
+     * @param array $fields
+     * @param bool $overwrite
+     * @return $this
+     */
+    public function select($fields = [], $overwrite = false)
+    {
+        if (!is_string($fields) && is_callable($fields)) {
+            $fields = $fields($this);
+        }
+
+        if (!is_array($fields)) {
+            $fields = [$fields];
+        }
+
+        if ($overwrite) {
+            $this->_parts['select'] = $fields;
+        } else {
+            $this->_parts['select'] = array_merge($this->_parts['select'], $fields);
+        }
+
+        return $this;
     }
 }
