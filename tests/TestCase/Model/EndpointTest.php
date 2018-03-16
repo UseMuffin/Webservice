@@ -358,4 +358,18 @@ class EndpointTest extends TestCase
             $endpoint->schema()
         );
     }
+
+    public function testFindWithSelectAndWhere()
+    {
+        $fields = ['id', 'name', 'avatar', 'biography'];
+        $conditions = ['id' => 1];
+
+        $query = $this->endpoint->find()
+            ->select($fields)
+            ->where($conditions);
+
+        $this->assertInstanceOf('\Muffin\Webservice\Query', $query);
+        $this->assertSame($fields, $query->clause('select'));
+        $this->assertSame($conditions, $query->clause('where'));
+    }
 }
