@@ -67,7 +67,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     protected $_parts = [
         'order' => [],
         'set' => [],
-        'where' => []
+        'where' => [],
+        'select' => []
     ];
 
     /**
