@@ -117,13 +117,13 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param string $name The registry alias for the webservice instance
      * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice Instance of the webservice
-     * @return \Muffin\Webservice\Webservice\WebserviceInterface
+     * @return $this
      */
     public function setWebservice($name, WebserviceInterface $webservice)
     {
         $this->_webservices[$name] = $webservice;
 
-        return $this->_webservices[$name];
+        return $this;
     }
 
     /**
