@@ -707,7 +707,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Set the webservice instance to be used for this endpoint
      *
      * @param \Muffin\Webservice\Webservice\WebserviceInterface|string $webservice The webservice to use
-     * @return \Muffin\Webservice\Webservice\WebserviceInterface
+     * @return $this
      * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no driver exists for the endpoint
      */
     public function setWebservice($webservice)
@@ -717,9 +717,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             throw new UnexpectedDriverException(__('No driver has been defined for this endpoint'));
         }
 
-        $this->_webservice = $connection->webservice($webservice);
+        $this->_webservice = $connection->setWebservice($webservice);
 
-        return $this->getWebservice();
+        return $this;
     }
 
     /**
@@ -1423,14 +1423,16 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Set the endpoint elias
+     * Set the endpoint alias
      *
      * @param string $alias Alias for this endpoint
-     * @return void
+     * @return $this
      */
     public function setAlias($alias)
     {
         $this->_alias = $alias;
+
+        return $this;
     }
 
     /**
