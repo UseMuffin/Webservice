@@ -264,8 +264,10 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Add AND conditions to the query
      *
-     * @param array $conditions
-     * @param array $types
+     * @param string|array|\Cake\Database\ExpressionInterface|callable $conditions The conditions to add with AND.
+     * @param array $types associative array of type names used to bind values to query
+     * @see \Cake\Database\Query::where()
+     * @see \Cake\Database\Type
      * @return $this
      */
     public function andWhere($conditions, $types = [])
@@ -555,8 +557,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Select the fields to include in the query
      *
-     * @param array $fields
-     * @param bool $overwrite
+     * @param array|\Cake\Database\ExpressionInterface|string|callable $fields fields to be added to the list.
+     * @param bool $overwrite whether to reset fields with passed list or not
      * @return $this
      */
     public function select($fields = [], $overwrite = false)
