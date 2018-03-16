@@ -123,6 +123,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * - alias: Alias to be assigned to this endpoint (default to endpoint name)
      * - connection: The connection instance to use
      * - name: Name of the endpoint to represent
+     * - endpoint: Deprecated, please pass name instead
      * - resourceClass: The fully namespaced class name of the resource class that will
      *   represent rows in this endpoint.
      * - schema: A \Muffin\Webservice\Schema object or an array that can be
@@ -146,6 +147,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
         if (!empty($config['name'])) {
             $this->setName($config['name']);
+        }
+        if (!empty($config['endpoint'])) {
+            $this->setName($config['endpoint']);
         }
         $eventManager = null;
         if (!empty($config['eventManager'])) {

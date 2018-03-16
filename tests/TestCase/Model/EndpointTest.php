@@ -61,6 +61,12 @@ class EndpointTest extends TestCase
         $this->assertSame($expected, $endpoint->getName());
     }
 
+    public function testEndpointNameUsingEndpoint()
+    {
+        $endpoint = new Endpoint(['endpoint' => 'example']);
+        $this->assertSame('example', $endpoint->getName());
+    }
+
     public function testFind()
     {
         $query = $this->endpoint->find();
@@ -245,7 +251,7 @@ class EndpointTest extends TestCase
      */
     public function testConnection()
     {
-        $endpoint = new Endpoint(['name' => 'users']);
+        $endpoint = new Endpoint(['endpoint' => 'users']);
         $this->assertNull($endpoint->getConnection());
         $endpoint->setConnection($this->connection);
         $this->assertSame($this->connection, $endpoint->getConnection());
@@ -258,7 +264,7 @@ class EndpointTest extends TestCase
      */
     public function testInflectionMethod()
     {
-        $endpoint = new Endpoint(['name' => 'users']);
+        $endpoint = new Endpoint(['endpoint' => 'users']);
         $this->assertSame('underscore', $endpoint->getInflectionMethod());
         $endpoint->setInflectionMethod('dasherize');
         $this->assertSame('dasherize', $endpoint->getInflectionMethod());
@@ -362,7 +368,7 @@ class EndpointTest extends TestCase
      */
     public function testSchema()
     {
-        $endpoint = new Endpoint(['name' => 'another']);
+        $endpoint = new Endpoint(['endpoint' => 'another']);
         $schema = ['id' => ['type' => 'integer']];
         $endpoint->setSchema($schema);
         $this->assertEquals(
