@@ -76,13 +76,13 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * Set the client instance this driver will use to make requests
      *
      * @param object $client Client instance
-     * @return object
+     * @return $this
      */
     public function setClient($client)
     {
         $this->_client = $client;
 
-        return $this->_client;
+        return $this;
     }
 
     /**

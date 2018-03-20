@@ -16,8 +16,6 @@ use Cake\Event\EventListenerInterface;
 use Cake\Event\EventManager;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
-use Muffin\Webservice\AbstractDriver;
-use Muffin\Webservice\Connection;
 use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Marshaller;
@@ -50,6 +48,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     const VALIDATOR_PROVIDER_NAME = 'endpoint';
 
+    /**
+     * Connection instance this endpoint uses
+     *
+     * @var \Muffin\Webservice\Connection $connection Connection instance
+     */
     protected $_connection;
 
     /**
@@ -232,14 +235,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Set the name of this endpoint
      *
      * @param string $name The name for this endpoint instance
-     * @return string
+     * @return $this
      */
     public function setName($name)
     {
         $inflectMethod = $this->getInflectionMethod();
         $this->_endpoint = Inflector::$inflectMethod($name);
 
-        return $this->_endpoint;
+        return $this;
     }
 
     /**
@@ -403,7 +406,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * out of it and used as the schema for this endpoint.
      *
      * @param \Muffin\Webservice\Schema|array $schema Either an array of fields and config, or a schema object
-     * @return \Muffin\Webservice\Schema
+     * @return $this
      */
     public function setSchema($schema)
     {
@@ -413,7 +416,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
         $this->_schema = $schema;
 
-        return $this->getSchema();
+        return $this;
     }
 
     /**
@@ -493,13 +496,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Returns the primary key field name
      *
      * @param string|array|null $key sets a new name to be used as primary key
-     * @return string|array
+     * @return $this
      */
     public function setPrimaryKey($key)
     {
         $this->_primaryKey = $key;
 
-        return $this->_primaryKey;
+        return $this;
     }
 
     /**
@@ -545,13 +548,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Sets the endpoint display field
      *
      * @param string $field The new field to use as the display field
-     * @return string
+     * @return $this
      */
     public function setDisplayField($field)
     {
         $this->_displayField = $field;
 
-        return $this->_displayField;
+        return $this;
     }
 
     /**
@@ -602,7 +605,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Set the resource class name used to hydrate resources for this endpoint
      *
      * @param string $name Name of the class to use
-     * @return string
+     * @return $this
      * @throws \Muffin\Webservice\Exception\MissingResourceClassException If the resource class specified does not exist
      */
     public function setResourceClass($name)
@@ -613,7 +616,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             throw new MissingResourceClassException([$name]);
         }
 
-        return $this->_resourceClass;
+        return $this;
     }
 
     /**
@@ -662,13 +665,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Set a new inflection method
      *
      * @param string $method The name of the inflection method
-     * @return string
+     * @return $this
      */
     public function setInflectionMethod($method)
     {
         $this->_inflectionMethod = $method;
 
-        return $this->_inflectionMethod;
+        return $this;
     }
 
     /**
