@@ -2,6 +2,7 @@
 
 namespace Muffin\Webservice\Test\TestCase;
 
+use Cake\Database\Expression\Comparison;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
@@ -221,6 +222,70 @@ class QueryTest extends TestCase
         ];
 
         $this->assertEquals(json_encode($expected), json_encode($this->query));
+    }
+
+    public function testAndWhere()
+    {
+        $conditions = [
+            'foo' => 'bar',
+            'baz' => 2
+        ];
+        $this->query->andWhere($conditions);
+
+        $this->assertSame($conditions, $this->query->clause('where'));
+    }
+
+    public function testSelectWithArrayMerging()
+    {
+        $this->query->select(['id', 'name', 'title', 'description']);
+        $this->assertSame(['id', 'name', 'title', 'description'], $this->query->clause('select'));
+
+        $this->query->select(['published']);
+        $this->assertSame(['id', 'name', 'title', 'description', 'published'], $this->query->clause('select'));
+    }
+
+    public function testSelectWithArrayOverwrite()
+    {
+        $firstFields = ['id', 'first_name', 'last_name', 'date_of_birth'];
+        $this->query->select($firstFields);
+        $this->assertSame($firstFields, $this->query->clause('select'));
+
+        $secondFields = ['id', 'username', 'email'];
+        $this->query->select($secondFields, true);
+        $this->assertSame($secondFields, $this->query->clause('select'));
+    }
+
+    public function testSelectWithString()
+    {
+        $field = 'examples';
+        $this->query->select($field);
+
+        $this->assertSame([$field], $this->query->clause('select'));
+    }
+
+    public function testSelectWithExpression()
+    {
+        $exp = new Comparison('upvotes', 50, 'integer', '>=');
+        $this->query->select($exp);
+
+    /** @var Comparison $comparisonClause */
+        $comparisonClause = $this->query->clause('select')[0];
+
+        $this->assertInstanceOf(Comparison::class, $comparisonClause);
+        $this->assertEquals(50, $comparisonClause->getValue());
+        $this->assertEquals('>=', $comparisonClause->getOperator());
+    }
+
+    public function testSelectWithCallable()
+    {
+        $fields = ['id', 'username', 'email', 'biography'];
+
+        $callable = function (Query $query) use ($fields) {
+            return $fields;
+        };
+        $this->query->select($callable);
+
+        $this->assertSame($fields, $this->query->clause('select'));
     }
 
     /**

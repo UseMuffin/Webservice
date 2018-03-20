@@ -67,7 +67,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     protected $_parts = [
         'order' => [],
         'set' => [],
-        'where' => []
+        'where' => [],
+        'select' => []
     ];
 
     /**
@@ -251,6 +252,22 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         }
 
         $this->_parts['where'] = (!$overwrite) ? Hash::merge($this->clause('where'), $conditions) : $conditions;
+
+        return $this;
+    }
+
+    /**
+     * Add AND conditions to the query
+     *
+     * @param string|array|\Cake\Database\ExpressionInterface|callable $conditions The conditions to add with AND.
+     * @param array $types associative array of type names used to bind values to query
+     * @see \Cake\Database\Query::where()
+     * @see \Cake\Database\Type
+     * @return $this
+     */
+    public function andWhere($conditions, $types = [])
+    {
+        $this->where($conditions, $types);
 
         return $this;
     }
@@ -528,24 +545,29 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     }
 
     /**
-     * andWhere method
+     * Select the fields to include in the query
      *
-     * @param $conditions
-     * @param array $types
-     * @return $this|void
-     */
-    public function andWhere($conditions, $types = [])
-    {
-    }
-
-    /**
-     * Select method
-     *
-     * @param array $fields
-     * @param bool $overwrite
-     * @return $this|void
+     * @param array|\Cake\Database\ExpressionInterface|string|callable $fields fields to be added to the list.
+     * @param bool $overwrite whether to reset fields with passed list or not
+     * @return $this
+     * @see \Cake\Database\Query::select
      */
     public function select($fields = [], $overwrite = false)
     {
+        if (!is_string($fields) && is_callable($fields)) {
+            $fields = $fields($this);
+        }
+
+        if (!is_array($fields)) {
+            $fields = [$fields];
+        }
+
+        if ($overwrite) {
+            $this->_parts['select'] = $fields;
+        } else {
+            $this->_parts['select'] = array_merge($this->_parts['select'], $fields);
+        }
+
+        return $this;
     }
 }
