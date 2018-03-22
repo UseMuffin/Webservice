@@ -17,7 +17,7 @@ class Schema
     /**
      * The name of the endpoint
      *
-     * @var string
+     * @var \Muffin\Webservice\Model\Endpoint
      */
     protected $_repository;
 
@@ -122,7 +122,7 @@ class Schema
     /**
      * Get the name of the endpoint.
      *
-     * @return string
+     * @return \Muffin\Webservice\Model\Endpoint
      */
     public function name()
     {
@@ -155,7 +155,7 @@ class Schema
      * - `comment` The comment for the column.
      *
      * @param string $name The name of the column
-     * @param array $attrs The attributes for the column.
+     * @param array|string $attrs The attributes for the column.
      * @return $this
      */
     public function addColumn($name, $attrs)

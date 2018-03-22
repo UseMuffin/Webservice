@@ -26,6 +26,7 @@ interface WebserviceInterface
      *
      * @param string $endpoint The endpoint to get the schema for
      * @return \Muffin\Webservice\Schema The schema to use
+     * @throws \Muffin\Webservice\Exception\MissingEndpointSchemaException If no schema can be found
      */
     public function describe($endpoint);
 }

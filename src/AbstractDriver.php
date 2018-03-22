@@ -271,6 +271,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @param string $className Class name of the webservice to initialize
      * @param array $options Set of options to pass to the constructor
      * @return WebserviceInterface
+     * @throws MissingWebserviceClassException If no webservice class can be found
      */
     protected function _createWebservice($className, array $options = [])
     {
