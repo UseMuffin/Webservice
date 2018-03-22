@@ -17,7 +17,7 @@ class Schema
     /**
      * The name of the endpoint
      *
-     * @var \Muffin\Webservice\Model\Endpoint
+     * @var string
      */
     protected $_repository;
 
@@ -122,7 +122,7 @@ class Schema
     /**
      * Get the name of the endpoint.
      *
-     * @return \Muffin\Webservice\Model\Endpoint
+     * @return string
      */
     public function name()
     {
