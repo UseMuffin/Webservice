@@ -36,8 +36,7 @@ class AbstractDriverTest extends TestCase
 
     public function testSetClient()
     {
-        $client = $this->getMockBuilder(Client::class)
-            ->getMock();
+        $client = new \StdClass();
 
         $driver = new Test();
         $driver->setClient($client);
