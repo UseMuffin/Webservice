@@ -28,6 +28,16 @@ class WebserviceTest extends TestCase
         ]);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        unset($this->webservice);
+    }
+
     public function testConstructor()
     {
         $testDriver = new Test([]);
@@ -209,12 +219,10 @@ class WebserviceTest extends TestCase
     }
 
     /**
-     * @inheritDoc
+     * @expectedException \Muffin\Webservice\Exception\MissingEndpointSchemaException
      */
-    public function tearDown()
+    public function testDescribeException()
     {
-        parent::tearDown();
-
-        unset($this->webservice);
+        $this->webservice->describe('example');
     }
 }

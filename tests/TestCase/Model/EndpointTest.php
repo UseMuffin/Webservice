@@ -2,12 +2,16 @@
 
 namespace Muffin\Webservice\Test\TestCase\Model;
 
+use Cake\Event\EventManager;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
+use Muffin\Webservice\Query;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\AppEndpoint;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
+use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
+use Muffin\Webservice\Webservice\WebserviceInterface;
 use SomeVendor\SomePlugin\Model\Endpoint\PluginEndpoint;
 
 class EndpointTest extends TestCase
@@ -390,4 +394,121 @@ class EndpointTest extends TestCase
         $this->assertSame($fields, $query->clause('select'));
         $this->assertSame($conditions, $query->clause('where'));
     }
+
+    public function testConstructorEventManager()
+    {
+        $eventManager = $this->getMockBuilder(EventManager::class)->getMock();
+        $endpoint = new Endpoint([
+            'endpoint' => 'another',
+            'eventManager' => $eventManager
+        ]);
+
+        $this->assertSame($eventManager, $endpoint->getEventManager());
+    }
+
+    public function testConstructorResourceClass()
+    {
+        $endpoint = new Endpoint([
+            'name' => 'example',
+            'resourceClass' => 'Example'
+        ]);
+
+        $this->assertSame('Muffin\Webservice\Test\test_app\Model\Resource\Example', $endpoint->getResourceClass());
+    }
+
+    /**
+     * @expectedException \Muffin\Webservice\Exception\MissingResourceClassException
+     */
+    public function testSetResourceMissingClass()
+    {
+        new Endpoint([
+            'name' => 'example',
+            'resourceClass' => 'Missing'
+        ]);
+    }
+
+    public function testHasField()
+    {
+        $this->assertTrue($this->endpoint->hasField('title'));
+    }
+
+    /**
+     * Fake an incorrect return of the schema to check the exception
+     *
+     * @expectedException \Muffin\Webservice\Exception\UnexpectedDriverException
+     */
+    public function testGetPrimaryKeyException()
+    {
+        $endpoint = $this->getMockBuilder(Endpoint::class)
+            ->setMethods(['getSchema'])
+            ->getMock();
+
+        $endpoint->expects($this->once())
+            ->method('getSchema')
+            ->willReturn(false);
+
+        $endpoint->getPrimaryKey();
+    }
+
+    public function testSetWebservice()
+    {
+        $testWebservice = new TestWebservice();
+        $return = $this->endpoint->setWebservice('test', $testWebservice);
+
+        $this->assertInstanceOf(Endpoint::class, $return);
+        $this->assertInstanceOf(WebserviceInterface::class, $this->endpoint->getWebservice());
+    }
+
+    /**
+     * @expectedException \Muffin\Webservice\Exception\UnexpectedDriverException
+     */
+    public function testSetWebserviceException()
+    {
+        $endpoint = $this->getMockBuilder(Endpoint::class)
+            ->setMethods(['getConnection'])
+            ->getMock();
+
+        $endpoint->expects($this->once())
+            ->method('getConnection')
+            ->willReturn(false);
+
+        $testWebservice = new TestWebservice();
+        $endpoint->setWebservice('test', $testWebservice);
+    }
+
+    public function testHasFinder()
+    {
+        $this->assertTrue($this->endpoint->hasFinder('Examples'));
+        $this->assertFalse($this->endpoint->hasFinder('Missing'));
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function testCallMissingFinder()
+    {
+        $query = $this->getMockBuilder(Query::class)
+            ->setConstructorArgs([new TestWebservice(), $this->endpoint])
+            ->getMock();
+
+        $this->endpoint->callFinder('Missing', $query);
+    }
+
+    public function testDebugInfo()
+    {
+        $expected = [
+            'registryAlias' => null,
+            'alias' => null,
+            'endpoint' => 'test',
+            'resourceClass' => 'Muffin\\Webservice\\Model\\Resource',
+            'defaultConnection' => 'test_app',
+            'connectionName' => 'test',
+            'inflector' => 'underscore'
+        ];
+        $result = $this->endpoint->__debugInfo();
+
+        $this->assertEquals($expected, $result);
+    }
+
+
 }

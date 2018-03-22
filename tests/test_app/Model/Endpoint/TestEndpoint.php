@@ -26,4 +26,14 @@ class TestEndpoint extends Endpoint
 
         return $validator;
     }
+
+    /**
+     * Example finder
+     *
+     * @return true
+     */
+    public function findExamples()
+    {
+        return true;
+    }
 }
