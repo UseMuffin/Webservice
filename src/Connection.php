@@ -9,7 +9,7 @@ use Muffin\Webservice\Exception\UnexpectedDriverException;
 /**
  * Class Connection
  *
- * @method Webservice\WebserviceInterface setWebservice(string $name) Proxy method through to the Driver
+ * @method \Muffin\Webservice\AbstractDriver setWebservice(string $name, Webservice\WebserviceInterface $webservice) Proxy method through to the Driver
  * @method Webservice\WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
  * @method string configName() Proxy method through to the Driver
  */

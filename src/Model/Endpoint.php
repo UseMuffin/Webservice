@@ -694,7 +694,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function webservice($webservice = null)
     {
         if ($webservice !== null) {
-            return $this->setWebservice($webservice);
+            return $this->setWebservice($this->getName(), $webservice);
         }
 
         if ($webservice === null) {
@@ -709,18 +709,20 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Set the webservice instance to be used for this endpoint
      *
-     * @param \Muffin\Webservice\Webservice\WebserviceInterface|string $webservice The webservice to use
+     * @param string $alias Alias for the webservice
+     * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice instance
      * @return $this
      * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no driver exists for the endpoint
      */
-    public function setWebservice($webservice)
+    public function setWebservice($alias, $webservice)
     {
         $connection = $this->getConnection();
         if (!$connection) {
             throw new UnexpectedDriverException(__('No driver has been defined for this endpoint'));
         }
 
-        $this->_webservice = $connection->setWebservice($webservice);
+        $connection->setWebservice($alias, $webservice);
+        $this->_webservice = $connection->getWebservice($alias);
 
         return $this;
     }
