@@ -82,5 +82,4 @@ class AbstractDriverTest extends TestCase
 
         $this->assertEquals($expected, $driver->__debugInfo());
     }
-
 }

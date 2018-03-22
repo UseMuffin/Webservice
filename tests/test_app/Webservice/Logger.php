@@ -22,7 +22,6 @@ class Logger implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        // TODO: Implement emergency() method.
     }
 
     /**
@@ -38,7 +37,6 @@ class Logger implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        // TODO: Implement alert() method.
     }
 
     /**
@@ -53,7 +51,6 @@ class Logger implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        // TODO: Implement critical() method.
     }
 
     /**
@@ -67,7 +64,6 @@ class Logger implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        // TODO: Implement error() method.
     }
 
     /**
@@ -83,7 +79,6 @@ class Logger implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        // TODO: Implement warning() method.
     }
 
     /**
@@ -96,7 +91,6 @@ class Logger implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        // TODO: Implement notice() method.
     }
 
     /**
@@ -111,7 +105,6 @@ class Logger implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        // TODO: Implement info() method.
     }
 
     /**
@@ -124,7 +117,6 @@ class Logger implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        // TODO: Implement debug() method.
     }
 
     /**
@@ -138,6 +130,5 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        // TODO: Implement log() method.
     }
 }
