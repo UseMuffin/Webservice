@@ -173,7 +173,7 @@ class WebserviceTest extends TestCase
 
         $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resource);
         $this->assertFalse($resource->isNew());
-        $this->assertFalse($resource->dirty());
+        $this->assertFalse($resource->isDirty());
     }
 
     public function testTransformResults()
