@@ -55,6 +55,7 @@ class EndpointRegistry
      * @param array $options The options you want to build the endpoint with.
      *
      * @return \Muffin\Webservice\Model\Endpoint
+     * @throws \RuntimeException If the class is already in the registry with configuration
      */
     public static function get($alias, array $options = [])
     {
@@ -100,6 +101,7 @@ class EndpointRegistry
 
         $options['registryAlias'] = $alias;
         self::$_instances[$alias] = self::_create($options);
+        self::$_options[$alias] = $options;
 
         return self::$_instances[$alias];
     }

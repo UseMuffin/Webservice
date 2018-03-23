@@ -1,10 +1,4 @@
 <?php
-/**
- * @package MuffinWebservice
- * @author David Yell <dyell@ukwebmedia.com>
- * @copyright UK Web Media Ltd
- */
-
 namespace Muffin\Webservice\Test\TestCase\Model\Endpoint\Schema;
 
 use Muffin\Webservice\Test\test_app\Model\Endpoint\Schema\TestSchema;
