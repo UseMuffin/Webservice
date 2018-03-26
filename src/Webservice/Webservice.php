@@ -179,7 +179,12 @@ abstract class Webservice implements WebserviceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Executes a query
+     *
+     * @param Query $query The query to execute
+     * @param array $options The options to use
+     *
+     * @return \Muffin\Webservice\ResultSet|int|bool
      */
     public function execute(Query $query, array $options = [])
     {
@@ -198,7 +203,10 @@ abstract class Webservice implements WebserviceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a schema for the provided endpoint
+     *
+     * @param string $endpoint The endpoint to get the schema for
+     * @return \Muffin\Webservice\Schema The schema to use
      */
     public function describe($endpoint)
     {

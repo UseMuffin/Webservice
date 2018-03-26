@@ -54,7 +54,7 @@ class EndpointRegistry
      * @param string $alias The alias name you want to get.
      * @param array $options The options you want to build the endpoint with.
      * @return \Muffin\Webservice\Model\Endpoint
-     * @throws \RuntimeException If the registry alias is already in use
+     * @throws \RuntimeException If the registry alias is already in use.
      */
     public static function get($alias, array $options = [])
     {
@@ -100,6 +100,7 @@ class EndpointRegistry
 
         $options['registryAlias'] = $alias;
         self::$_instances[$alias] = self::_create($options);
+        self::$_options[$alias] = $options;
 
         return self::$_instances[$alias];
     }

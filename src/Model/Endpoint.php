@@ -13,7 +13,6 @@ use Cake\Datasource\RulesChecker;
 use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
-use Cake\Event\EventManager;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
 use Muffin\Webservice\Exception\MissingResourceClassException;
@@ -154,10 +153,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if (!empty($config['endpoint'])) {
             $this->setName($config['endpoint']);
         }
-        $eventManager = null;
-        if (!empty($config['eventManager'])) {
-            $eventManager = $config['eventManager'];
-        }
         if (!empty($config['primaryKey'])) {
             $this->setPrimaryKey($config['primaryKey']);
         }
@@ -171,10 +166,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $this->setResourceClass($config['resourceClass']);
         }
 
-        $this->_eventManager = $eventManager ?: new EventManager();
+        if (!empty($config['eventManager'])) {
+            $this->setEventManager($config['eventManager']);
+        }
 
         $this->initialize($config);
-        $this->_eventManager->on($this);
+        $this->getEventManager()->on($this);
         $this->dispatchEvent('Model.initialize');
     }
 
@@ -1268,8 +1265,16 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * {@inheritDoc}
+     * Create a new entity + associated entities from an array.
      *
+     * This is most useful when hydrating web service data back into entities.
+     *
+     * The hydrated entity will correctly do an insert/update based
+     * on the primary key data existing in the database when the entity
+     * is saved. Until the entity is saved, it will be a detached record.
+     *
+     * @param array|null $data The data to build an entity with.
+     * @param array $options A list of options for the object hydration.
      * @return \Muffin\Webservice\Model\Resource
      */
     public function newEntity($data = null, array $options = [])
@@ -1397,7 +1402,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a RulesChecker object after modifying the one that was supplied.
+     *
+     * Subclasses should override this method in order to initialize the rules to be applied to
+     * entities saved by this instance.
      *
      * @param \Cake\Datasource\RulesChecker $rules The rules object to be modified.
      * @return \Cake\Datasource\RulesChecker

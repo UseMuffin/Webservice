@@ -51,7 +51,11 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the current record in the result iterator
+     *
+     * Part of Iterator interface.
+     *
+     * @return array|object
      */
     public function current()
     {
@@ -59,7 +63,12 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Rewinds a ResultSet.
+     *
+     * Part of Iterator interface.
+     *
+     * @throws \Cake\Database\Exception
+     * @return void
      */
     public function rewind()
     {
@@ -67,7 +76,11 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Serializes a resultset.
+     *
+     * Part of Serializable interface.
+     *
+     * @return string Serialized object
      */
     public function serialize()
     {
@@ -79,7 +92,11 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Whether there are more results to be fetched from the iterator
+     *
+     * Part of Iterator interface.
+     *
+     * @return bool
      */
     public function valid()
     {
@@ -93,7 +110,11 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the key of the current record in the iterator
+     *
+     * Part of Iterator interface.
+     *
+     * @return int
      */
     public function key()
     {
@@ -101,7 +122,11 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Advances the iterator pointer to the next record
+     *
+     * Part of Iterator interface.
+     *
+     * @return void
      */
     public function next()
     {
@@ -109,7 +134,12 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Unserializes a resultset.
+     *
+     * Part of Serializable interface.
+     *
+     * @param string $serialized Serialized object
+     * @return void
      */
     public function unserialize($serialized)
     {
@@ -117,7 +147,11 @@ class ResultSet implements ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Gives the number of rows in the result set.
+     *
+     * Part of the Countable interface.
+     *
+     * @return int
      */
     public function count()
     {
