@@ -144,10 +144,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if (!empty($config['endpoint'])) {
             $this->endpoint($config['endpoint']);
         }
-        $eventManager = null;
-        if (!empty($config['eventManager'])) {
-            $eventManager = $config['eventManager'];
-        }
         if (!empty($config['primaryKey'])) {
             $this->primaryKey($config['primaryKey']);
         }
@@ -164,10 +160,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $this->inflectionMethod($config['inflect']);
         }
 
-        $this->_eventManager = $eventManager ?: new EventManager();
+        if (!empty($config['eventManager'])) {
+            $this->setEventManager($config['eventManager']);
+        }
 
         $this->initialize($config);
-        $this->_eventManager->on($this);
+        $this->getEventManager()->on($this);
         $this->dispatchEvent('Model.initialize');
     }
 
