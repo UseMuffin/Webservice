@@ -1046,8 +1046,16 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * {@inheritDoc}
+     * Create a new entity + associated entities from an array.
      *
+     * This is most useful when hydrating web service data back into entities.
+     *
+     * The hydrated entity will correctly do an insert/update based
+     * on the primary key data existing in the database when the entity
+     * is saved. Until the entity is saved, it will be a detached record.
+     *
+     * @param array|null $data The data to build an entity with.
+     * @param array $options A list of options for the object hydration.
      * @return \Muffin\Webservice\Model\Resource
      */
     public function newEntity($data = null, array $options = [])
@@ -1175,7 +1183,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a RulesChecker object after modifying the one that was supplied.
+     *
+     * Subclasses should override this method in order to initialize the rules to be applied to
+     * entities saved by this instance.
      *
      * @param \Cake\Datasource\RulesChecker $rules The rules object to be modified.
      * @return \Cake\Datasource\RulesChecker

@@ -203,7 +203,20 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Apply custom finds to against an existing query object.
+     *
+     * Allows custom find methods to be combined and applied to each other.
+     *
+     * ```
+     * $repository->find('all')->find('recent');
+     * ```
+     *
+     * The above is an example of stacking multiple finder methods onto
+     * a single query.
+     *
+     * @param string $finder The finder method to use.
+     * @param array $options The options for the finder.
+     * @return $this Returns a modified query.
      */
     public function find($finder, array $options = [])
     {
@@ -385,7 +398,21 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Adds a single or multiple fields to be used in the ORDER clause for this query.
+     * Fields can be passed as an array of strings, array of expression
+     * objects, a single expression or a single string.
+     *
+     * If an array is passed, keys will be used as the field itself and the value will
+     * represent the order in which such field should be ordered. When called multiple
+     * times with the same fields as key, the last order definition will prevail over
+     * the others.
+     *
+     * By default this function will append any passed argument to the list of fields
+     * to be selected, unless the second argument is set to true.
+     *
+     * @param array|string $fields fields to be added to the list
+     * @param bool $overwrite whether to reset order with field list or not
+     * @return $this
      */
     public function order($fields, $overwrite = false)
     {
