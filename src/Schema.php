@@ -155,7 +155,7 @@ class Schema
      * - `comment` The comment for the column.
      *
      * @param string $name The name of the column
-     * @param array $attrs The attributes for the column.
+     * @param array|string $attrs The attributes for the column.
      * @return $this
      */
     public function addColumn($name, $attrs)
