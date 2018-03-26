@@ -2,6 +2,7 @@
 
 namespace Muffin\Webservice\Model;
 
+use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
@@ -86,26 +87,6 @@ class EndpointRegistryTest extends TestCase
 
         $this->assertInstanceOf(Endpoint::class, $result);
         $this->assertEquals('unfindable_class', $result->endpoint());
-    }
-
-    public function testGetInstanceWithNoConnectionAndClassName()
-    {
-        $result = EndpointRegistry::get('Test', [
-            'className' => TestEndpoint::class
-        ]);
-
-        $this->assertInstanceOf(Endpoint::class, $result);
-        $this->assertEquals('test', $result->endpoint());
-    }
-
-    public function testGetInstanceWithNoConnectionAndNoClassName()
-    {
-        $result = EndpointRegistry::get('SomeVendor/SomePlugin.Plugin', [
-            'className' => 'Muffin\Webservice\Model\Endpoint'
-        ]);
-
-        $this->assertInstanceOf(Endpoint::class, $result);
-        $this->assertEquals('test', $result->endpoint());
     }
 
     public function testRemovingInstance()
