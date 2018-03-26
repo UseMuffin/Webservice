@@ -7,7 +7,9 @@ class UnimplementedWebserviceMethodException extends Exception
 {
 
     /**
-     * {@inheritDoc}
+     * Template string that has attributes sprintf()'ed into it.
+     *
+     * @var string
      */
     protected $_messageTemplate = 'Webservice %s does not implement %s';
 }
