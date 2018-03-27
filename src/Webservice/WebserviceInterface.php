@@ -17,7 +17,6 @@ interface WebserviceInterface
      *
      * @param Query $query The query to execute
      * @param array $options The options to use
-     *
      * @return \Muffin\Webservice\ResultSet|int|bool
      */
     public function execute(Query $query, array $options = []);
@@ -27,6 +26,7 @@ interface WebserviceInterface
      *
      * @param string $endpoint The endpoint to get the schema for
      * @return \Muffin\Webservice\Schema The schema to use
+     * @throws \Muffin\Webservice\Exception\MissingEndpointSchemaException If no schema can be found
      */
     public function describe($endpoint);
 }

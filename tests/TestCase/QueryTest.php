@@ -98,8 +98,8 @@ class QueryTest extends TestCase
 
     public function testFind()
     {
-        $this->query->endpoint()->primaryKey('id');
-        $this->query->endpoint()->displayField('title');
+        $this->query->endpoint()->setPrimaryKey('id');
+        $this->query->endpoint()->setDisplayField('title');
 
         $this->assertEquals($this->query, $this->query->find('list'));
 

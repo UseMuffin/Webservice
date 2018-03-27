@@ -31,6 +31,11 @@ class ResultSet implements ResultSetInterface
      */
     protected $_results = [];
 
+    /**
+     * Total number of results
+     *
+     * @var int|null
+     */
     protected $_total;
 
     /**

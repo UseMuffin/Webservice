@@ -6,6 +6,13 @@ use Muffin\Webservice\Exception\MissingConnectionException;
 use Muffin\Webservice\Exception\MissingDriverException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
 
+/**
+ * Class Connection
+ *
+ * @method \Muffin\Webservice\AbstractDriver setWebservice(string $name, Webservice\WebserviceInterface $webservice) Proxy method through to the Driver
+ * @method Webservice\WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
+ * @method string configName() Proxy method through to the Driver
+ */
 class Connection
 {
     /**
