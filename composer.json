@@ -43,7 +43,7 @@
         "cakephp/cakephp": "dev-3.next as 3.6.0"        
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "2.*",
+        "cakephp/cakephp-codesniffer": "3.*",
         "phpunit/phpunit": "<6.0"
     },
     "autoload": {
