@@ -268,7 +268,7 @@ class QueryTest extends TestCase
         $exp = new Comparison('upvotes', 50, 'integer', '>=');
         $this->query->select($exp);
 
-    /** @var Comparison $comparisonClause */
+        /** @var Comparison $comparisonClause */
         $comparisonClause = $this->query->clause('select')[0];
 
         $this->assertInstanceOf(Comparison::class, $comparisonClause);
