@@ -80,7 +80,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @var string
      */
-    protected $_endpoint;
+    protected $_name;
 
     /**
      * The name of the field that represents the primary key in the endpoint
@@ -237,7 +237,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function setName($name)
     {
         $inflectMethod = $this->getInflectionMethod();
-        $this->_endpoint = Inflector::$inflectMethod($name);
+        $this->_name = Inflector::$inflectMethod($name);
 
         return $this;
     }
@@ -249,15 +249,15 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function getName()
     {
-        if ($this->_endpoint === null) {
+        if ($this->_name === null) {
             $endpoint = namespaceSplit(get_class($this));
             $endpoint = substr(end($endpoint), 0, -8);
 
             $inflectMethod = $this->getInflectionMethod();
-            $this->_endpoint = Inflector::$inflectMethod($endpoint);
+            $this->_name = Inflector::$inflectMethod($endpoint);
         }
 
-        return $this->_endpoint;
+        return $this->_name;
     }
 
     /**
