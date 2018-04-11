@@ -55,19 +55,19 @@ class SchemaTest extends \PHPUnit_Framework_TestCase
 
     public function testColumnType()
     {
-        $this->assertEquals('int', $this->schema->columnType('id'));
+        $this->assertEquals('int', $this->schema->getColumnType('id'));
     }
 
     public function testMissingColumnType()
     {
-        $this->assertNull($this->schema->columnType('missing'));
+        $this->assertNull($this->schema->getColumnType('missing'));
     }
 
     public function testChangingColumnType()
     {
-        $this->assertEquals('string', $this->schema->columnType('body'));
-        $this->schema->columnType('body', 'text');
-        $this->assertEquals('text', $this->schema->columnType('body'));
+        $this->assertEquals('string', $this->schema->getColumnType('body'));
+        $this->schema->setColumnType('body', 'text');
+        $this->assertEquals('text', $this->schema->getColumnType('body'));
     }
 
     public function testBaseColumnType()
@@ -128,8 +128,8 @@ class SchemaTest extends \PHPUnit_Framework_TestCase
 
     public function testOptions()
     {
-        $this->assertEmpty($this->schema->options());
-        $this->schema->options(['example' => true]);
-        $this->assertEquals(['example' => true], $this->schema->options());
+        $this->assertEmpty($this->schema->getOptions());
+        $this->schema->setOptions(['example' => true]);
+        $this->assertEquals(['example' => true], $this->schema->getOptions());
     }
 }
