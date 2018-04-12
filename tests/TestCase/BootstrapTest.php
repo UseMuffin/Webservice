@@ -10,11 +10,6 @@ use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 
-/**
- * @package MuffinWebservice
- * @author David Yell <dyell@ukwebmedia.com>
- * @copyright UK Web Media Ltd
- */
 class BootstrapTest extends TestCase
 {
     /**
