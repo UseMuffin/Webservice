@@ -9,7 +9,7 @@ use Cake\Routing\DispatcherFilter;
  * This filter registers the endpoint model type in controllers
  *
  * @package Muffin\Webservice\Routing\Filter
- * @deprecated Since 2.0.0
+ * @deprecated 2.0.0 Dispatch filters are deprecated
  */
 class ControllerEndpointFilter extends DispatcherFilter
 {
