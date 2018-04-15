@@ -117,3 +117,5 @@ Plugin::load('DebugKit', ['path' => ROOT, 'bootstrap' => true]);
 
 DispatcherFactory::add('Routing');
 DispatcherFactory::add('ControllerFactory');
+
+loadPHPUnitAliases();

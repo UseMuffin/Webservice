@@ -1,16 +1,17 @@
 <?php
 namespace Muffin\Webservice\Test\TestCase\Model\Endpoint\Schema;
 
+use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\Schema\TestSchema;
 
-class SchemaTest extends \PHPUnit_Framework_TestCase
+class SchemaTest extends TestCase
 {
     /**
      * @var \Muffin\Webservice\Schema
      */
     private $schema;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->schema = new TestSchema('test');
     }

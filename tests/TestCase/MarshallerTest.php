@@ -3,12 +3,13 @@ namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Entity;
+use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Marshaller;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 
-class MarshallerTest extends \PHPUnit_Framework_TestCase
+class MarshallerTest extends TestCase
 {
 
     /**
@@ -21,7 +22,7 @@ class MarshallerTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    protected function setUp()
+    public function setUp()
     {
         $connection = new Connection([
             'name' => 'test',
