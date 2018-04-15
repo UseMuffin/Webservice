@@ -44,7 +44,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     public function __construct($config = [])
     {
         if (!empty($config)) {
-            $this->config($config);
+            $this->setConfig($config);
         }
 
         $this->initialize();
