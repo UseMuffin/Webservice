@@ -14,7 +14,6 @@ use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use Cake\Event\EventManager;
-use Cake\Network\Exception\NotImplementedException;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
 use Muffin\Webservice\Exception\MissingResourceClassException;
@@ -22,7 +21,6 @@ use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Marshaller;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Schema;
-use Muffin\Webservice\StreamQuery;
 
 /**
  * The table equivalent of a webservice endpoint
@@ -839,11 +837,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                 'checkExisting' => false,
             ]);
 
-        if ($resource->errors()) {
+        if ($resource->getErrors()) {
             return false;
         }
 
-        if ($resource->isNew() === false && !$resource->dirty()) {
+        if ($resource->isNew() === false && !$resource->isDirty()) {
             return $resource;
         }
 

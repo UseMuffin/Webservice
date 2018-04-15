@@ -55,7 +55,7 @@ class Marshaller
         $resourceClass = $this->_endpoint->resourceClass();
         /* @var \Muffin\Webservice\Model\Resource $entity */
         $entity = new $resourceClass();
-        $entity->source($this->_endpoint->registryAlias());
+        $entity->setSource($this->_endpoint->registryAlias());
 
         if (isset($options['accessibleFields'])) {
             foreach ((array)$options['accessibleFields'] as $key => $value) {
@@ -79,7 +79,7 @@ class Marshaller
 
         if (!isset($options['fieldList'])) {
             $entity->set($properties);
-            $entity->errors($errors);
+            $entity->setErrors($errors);
 
             return $entity;
         }
@@ -106,22 +106,23 @@ class Marshaller
      */
     protected function _validate($data, $options, $isNew)
     {
-        if (!$options['validate']) {
-            return [];
-        }
+        $validator = null;
+
         if ($options['validate'] === true) {
-            $options['validate'] = $this->_endpoint->validator('default');
+            $validator = $this->_endpoint->getValidator('default');
+        } elseif (is_string($options['validate'])) {
+            $validator = $this->_endpoint->getValidator($options['validate']);
+        } elseif (is_object($options['validate'])) {
+            $validator = $options['validate'];
         }
-        if (is_string($options['validate'])) {
-            $options['validate'] = $this->_endpoint->validator($options['validate']);
-        }
-        if (!is_object($options['validate'])) {
+
+        if ($validator === null) {
             throw new RuntimeException(
                 sprintf('validate must be a boolean, a string or an object. Got %s.', gettype($options['validate']))
             );
         }
 
-        return $options['validate']->errors($data, $isNew);
+        return $validator->errors($data, $isNew);
     }
 
     /**

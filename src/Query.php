@@ -175,7 +175,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     public function endpoint(Endpoint $endpoint = null)
     {
         if ($endpoint === null) {
-            return $this->repository();
+            return $this->getRepository();
         }
 
         $this->repository($endpoint);
@@ -206,7 +206,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function find($finder, array $options = [])
     {
-        return $this->repository()->callFinder($finder, $this, $options);
+        return $this->getRepository()->callFinder($finder, $this, $options);
     }
 
     /**
@@ -224,7 +224,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         }
         throw new RecordNotFoundException(sprintf(
             'Record not found in endpoint "%s"',
-            $this->repository()->endpoint()
+            $this->getRepository()->endpoint()
         ));
     }
 
@@ -466,12 +466,12 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     public function triggerBeforeFind()
     {
         if (!$this->_beforeFindFired && $this->action() === self::ACTION_READ) {
-            $endpoint = $this->repository();
+            $endpoint = $this->getRepository();
             $this->_beforeFindFired = true;
             $endpoint->dispatchEvent('Model.beforeFind', [
                 $this,
                 new ArrayObject($this->_options),
-                !$this->eagerLoaded()
+                !$this->isEagerLoaded()
             ]);
         }
     }
