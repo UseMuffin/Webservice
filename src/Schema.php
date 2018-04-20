@@ -208,7 +208,7 @@ class Schema
      * @param string $name The column to get the type of.
      * @param string $type The type to set the column to.
      * @return string|null Either the column type or null.
-     * @deprecated Since 2.0.0 please use setColumnType or getColumnType instead.
+     * @deprecated 2.0.0 Please use setColumnType or getColumnType instead.
      */
     public function columnType($name, $type = null)
     {
@@ -355,7 +355,7 @@ class Schema
      *
      * @param array|null $options The options to set, or null to read options.
      * @return $this|array Either the endpoint instance, or an array of options when reading.
-     * @deprecated Since 2.0.0 please use setOptions and getOptions instead.
+     * @deprecated 2.0.0 Please use setOptions and getOptions instead.
      */
     public function options($options = null)
     {
