@@ -1,3 +1,2 @@
 <?php
-
-\Cake\Routing\DispatcherFactory::add('Muffin/Webservice.ControllerEndpoint');
+\Cake\Datasource\FactoryLocator::add('Endpoint', [Muffin\Webservice\Model\EndpointRegistry::class, 'get']);
