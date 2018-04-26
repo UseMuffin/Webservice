@@ -86,6 +86,13 @@ Cache::setConfig([
     ]
 ]);
 
+$config = [
+    'url' => 'sqlite:/' . TMP . 'webservice_test.sqlite',
+    'timezone' => 'UTC',
+];
+
+ConnectionManager::setConfig('test', $config);
+
 Log::setConfig([
     'debug' => [
         'engine' => 'Cake\Log\Engine\FileLog',
