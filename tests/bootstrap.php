@@ -92,6 +92,7 @@ $config = [
 ];
 
 ConnectionManager::setConfig('test', $config);
+ConnectionManager::setConfig('test_webservice', $config);
 
 Log::setConfig([
     'debug' => [
