@@ -86,20 +86,6 @@ Cache::setConfig([
     ]
 ]);
 
-// Ensure default test connection is defined
-if (!getenv('db_dsn')) {
-    putenv('db_dsn=sqlite:/' . TMP . 'debug_kit_test.sqlite');
-}
-
-$config = [
-    'url' => getenv('db_dsn'),
-    'timezone' => 'UTC',
-];
-
-// Use the test connection for 'debug_kit' as well.
-ConnectionManager::setConfig('test', $config);
-ConnectionManager::setConfig('test_webservice', $config);
-
 Log::setConfig([
     'debug' => [
         'engine' => 'Cake\Log\Engine\FileLog',
