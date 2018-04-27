@@ -134,12 +134,21 @@ class EndpointLocator
     /**
      * Stores a list of options to be used when instantiating an object with a matching alias.
      *
-     * @param string $alias The alias to set configuration for
-     * @param null|array $options Array of options
+     * If configuring many aliases, use an array keyed by the alias.
+     *
+     * ```
+     * $locator->setConfig([
+     *     'Example' => ['registryAlias' => 'example'],
+     *     'Posts' => ['registryAlias' => 'posts'],
+     * ]);
+     * ```
+     *
+     * @param string|array $alias The alias to set configuration for, or an array of configuration keyed by alias
+     * @param null|array $config Array of configuration options
      * @return $this
      * @throws \RuntimeException
      */
-    public function setConfig($alias, $options = null)
+    public function setConfig($alias, $config = null)
     {
         if (!is_string($alias)) {
             $this->_config = $alias;
@@ -154,7 +163,7 @@ class EndpointLocator
             ));
         }
 
-        $this->_config[$alias] = $options;
+        $this->_config[$alias] = $config;
 
         return $this;
     }
