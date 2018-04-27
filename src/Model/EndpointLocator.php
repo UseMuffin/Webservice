@@ -24,7 +24,7 @@ class EndpointLocator
     protected $_config = [];
 
     /**
-     * Instances that belong to the registry.
+     * Instances that belong to the locator.
      *
      * @var \Muffin\Webservice\Model\Endpoint[]
      */
@@ -38,7 +38,7 @@ class EndpointLocator
     protected $_options = [];
 
     /**
-     * Set an Endpoint instance to the registry
+     * Set an Endpoint instance to the locator.
      *
      * @param string $alias The alias to set.
      * @param \Muffin\Webservice\Model\Endpoint $object The table to set.
@@ -50,7 +50,7 @@ class EndpointLocator
     }
 
     /**
-     * Get a endpoint instance from the registry.
+     * Get a endpoint instance from the locator.
      *
      * @param string $alias The alias name you want to get.
      * @param array $options The options you want to build the endpoint with.
@@ -62,7 +62,7 @@ class EndpointLocator
         if (isset($this->_instances[$alias])) {
             if (!empty($options) && $this->_options[$alias] !== $options) {
                 throw new RuntimeException(sprintf(
-                    'You cannot configure "%s", it already exists in the registry.',
+                    'You cannot configure "%s", it already exists in the locator.',
                     $alias
                 ));
             }
@@ -107,7 +107,7 @@ class EndpointLocator
     }
 
     /**
-     * Check to see if an instance exists in the registry.
+     * Check to see if an instance exists in the locator.
      *
      * @param string $alias The alias to check for.
      * @return bool
@@ -170,7 +170,7 @@ class EndpointLocator
     }
 
     /**
-     * Clear the endpoint locator registry of all instances
+     * Clear the endpoint locator of all instances
      *
      * @return void
      */
@@ -182,7 +182,7 @@ class EndpointLocator
     }
 
     /**
-     * Remove a specific endpoint instance from the registry by alias
+     * Remove a specific endpoint instance from the locator by alias
      *
      * @param string $alias String alias of the endpoint
      * @return void

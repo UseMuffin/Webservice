@@ -115,7 +115,7 @@ class EndpointLocatorTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage You cannot configure "First", it already exists in the registry.
+     * @expectedExceptionMessage You cannot configure "First", it already exists in the locator.
      */
     public function testGetWithExistingObject()
     {
