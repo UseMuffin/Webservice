@@ -8,6 +8,11 @@ use Cake\Utility\Inflector;
 use Muffin\Webservice\AbstractDriver;
 use RuntimeException;
 
+/**
+ * EndpointRegistry
+ *
+ * @deprecated 2.0.0 The registry has been deprecated, please use EndpointLocator instead.
+ */
 class EndpointRegistry
 {
 
