@@ -15,7 +15,6 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
-use Cake\Routing\DispatcherFactory;
 
 require_once 'vendor/autoload.php';
 
@@ -114,8 +113,5 @@ Log::setConfig([
 ]);
 
 Plugin::load('DebugKit', ['path' => ROOT, 'bootstrap' => true]);
-
-DispatcherFactory::add('Routing');
-DispatcherFactory::add('ControllerFactory');
 
 loadPHPUnitAliases();
