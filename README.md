@@ -45,11 +45,11 @@ class Articles extends AbstractDriver
 {
 
     /**
-     * {@inheritDoc}
+     * Initialize is used to easily extend the constructor.
      */
     public function initialize()
     {
-        $this->client(new Client([
+        $this->setClient(new Client([
             'host' => 'example.com'
         ]));
     }
@@ -63,7 +63,6 @@ class Articles extends AbstractDriver
 
 namespace App\Webservice;
 
-use Cake\Network\Http\Client;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Webservice\Webservice;
@@ -72,11 +71,11 @@ class ArticlesWebservice extends Webservice
 {
 
     /**
-     * {@inheritDoc}
+     * Executes a query with the read action using the Cake HTTP Client
      */
     protected function _executeReadQuery(Query $query, array $options = [])
     {
-        $response = $this->driver()->client()->get('/articles.json');
+        $response = $this->getDriver()->getClient()->get('/articles.json');
 
         if (!$response->isOk()) {
             return false;
@@ -127,18 +126,19 @@ class Article extends Resource
 namespace App\Controller;
 
 use Cake\Event\Event;
+use Muffin\Webservice\Model\EndpointLocator;
 
 class ArticlesController extends AppController
 {
     public function initialize()
     {
         // You can also put this in AppController::initialize() itself
-        $this->modelFactory('Endpoint', ['Muffin\Webservice\Model\EndpointRegistry', 'get']);
+        $this->EndpointLocator = new EndpointLocator();
     }
 
     public function beforeFilter(Event $event)
     {
-        $this->loadModel('Articles', 'Endpoint');
+        $this->EndpointLocator->get('Articles');
     }
 
     public function index()
