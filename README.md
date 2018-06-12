@@ -130,7 +130,7 @@ use Muffin\Webservice\Model\EndpointLocator;
 
 class ArticlesController extends AppController
 {
-    // Either set the default model type of "Endpoint" or explicitly specify
+    // Either set the default model type to "Endpoint" or explicitly specify
     // model type in loadModel() call as shown below.
     protected $_modelType = 'Endpoint';
 
