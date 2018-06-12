@@ -125,24 +125,21 @@ class Article extends Resource
 
 namespace App\Controller;
 
-use Cake\Event\Event;
+use Cake\Datasource\ModelAwareTrait;
 use Muffin\Webservice\Model\EndpointLocator;
 
 class ArticlesController extends AppController
 {
+    use ModelAwareTrait;
+    
     public function initialize()
     {
-        // You can also put this in AppController::initialize() itself
-        $this->EndpointLocator = new EndpointLocator();
-    }
-
-    public function beforeFilter(Event $event)
-    {
-        $this->EndpointLocator->get('Articles');
+        $this->modelFactory('Endpoint', [new EndpointLocator(), 'get']);
     }
 
     public function index()
     {
+        $this->loadModel('Articles', 'Endpoint');
         $articles = $this->Articles->find();
     }
 
