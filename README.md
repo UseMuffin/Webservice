@@ -21,10 +21,10 @@ You then need to load the plugin. You can use the shell command:
 bin/cake plugin load Muffin/Webservice
 ```
 
-or by manually adding statement shown below to `boostrap.php`:
+or by manually adding statement shown below to your app's `Application::bootstrap()` method:
 
 ```php
-Plugin::load('Muffin/Webservice', ['bootstrap' => true]);
+$this->addPlugin('Muffin/Webservice');
 ```
 
 ## Usage
@@ -130,22 +130,18 @@ use Muffin\Webservice\Model\EndpointLocator;
 
 class ArticlesController extends AppController
 {
-    public function initialize()
-    {
-        // You can also put this in AppController::initialize() itself
-        $this->EndpointLocator = new EndpointLocator();
-    }
-
-    public function beforeFilter(Event $event)
-    {
-        $this->EndpointLocator->get('Articles');
-    }
+    // Either set the default model type of "Endpoint" or explicitly specify
+    // model type in loadModel() call as shown below.
+    protected $_modelType = 'Endpoint';
 
     public function index()
     {
+        // This is required only if you haven't set `$_modelType` property to
+        // "Endpoint" as shown above.
+        $this->loadModel('Articles', 'Endpoint');
+
         $articles = $this->Articles->find();
     }
-
 }
 ```
 
