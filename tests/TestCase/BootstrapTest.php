@@ -8,6 +8,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\FactoryLocator;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
+use Muffin\Webservice\Model\EndpointLocator;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 
 class BootstrapTest extends TestCase
@@ -40,9 +41,9 @@ class BootstrapTest extends TestCase
 
     public function testFactoryLocatorAddition()
     {
-        $expected = [\Muffin\Webservice\Model\EndpointRegistry::class, 'get'];
         $result = FactoryLocator::get('Endpoint');
 
-        $this->assertSame($expected, $result);
+        $this->assertInstanceOf(EndpointLocator::class, $result[0]);
+        $this->assertSame('get', $result[1]);
     }
 }

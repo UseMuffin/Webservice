@@ -1,2 +1,5 @@
 <?php
-\Cake\Datasource\FactoryLocator::add('Endpoint', [Muffin\Webservice\Model\EndpointRegistry::class, 'get']);
+use Cake\Datasource\FactoryLocator;
+use Muffin\Webservice\Model\EndpointLocator;
+
+FactoryLocator::add('Endpoint', [new EndpointLocator(), 'get']);
