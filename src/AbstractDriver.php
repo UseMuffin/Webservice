@@ -231,7 +231,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     {
         return [
             'client' => $this->client(),
-            'logger' => $this->logger(),
+            'logger' => $this->getLogger(),
             'webservices' => array_keys($this->_webservices)
         ];
     }
