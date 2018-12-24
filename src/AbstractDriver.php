@@ -111,8 +111,20 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * Returns a logger instance
      *
      * @return \Psr\Log\LoggerInterface
+     *
+     * @deprecated 1.4.0 Use getLogger() instead.
      */
     public function logger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * Returns a logger instance
+     *
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function getLogger()
     {
         return $this->logger;
     }
@@ -134,6 +146,8 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *   Use null to read current value.
      *
      * @return bool
+     *
+     * @deprecated 1.4.0 Use enableQueryLogging()/disableQueryLogging()/isQueryLoggingEnabled() instead.
      */
     public function logQueries($enable = null)
     {
@@ -142,6 +156,40 @@ abstract class AbstractDriver implements LoggerAwareInterface
         }
 
         $this->_logQueries = $enable;
+    }
+
+    /**
+     * Enable/disable query logging
+     *
+     * @return $this
+     */
+    public function enableQueryLogging()
+    {
+        $this->_logQueries = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable query logging
+     *
+     * @return $this
+     */
+    public function disableQueryLogging()
+    {
+        $this->_logQueries = false;
+
+        return $this;
+    }
+
+    /**
+     * Check if query logging is enabled.
+     *
+     * @return bool
+     */
+    public function isQueryLoggingEnabled()
+    {
+        return $this->_logQueries;
     }
 
     /**

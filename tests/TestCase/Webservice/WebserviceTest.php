@@ -110,7 +110,7 @@ class WebserviceTest extends TestCase
             ->expects($this->once())
             ->method('debug');
 
-        $this->webservice->driver()->logQueries(true);
+        $this->webservice->driver()->enableQueryLogging();
         $this->webservice->driver()->setLogger($logger);
 
         $query = new Query($this->webservice, new Endpoint());
