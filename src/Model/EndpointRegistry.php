@@ -5,7 +5,6 @@ namespace Muffin\Webservice\Model;
 use Cake\Core\App;
 use Cake\Datasource\ConnectionManager;
 use Cake\Utility\Inflector;
-use Muffin\Webservice\AbstractDriver;
 use RuntimeException;
 
 class EndpointRegistry

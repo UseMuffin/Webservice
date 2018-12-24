@@ -3,8 +3,6 @@
 namespace Muffin\Webservice\Webservice;
 
 use Cake\Core\App;
-use Cake\Core\Configure;
-use Cake\Datasource\ConnectionInterface;
 use Cake\Utility\Inflector;
 use Cake\Utility\Text;
 use Muffin\Webservice\AbstractDriver;
@@ -12,7 +10,6 @@ use Muffin\Webservice\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 /**
