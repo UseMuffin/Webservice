@@ -21,11 +21,6 @@ class BootstrapTest extends TestCase
      */
     public function testLoadingEndpointWithLoadModel()
     {
-        Plugin::load('Muffin/Webservice', [
-            'path' => ROOT . 'src',
-            'bootstrap' => true
-        ]);
-
         $connection = new Connection([
             'name' => 'test',
             'service' => 'Test'

@@ -112,6 +112,7 @@ Log::setConfig([
     ]
 ]);
 
-Plugin::load('DebugKit', ['path' => ROOT, 'bootstrap' => true]);
+Plugin::getCollection()->add(new \Muffin\Webservice\Plugin());
+require Plugin::getCollection()->get('Muffin/Webservice')->getConfigPath() . 'bootstrap.php';
 
 loadPHPUnitAliases();
