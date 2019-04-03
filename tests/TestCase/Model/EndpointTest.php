@@ -9,6 +9,7 @@ use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\AppEndpoint;
+use Muffin\Webservice\Test\test_app\Model\Endpoint\ExampleEndpoint;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
 use Muffin\Webservice\Webservice\WebserviceInterface;
@@ -508,5 +509,12 @@ class EndpointTest extends TestCase
         $result = $this->endpoint->__debugInfo();
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testGetResourceWithCustomResource()
+    {
+        $endpoint = new ExampleEndpoint();
+
+        $this->assertEquals('Muffin\Webservice\Test\test_app\Model\Resource\Example', $endpoint->getResourceClass());
     }
 }
