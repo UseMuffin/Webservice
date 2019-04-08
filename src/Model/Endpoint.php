@@ -50,7 +50,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Connection instance this endpoint uses
      *
-     * @var \Muffin\Webservice\Connection $connection Connection instance
+     * @var \Muffin\Webservice\Connection|null $connection Connection instance
      */
     protected $_connection;
 
@@ -222,7 +222,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function endpoint($endpoint = null)
     {
         if ($endpoint !== null) {
-            return $this->setName($endpoint);
+            $this->setName($endpoint);
         }
 
         return $this->getName();
@@ -362,7 +362,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Returns the connection driver.
      *
-     * @return \Muffin\Webservice\Connection
+     * @return \Muffin\Webservice\Connection|null
      */
     public function getConnection()
     {
@@ -592,7 +592,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function resourceClass($name = null)
     {
         if ($name !== null) {
-            return $this->setResourceClass($name);
+            $this->setResourceClass($name);
         }
 
         return $this->getResourceClass();
@@ -654,7 +654,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function inflectionMethod($method = null)
     {
         if ($method !== null) {
-            return $this->setInflectionMethod($method);
+            $this->setInflectionMethod($method);
         }
 
         return $this->getInflectionMethod();
@@ -1057,7 +1057,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function save(EntityInterface $resource, $options = [])
     {
-        $options = new ArrayObject($options + [
+        $options = new ArrayObject((array)$options + [
                 'checkRules' => true,
                 'checkExisting' => false,
             ]);

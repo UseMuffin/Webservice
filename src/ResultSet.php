@@ -46,7 +46,7 @@ class ResultSet implements ResultSetInterface
      */
     public function __construct(array $resources, $total = null)
     {
-        $this->_results = \SplFixedArray::fromArray($resources, false);
+        $this->_results = array_values($resources);
         $this->_total = $total;
     }
 

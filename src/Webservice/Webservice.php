@@ -23,7 +23,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * The driver to use to communicate with the webservice
      *
-     * @var \Muffin\Webservice\AbstractDriver
+     * @var \Muffin\Webservice\AbstractDriver|null
      */
     protected $_driver;
 
@@ -99,7 +99,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Get this webservices driver
      *
-     * @return \Muffin\Webservice\AbstractDriver
+     * @return \Muffin\Webservice\AbstractDriver|null
      */
     public function getDriver()
     {
@@ -195,8 +195,8 @@ abstract class Webservice implements WebserviceInterface
         }
 
         // Write to the logger when one has been defined
-        if ($this->getDriver()->logger()) {
-            $this->_logQuery($query, $this->getDriver()->logger());
+        if ($this->getDriver()->getLogger()) {
+            $this->_logQuery($query, $this->getDriver()->getLogger());
         }
 
         return $result;
