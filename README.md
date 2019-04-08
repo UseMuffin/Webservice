@@ -21,12 +21,6 @@ You then need to load the plugin. You can use the shell command:
 bin/cake plugin load Muffin/Webservice
 ```
 
-or by manually adding statement shown below to your app's `Application::bootstrap()` method:
-
-```php
-$this->addPlugin('Muffin/Webservice');
-```
-
 ## Usage
 
 ### As an ORM
@@ -35,7 +29,6 @@ $this->addPlugin('Muffin/Webservice');
 
 ```php
 <?php
-
 namespace App\Webservice\Driver;
 
 use Cake\Network\Http\Client;
@@ -43,7 +36,6 @@ use Muffin\Webservice\AbstractDriver;
 
 class Articles extends AbstractDriver
 {
-
     /**
      * Initialize is used to easily extend the constructor.
      */
@@ -60,7 +52,6 @@ class Articles extends AbstractDriver
 
 ```php
 <?php
-
 namespace App\Webservice;
 
 use Muffin\Webservice\Query;
@@ -69,7 +60,6 @@ use Muffin\Webservice\Webservice\Webservice;
 
 class ArticlesWebservice extends Webservice
 {
-
     /**
      * Executes a query with the read action using the Cake HTTP Client
      */
@@ -92,14 +82,12 @@ class ArticlesWebservice extends Webservice
 
 ```php
 <?php
-
 namespace App\Model\Endpoint;
 
 use Muffin\Webservice\Model\Endpoint;
 
 class ArticlesEndpoint extends Endpoint
 {
-
 }
 ```
 
@@ -107,14 +95,12 @@ class ArticlesEndpoint extends Endpoint
 
 ```php
 <?php
-
 namespace App\Model\Resource;
 
 use Muffin\Webservice\Model\Resource;
 
 class Article extends Resource
 {
-
 }
 ```
 
@@ -122,7 +108,6 @@ class Article extends Resource
 
 ```php
 <?php
-
 namespace App\Controller;
 
 use Cake\Event\Event;
@@ -191,7 +176,7 @@ http://github.com/usemuffin/webservice/issues
 
 ## License
 
-Copyright (c) 2015, [Use Muffin] and licensed under [The MIT License][mit].
+Copyright (c) 2015-Present, [Use Muffin] and licensed under [The MIT License][mit].
 
 [cakephp]:http://cakephp.org
 [composer]:http://getcomposer.org
