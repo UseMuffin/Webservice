@@ -84,13 +84,6 @@ class WebserviceTest extends TestCase
         $webservice->execute($query);
     }
 
-    public function testExecuteLoggingWithoutLogger()
-    {
-        $query = new Query($this->webservice, new Endpoint());
-
-        $this->webservice->execute($query);
-    }
-
     public function testExecuteLoggingWithLogger()
     {
         $logger = $this->getMockBuilder('Cake\Log\Engine\ConsoleLog')
@@ -208,6 +201,15 @@ class WebserviceTest extends TestCase
 
         $this->assertInternalType('array', $resources);
         $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resources[0]);
+    }
+
+    public function testDescribe()
+    {
+        $service = new TestWebservice();
+
+        $result = $service->describe('test');
+        $this->assertInstanceOf('\Muffin\Webservice\Model\Schema', $result);
+        $this->assertEquals('Test', $result->name());
     }
 
     public function testDebugInfo()

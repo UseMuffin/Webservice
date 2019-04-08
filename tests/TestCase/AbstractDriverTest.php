@@ -49,7 +49,7 @@ class AbstractDriverTest extends TestCase
         $driver = new Test();
         $driver->enableQueryLogging();
 
-        $this->assertTrue($driver->getQueryLogging());
+        $this->assertTrue($driver->isQueryLoggingEnabled());
     }
 
     public function testDisableQueryLogging()
@@ -57,7 +57,7 @@ class AbstractDriverTest extends TestCase
         $driver = new Test();
         $driver->disableQueryLogging();
 
-        $this->assertFalse($driver->getQueryLogging());
+        $this->assertFalse($driver->isQueryLoggingEnabled());
     }
 
     public function testDebugInfo()
