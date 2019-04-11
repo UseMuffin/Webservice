@@ -21,12 +21,6 @@ You then need to load the plugin. You can use the shell command:
 bin/cake plugin load Muffin/Webservice
 ```
 
-or by manually adding statement shown below to `boostrap.php`:
-
-```php
-Plugin::load('Muffin/Webservice', ['bootstrap' => true]);
-```
-
 ## Usage
 
 ### As an ORM
@@ -35,7 +29,6 @@ Plugin::load('Muffin/Webservice', ['bootstrap' => true]);
 
 ```php
 <?php
-
 namespace App\Webservice\Driver;
 
 use Cake\Network\Http\Client;
@@ -43,13 +36,12 @@ use Muffin\Webservice\AbstractDriver;
 
 class Articles extends AbstractDriver
 {
-
     /**
-     * {@inheritDoc}
+     * Initialize is used to easily extend the constructor.
      */
     public function initialize()
     {
-        $this->client(new Client([
+        $this->setClient(new Client([
             'host' => 'example.com'
         ]));
     }
@@ -60,23 +52,20 @@ class Articles extends AbstractDriver
 
 ```php
 <?php
-
 namespace App\Webservice;
 
-use Cake\Network\Http\Client;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Webservice\Webservice;
 
 class ArticlesWebservice extends Webservice
 {
-
     /**
-     * {@inheritDoc}
+     * Executes a query with the read action using the Cake HTTP Client
      */
     protected function _executeReadQuery(Query $query, array $options = [])
     {
-        $response = $this->driver()->client()->get('/articles.json');
+        $response = $this->getDriver()->getClient()->get('/articles.json');
 
         if (!$response->isOk()) {
             return false;
@@ -93,14 +82,12 @@ class ArticlesWebservice extends Webservice
 
 ```php
 <?php
-
 namespace App\Model\Endpoint;
 
 use Muffin\Webservice\Model\Endpoint;
 
 class ArticlesEndpoint extends Endpoint
 {
-
 }
 ```
 
@@ -108,14 +95,12 @@ class ArticlesEndpoint extends Endpoint
 
 ```php
 <?php
-
 namespace App\Model\Resource;
 
 use Muffin\Webservice\Model\Resource;
 
 class Article extends Resource
 {
-
 }
 ```
 
@@ -123,29 +108,25 @@ class Article extends Resource
 
 ```php
 <?php
-
 namespace App\Controller;
 
 use Cake\Event\Event;
+use Muffin\Webservice\Model\EndpointLocator;
 
 class ArticlesController extends AppController
 {
-    public function initialize()
-    {
-        // You can also put this in AppController::initialize() itself
-        $this->modelFactory('Endpoint', ['Muffin\Webservice\Model\EndpointRegistry', 'get']);
-    }
-
-    public function beforeFilter(Event $event)
-    {
-        $this->loadModel('Articles', 'Endpoint');
-    }
+    // Either set the default model type to "Endpoint" or explicitly specify
+    // model type in loadModel() call as shown below.
+    protected $_modelType = 'Endpoint';
 
     public function index()
     {
+        // This is required only if you haven't set `$_modelType` property to
+        // "Endpoint" as shown above.
+        $this->loadModel('Articles', 'Endpoint');
+
         $articles = $this->Articles->find();
     }
-
 }
 ```
 
@@ -195,7 +176,7 @@ http://github.com/usemuffin/webservice/issues
 
 ## License
 
-Copyright (c) 2015, [Use Muffin] and licensed under [The MIT License][mit].
+Copyright (c) 2015-Present, [Use Muffin] and licensed under [The MIT License][mit].
 
 [cakephp]:http://cakephp.org
 [composer]:http://getcomposer.org

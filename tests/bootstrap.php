@@ -15,7 +15,6 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
-use Cake\Routing\DispatcherFactory;
 
 require_once 'vendor/autoload.php';
 
@@ -91,6 +90,7 @@ $config = [
     'timezone' => 'UTC',
 ];
 
+// Use the test connection for 'debug_kit' as well.
 ConnectionManager::setConfig('test', $config);
 ConnectionManager::setConfig('test_webservice', $config);
 
@@ -107,5 +107,7 @@ Log::setConfig([
     ]
 ]);
 
-DispatcherFactory::add('Routing');
-DispatcherFactory::add('ControllerFactory');
+Plugin::getCollection()->add(new \Muffin\Webservice\Plugin());
+require Plugin::getCollection()->get('Muffin/Webservice')->getConfigPath() . 'bootstrap.php';
+
+loadPHPUnitAliases();

@@ -60,17 +60,38 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * Set or return an instance of the client used for communication
      *
      * @param object $client The client to use
-     *
      * @return object
+     * @deprecated 2.0.0 Use setClient() and getClient() instead.
      */
     public function client($client = null)
     {
         if ($client === null) {
-            return $this->_client;
+            return $this->getClient();
         }
 
+        return $this->setClient($client);
+    }
+
+    /**
+     * Set the client instance this driver will use to make requests
+     *
+     * @param object $client Client instance
+     * @return $this
+     */
+    public function setClient($client)
+    {
         $this->_client = $client;
 
+        return $this;
+    }
+
+    /**
+     * Get the client instance configured for this driver
+     *
+     * @return object
+     */
+    public function getClient()
+    {
         return $this->_client;
     }
 
@@ -79,17 +100,40 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param string $name The name of the webservice
      * @param \Muffin\Webservice\Webservice\WebserviceInterface|null $webservice The instance of the webservice you'd like to set
-     *
-     * @return $this
+     * @return $this|\Muffin\Webservice\Webservice\WebserviceInterface
+     * @deprecated 2.0.0 Use setWebservice() or getWebservice() instead.
      */
     public function webservice($name, WebserviceInterface $webservice = null)
     {
         if ($webservice !== null) {
-            $this->_webservices[$name] = $webservice;
-
-            return $this;
+            $this->setWebservice($name, $webservice);
         }
 
+        return $this->getWebservice($name);
+    }
+
+    /**
+     * Set the webservice instance used by the driver
+     *
+     * @param string $name The registry alias for the webservice instance
+     * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice Instance of the webservice
+     * @return $this
+     */
+    public function setWebservice($name, WebserviceInterface $webservice)
+    {
+        $this->_webservices[$name] = $webservice;
+
+        return $this;
+    }
+
+    /**
+     * Fetch a webservice instance from the driver registry
+     *
+     * @param string $name Registry alias to fetch
+     * @return \Muffin\Webservice\Webservice\WebserviceInterface|null
+     */
+    public function getWebservice($name)
+    {
         if (!isset($this->_webservices[$name])) {
             list($pluginName) = pluginSplit(App::shortName(get_class($this), 'Webservice/Driver'));
 
@@ -121,7 +165,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Returns a logger instance
      *
-     * @return \Psr\Log\LoggerInterface
+     * @return \Psr\Log\LoggerInterface|null
      */
     public function getLogger()
     {
@@ -141,9 +185,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Enables or disables query logging for this driver
      *
-     * @param bool|null $enable whether to turn logging on or disable it.
-     *   Use null to read current value.
-     *
+     * @param bool|null $enable whether to turn logging on or disable it. Use null to read current value.
      * @return bool
      *
      * @deprecated 1.4.0 Use enableQueryLogging()/disableQueryLogging()/isQueryLoggingEnabled() instead.
@@ -158,7 +200,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     }
 
     /**
-     * Enable/disable query logging
+     * Enable query logging for the driver
      *
      * @return $this
      */
@@ -170,7 +212,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     }
 
     /**
-     * Disable query logging
+     * Disable query logging for the driver
      *
      * @return $this
      */
@@ -196,24 +238,22 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param string $method Method name.
      * @param array $args Arguments to pass-through.
-     *
      * @return mixed
-     *
      * @throws \RuntimeException If the client object has not been initialized.
      * @throws \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException If the method does not exist in the client.
      */
     public function __call($method, $args)
     {
-        if (!is_object($this->client())) {
+        if (!is_object($this->getClient())) {
             throw new RuntimeException(sprintf(
                 'The `%s` client has not been initialized',
-                $this->config('name')
+                $this->getConfig('name')
             ));
         }
 
-        if (!method_exists($this->client(), $method)) {
+        if (!method_exists($this->getClient(), $method)) {
             throw new UnimplementedWebserviceMethodException([
-                'name' => $this->config('name'),
+                'name' => $this->getConfig('name'),
                 'method' => $method
             ]);
         }
@@ -229,8 +269,9 @@ abstract class AbstractDriver implements LoggerAwareInterface
     public function __debugInfo()
     {
         return [
-            'client' => $this->client(),
-            'logger' => $this->getLogger(),
+            'client' => $this->getClient(),
+            'logger' => $this->logger(),
+            'query_logging' => $this->isQueryLoggingEnabled(),
             'webservices' => array_keys($this->_webservices)
         ];
     }
@@ -242,8 +283,8 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param string $className Class name of the webservice to initialize
      * @param array $options Set of options to pass to the constructor
-     *
      * @return WebserviceInterface
+     * @throws \Muffin\Webservice\Exception\MissingWebserviceClassException If no webservice class can be found
      */
     protected function _createWebservice($className, array $options = [])
     {

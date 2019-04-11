@@ -22,8 +22,19 @@ class TestEndpoint extends Endpoint
         $validator->requirePresence('title')
             ->notEmpty('title')
             ->requirePresence('body')
-            ->notEmpty('body');
+            ->notEmpty('body')
+            ->minLength('body', 5, 'Must be 5 characters or longer');
 
         return $validator;
+    }
+
+    /**
+     * Example finder
+     *
+     * @return true
+     */
+    public function findExamples()
+    {
+        return true;
     }
 }

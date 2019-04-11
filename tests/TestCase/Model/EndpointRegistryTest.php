@@ -2,12 +2,14 @@
 
 namespace Muffin\Webservice\Model;
 
+use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
+use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 
 class EndpointRegistryTest extends TestCase
 {
-    public function tearDown()
+    public function setUp()
     {
         EndpointRegistry::clear();
     }
@@ -26,7 +28,8 @@ class EndpointRegistryTest extends TestCase
             ])
         ]);
 
-        $this->assertInstanceOf(\Muffin\Webservice\Model\Endpoint::class, $result);
+        $this->assertInstanceOf(Endpoint::class, $result);
+        $this->assertEquals('test', $result->endpoint());
     }
 
     /**
@@ -34,24 +37,56 @@ class EndpointRegistryTest extends TestCase
      * exception is thrown
      *
      * @expectedException \RuntimeException
+     * @expectedExceptionMessage You cannot configure "Test", it already exists in the registry.
      */
-    public function testAddingSameEndpoint()
+    public function testReconfiguringExistingInstance()
     {
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',
                 'service' => 'test'
-            ])
+            ]),
+            'displayField' => 'foo'
         ]);
 
-        $this->assertInstanceOf(\Muffin\Webservice\Model\Endpoint::class, $result);
+        $this->assertInstanceOf(Endpoint::class, $result);
+        $this->assertEquals('test', $result->endpoint());
 
         $result = EndpointRegistry::get('Test', [
-            'connection' => new Connection([
-                'name' => 'exception',
-                'service' => 'exception'
-            ])
+            'displayField' => 'foo'
         ]);
+    }
+
+    public function testGettingSameInstance()
+    {
+        $result = EndpointRegistry::get('Test', [
+            'connection' => new Connection([
+                'name' => 'test',
+                'service' => 'test'
+            ]),
+        ]);
+
+        $this->assertInstanceOf(Endpoint::class, $result);
+        $this->assertEquals('test', $result->endpoint());
+
+        $result = EndpointRegistry::get('Test');
+
+        $this->assertInstanceOf(Endpoint::class, $result);
+        $this->assertEquals('test', $result->endpoint());
+    }
+
+    public function testGetInstanceWithNoEndpointName()
+    {
+        $result = EndpointRegistry::get('Test', [
+            'connection' => new Connection([
+                'name' => 'test',
+                'service' => 'test'
+            ]),
+            'className' => 'UnfindableClass'
+        ]);
+
+        $this->assertInstanceOf(Endpoint::class, $result);
+        $this->assertEquals('unfindable_class', $result->endpoint());
     }
 
     public function testRemovingInstance()
@@ -63,7 +98,7 @@ class EndpointRegistryTest extends TestCase
             ])
         ]);
 
-        $this->assertInstanceOf(\Muffin\Webservice\Model\Endpoint::class, $result);
+        $this->assertInstanceOf(Endpoint::class, $result);
 
         EndpointRegistry::remove('Test');
 
@@ -81,7 +116,7 @@ class EndpointRegistryTest extends TestCase
             ])
         ]);
 
-        $this->assertInstanceOf(\Muffin\Webservice\Model\Endpoint::class, $result);
+        $this->assertInstanceOf(Endpoint::class, $result);
 
         EndpointRegistry::clear();
 

@@ -51,15 +51,15 @@ class Marshaller
     {
         list($data, $options) = $this->_prepareDataAndOptions($data, $options);
 
-        $primaryKey = (array)$this->_endpoint->primaryKey();
-        $resourceClass = $this->_endpoint->resourceClass();
+        $primaryKey = (array)$this->_endpoint->getPrimaryKey();
+        $resourceClass = $this->_endpoint->getResourceClass();
         /* @var \Muffin\Webservice\Model\Resource $entity */
         $entity = new $resourceClass();
-        $entity->setSource($this->_endpoint->registryAlias());
+        $entity->setSource($this->_endpoint->getRegistryAlias());
 
         if (isset($options['accessibleFields'])) {
             foreach ((array)$options['accessibleFields'] as $key => $value) {
-                $entity->accessible($key, $value);
+                $entity->setAccess($key, $value);
             }
         }
 
@@ -67,7 +67,7 @@ class Marshaller
         $properties = [];
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
-                $entity->invalid($key, $value);
+                $entity->setInvalidField($key, $value);
                 continue;
             }
             if ($value === '' && in_array($key, $primaryKey, true)) {
@@ -90,7 +90,7 @@ class Marshaller
             }
         }
 
-        $entity->errors($errors);
+        $entity->setErrors($errors);
 
         return $entity;
     }
@@ -106,20 +106,24 @@ class Marshaller
      */
     protected function _validate($data, $options, $isNew)
     {
-        $validator = null;
+        if (!$options['validate']) {
+            return [];
+        }
 
+        $validator = null;
         if ($options['validate'] === true) {
             $validator = $this->_endpoint->getValidator('default');
         } elseif (is_string($options['validate'])) {
             $validator = $this->_endpoint->getValidator($options['validate']);
-        } elseif (is_object($options['validate'])) {
-            $validator = $options['validate'];
+        } else {
+            $validator = $options['validator'];
         }
 
-        if ($validator === null) {
-            throw new RuntimeException(
-                sprintf('validate must be a boolean, a string or an object. Got %s.', gettype($options['validate']))
-            );
+        if (!is_callable([$validator, 'errors'])) {
+            throw new RuntimeException(sprintf(
+                '"validate" must be a boolean, a string or an object with method "errors()". Got %s instead.',
+                gettype($options['validate'])
+            ));
         }
 
         return $validator->errors($data, $isNew);
@@ -136,7 +140,7 @@ class Marshaller
     {
         $options += ['validate' => true];
 
-        $endpointName = $this->_endpoint->alias();
+        $endpointName = $this->_endpoint->getAlias();
         if (isset($data[$endpointName])) {
             $data = $data[$endpointName];
         }
@@ -200,12 +204,12 @@ class Marshaller
         $keys = [];
 
         if (!$isNew) {
-            $keys = $entity->extract((array)$this->_endpoint->primaryKey());
+            $keys = $entity->extract((array)$this->_endpoint->getPrimaryKey());
         }
 
         if (isset($options['accessibleFields'])) {
             foreach ((array)$options['accessibleFields'] as $key => $value) {
-                $entity->accessible($key, $value);
+                $entity->setAccess($key, $value);
             }
         }
 
@@ -214,7 +218,7 @@ class Marshaller
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
                 if ($entity instanceof InvalidPropertyInterface) {
-                    $entity->invalid($key, $value);
+                    $entity->setInvalidField($key, $value);
                 }
                 continue;
             }
@@ -224,7 +228,7 @@ class Marshaller
 
         if (!isset($options['fieldList'])) {
             $entity->set($properties);
-            $entity->errors($errors);
+            $entity->setErrors($errors);
 
             return $entity;
         }
@@ -235,7 +239,7 @@ class Marshaller
             }
         }
 
-        $entity->errors($errors);
+        $entity->setErrors($errors);
 
         return $entity;
     }
@@ -262,7 +266,7 @@ class Marshaller
      */
     public function mergeMany($entities, array $data, array $options = [])
     {
-        $primary = (array)$this->_endpoint->primaryKey();
+        $primary = (array)$this->_endpoint->getPrimaryKey();
 
         $indexed = (new Collection($data))
             ->groupBy(function ($el) use ($primary) {

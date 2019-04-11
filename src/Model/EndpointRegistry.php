@@ -7,6 +7,11 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Utility\Inflector;
 use RuntimeException;
 
+/**
+ * EndpointRegistry
+ *
+ * @deprecated 2.0.0 The registry has been deprecated, please use EndpointLocator instead.
+ */
 class EndpointRegistry
 {
 
@@ -52,8 +57,8 @@ class EndpointRegistry
      *
      * @param string $alias The alias name you want to get.
      * @param array $options The options you want to build the endpoint with.
-     *
      * @return \Muffin\Webservice\Model\Endpoint
+     * @throws \RuntimeException If the registry alias is already in use.
      */
     public static function get($alias, array $options = [])
     {
@@ -99,6 +104,7 @@ class EndpointRegistry
 
         $options['registryAlias'] = $alias;
         self::$_instances[$alias] = self::_create($options);
+        self::$_options[$alias] = $options;
 
         return self::$_instances[$alias];
     }

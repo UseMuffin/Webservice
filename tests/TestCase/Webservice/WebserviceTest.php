@@ -28,6 +28,16 @@ class WebserviceTest extends TestCase
         ]);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        unset($this->webservice);
+    }
+
     public function testConstructor()
     {
         $testDriver = new Test([]);
@@ -37,8 +47,8 @@ class WebserviceTest extends TestCase
             'endpoint' => 'test'
         ]);
 
-        $this->assertEquals($testDriver, $webservice->driver());
-        $this->assertEquals('test', $webservice->endpoint());
+        $this->assertEquals($testDriver, $webservice->getDriver());
+        $this->assertEquals('test', $webservice->getEndpoint());
     }
 
     public function testNestedResources()
@@ -74,13 +84,6 @@ class WebserviceTest extends TestCase
         $webservice->execute($query);
     }
 
-    public function testExecuteLoggingWithoutLogger()
-    {
-        $query = new Query($this->webservice, new Endpoint());
-
-        $this->webservice->execute($query);
-    }
-
     public function testExecuteLoggingWithLogger()
     {
         $logger = $this->getMockBuilder('Cake\Log\Engine\ConsoleLog')
@@ -92,7 +95,7 @@ class WebserviceTest extends TestCase
             ->expects($this->never())
             ->method('debug');
 
-        $this->webservice->driver()->setLogger($logger);
+        $this->webservice->getDriver()->setLogger($logger);
 
         $query = new Query($this->webservice, new Endpoint());
 
@@ -110,8 +113,8 @@ class WebserviceTest extends TestCase
             ->expects($this->once())
             ->method('debug');
 
-        $this->webservice->driver()->enableQueryLogging();
-        $this->webservice->driver()->setLogger($logger);
+        $this->webservice->getDriver()->enableQueryLogging();
+        $this->webservice->getDriver()->setLogger($logger);
 
         $query = new Query($this->webservice, new Endpoint());
 
@@ -212,18 +215,16 @@ class WebserviceTest extends TestCase
     public function testDebugInfo()
     {
         $this->assertEquals([
-            'driver' => $this->webservice->driver(),
-            'endpoint' => $this->webservice->endpoint()
+            'driver' => $this->webservice->getDriver(),
+            'endpoint' => $this->webservice->getEndpoint()
         ], $this->webservice->__debugInfo());
     }
 
     /**
-     * @inheritDoc
+     * @expectedException \Muffin\Webservice\Exception\MissingEndpointSchemaException
      */
-    public function tearDown()
+    public function testDescribeException()
     {
-        parent::tearDown();
-
-        unset($this->webservice);
+        $this->webservice->describe('example');
     }
 }
