@@ -165,7 +165,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Returns a logger instance
      *
-     * @return \Psr\Log\LoggerInterface
+     * @return \Psr\Log\LoggerInterface|null
      */
     public function getLogger()
     {

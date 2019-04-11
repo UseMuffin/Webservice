@@ -81,7 +81,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * The results from the webservice
      *
-     * @var ResultSet
+     * @var ResultSet|null
      */
     protected $__resultSet;
 
@@ -234,7 +234,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         }
         throw new RecordNotFoundException(sprintf(
             'Record not found in endpoint "%s"',
-            $this->getRepository()->endpoint()
+            $this->getRepository()->getName()
         ));
     }
 
