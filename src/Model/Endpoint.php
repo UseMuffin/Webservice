@@ -1106,6 +1106,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return false;
         }
 
+        $event = $this->dispatchEvent('Model.afterSave', compact('resource', 'options'));
+
+        if ($event->isStopped()) {
+            return $event->result;
+        }
+
         if (($resource->isNew()) && ($result instanceof EntityInterface)) {
             return $result;
         }
