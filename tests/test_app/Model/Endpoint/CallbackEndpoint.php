@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Muffin\Webservice\Test\test_app\Model\Endpoint;
-
 
 use Cake\Datasource\EntityInterface;
 use Cake\Event\Event;
@@ -21,9 +19,9 @@ class CallbackEndpoint extends Endpoint
     public function afterSave(Event $event, EntityInterface $entity, \ArrayObject $options)
     {
         $event->stopPropagation();
-        if($entity->get('title')) {
-        $entity->set('title', 'Loads of sun');
-    }
+        if ($entity->get('title')) {
+            $entity->set('title', 'Loads of sun');
+        }
 
         return $entity;
     }

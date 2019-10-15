@@ -68,7 +68,5 @@ class EndpointAfterSaveCallbackTest extends TestCase
             'title' => 'Loads of fun',
             'body' => 'Woot'
         ], $newResource->toArray());
-
     }
-
 }
