@@ -3,6 +3,8 @@ namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
+use Muffin\Webservice\Exception\MissingConnectionException;
+use Muffin\Webservice\Exception\MissingDriverException;
 
 class ConnectionTest extends TestCase
 {
@@ -22,22 +24,20 @@ class ConnectionTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\MissingDriverException
-     */
     public function testConstructorMissingDriver()
     {
+        $this->expectException(MissingDriverException::class);
+
         new Connection([
             'name' => 'test',
             'service' => 'MissingDriver'
         ]);
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\MissingConnectionException
-     */
     public function testConstructorNoDriver()
     {
+        $this->expectException(MissingConnectionException::class);
+
         new Connection([
             'name' => 'test',
         ]);

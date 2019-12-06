@@ -2,6 +2,7 @@
 namespace Muffin\Webservice\Model;
 
 use Cake\TestSuite\TestCase;
+use RuntimeException;
 
 class EndpointLocatorTest extends TestCase
 {
@@ -37,12 +38,11 @@ class EndpointLocatorTest extends TestCase
         $this->assertSame($configExample, $this->Locator->getConfig('example'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You cannot configure "Test", it has already been constructed.
-     */
     public function testSetConfigForExistingObject()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot configure "Test", it has already been constructed.');
+
         $this->Locator->get('Test', [
             'registryAlias' => 'Test',
             'connection' => 'test'
@@ -113,12 +113,11 @@ class EndpointLocatorTest extends TestCase
         $this->assertSame($first, $result);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You cannot configure "First", it already exists in the locator.
-     */
     public function testGetWithExistingObject()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot configure "First", it already exists in the locator.');
+
         $result = $this->Locator->get('First', [
             'className' => Endpoint::class,
             'registryAlias' => 'First',

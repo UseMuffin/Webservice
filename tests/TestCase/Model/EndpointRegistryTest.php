@@ -6,6 +6,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
+use RuntimeException;
 
 class EndpointRegistryTest extends TestCase
 {
@@ -35,12 +36,12 @@ class EndpointRegistryTest extends TestCase
     /**
      * Ensure that if you try and set the options for an already configured Endpoint instance an
      * exception is thrown
-     *
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You cannot configure "Test", it already exists in the registry.
      */
     public function testReconfiguringExistingInstance()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot configure "Test", it already exists in the registry.');
+
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',

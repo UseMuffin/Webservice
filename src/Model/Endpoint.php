@@ -1470,6 +1470,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function getAlias(): string
     {
+        if ($this->_alias === null) {
+            $this->_alias = $this->getName();
+        }
+
         return $this->_alias;
     }
 }

@@ -20,9 +20,9 @@ class TestEndpoint extends Endpoint
     public function validationDefault(Validator $validator): Validator
     {
         $validator->requirePresence('title')
-            ->notEmpty('title')
+            ->notEmptyString('title')
             ->requirePresence('body')
-            ->notEmpty('body')
+            ->notEmptyString('body')
             ->minLength('body', 5, 'Must be 5 characters or longer');
 
         return $validator;

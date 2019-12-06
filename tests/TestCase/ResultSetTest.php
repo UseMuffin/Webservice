@@ -49,7 +49,7 @@ class ResultSetTest extends TestCase
 
     public function testSerialize()
     {
-        $this->assertInternalType('string', serialize($this->resultSet));
+        $this->assertIsString(serialize($this->resultSet));
     }
 
     public function testUnserialize()

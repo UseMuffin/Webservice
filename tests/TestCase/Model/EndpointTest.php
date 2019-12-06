@@ -2,9 +2,13 @@
 
 namespace Muffin\Webservice\Test\TestCase\Model;
 
+use BadMethodCallException;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\EventManager;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
+use Muffin\Webservice\Exception\MissingResourceClassException;
+use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
@@ -123,11 +127,10 @@ class EndpointTest extends TestCase
         $this->assertFalse($this->endpoint->exists(['id' => 10]));
     }
 
-    /**
-     * @expectedException \Cake\Datasource\Exception\RecordNotFoundException
-     */
     public function testGetNonExisting()
     {
+        $this->expectException(RecordNotFoundException::class);
+
         $this->endpoint->get(10);
     }
 
@@ -175,11 +178,10 @@ class EndpointTest extends TestCase
         $this->assertEquals($newResource->title, 'New ORM for webservices');
     }
 
-    /**
-     * @expectedException \Cake\Datasource\Exception\RecordNotFoundException
-     */
     public function testDelete()
     {
+        $this->expectException(RecordNotFoundException::class);
+
         $resource = $this->endpoint->get(2);
 
         $this->assertTrue($this->endpoint->delete($resource));
@@ -200,10 +202,13 @@ class EndpointTest extends TestCase
 
     public function testNewEntity()
     {
-        $this->assertEquals(new Resource([
+        $resource = new Resource([
             'title' => 'New entity',
             'body' => 'New entity body'
-        ]), $this->endpoint->newEntity([
+        ]);
+        $resource->setSource('test');
+
+        $this->assertEquals($resource, $this->endpoint->newEntity([
             'title' => 'New entity',
             'body' => 'New entity body'
         ]));
@@ -211,15 +216,21 @@ class EndpointTest extends TestCase
 
     public function testNewEntities()
     {
+        $resource1 = new Resource([
+            'title' => 'New entity',
+            'body' => 'New entity body'
+        ]);
+        $resource1->setSource('test');
+
+        $resource2 = new Resource([
+            'title' => 'Second new entity',
+            'body' => 'Second new entity body'
+        ]);
+        $resource2->setSource('test');
+
         $this->assertEquals([
-            new Resource([
-                'title' => 'New entity',
-                'body' => 'New entity body'
-            ]),
-            new Resource([
-                'title' => 'Second new entity',
-                'body' => 'Second new entity body'
-            ])
+            $resource1,
+            $resource2,
         ], $this->endpoint->newEntities([
             [
                 'title' => 'New entity',
@@ -417,11 +428,10 @@ class EndpointTest extends TestCase
         $this->assertSame('Muffin\Webservice\Test\test_app\Model\Resource\Example', $endpoint->getResourceClass());
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\MissingResourceClassException
-     */
     public function testSetResourceMissingClass()
     {
+        $this->expectException(MissingResourceClassException::class);
+
         new Endpoint([
             'name' => 'example',
             'resourceClass' => 'Missing'
@@ -435,11 +445,11 @@ class EndpointTest extends TestCase
 
     /**
      * Fake an incorrect return of the schema to check the exception
-     *
-     * @expectedException \Muffin\Webservice\Exception\UnexpectedDriverException
      */
     public function testGetPrimaryKeyException()
     {
+        $this->expectException(UnexpectedDriverException::class);
+
         $endpoint = $this->getMockBuilder(Endpoint::class)
             ->setMethods(['getSchema'])
             ->getMock();
@@ -460,11 +470,10 @@ class EndpointTest extends TestCase
         $this->assertInstanceOf(WebserviceInterface::class, $this->endpoint->getWebservice());
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\UnexpectedDriverException
-     */
     public function testSetWebserviceException()
     {
+        $this->expectException(UnexpectedDriverException::class);
+
         $endpoint = $this->getMockBuilder(Endpoint::class)
             ->setMethods(['getConnection'])
             ->getMock();
@@ -483,11 +492,10 @@ class EndpointTest extends TestCase
         $this->assertFalse($this->endpoint->hasFinder('Missing'));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testCallMissingFinder()
     {
+        $this->expectException(BadMethodCallException::class);
+
         $query = $this->getMockBuilder(Query::class)
             ->setConstructorArgs([new TestWebservice(), $this->endpoint])
             ->getMock();
@@ -498,8 +506,8 @@ class EndpointTest extends TestCase
     public function testDebugInfo()
     {
         $expected = [
-            'registryAlias' => null,
-            'alias' => null,
+            'registryAlias' => 'test',
+            'alias' => 'test',
             'endpoint' => 'test',
             'resourceClass' => 'Muffin\\Webservice\\Model\\Resource',
             'defaultConnection' => 'test_app',

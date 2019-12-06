@@ -31,7 +31,8 @@ class MarshallerTest extends TestCase
         $endpoint = new TestEndpoint([
             'connection' => $connection,
             'primaryKey' => 'id',
-            'displayField' => 'title'
+            'displayField' => 'title',
+            'alias' => 'TestEndpoint',
         ]);
 
         $this->marshaller = new Marshaller($endpoint);
@@ -221,7 +222,7 @@ class MarshallerTest extends TestCase
             'title' => 'Testing',
             'body' => 'Longer body'
         ]);
-        $entity->isNew(false);
+        $entity->setNew(false);
 
         $data = [
             'title' => 'Changed the title',

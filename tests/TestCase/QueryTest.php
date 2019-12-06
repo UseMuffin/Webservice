@@ -9,6 +9,7 @@ use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Test\test_app\Webservice\StaticWebservice;
+use UnexpectedValueException;
 
 class QueryTest extends TestCase
 {
@@ -105,14 +106,13 @@ class QueryTest extends TestCase
 
         $debugInfo = $this->query->__debugInfo();
 
-        $this->assertInternalType('callable', $debugInfo['formatters'][0]);
+        $this->assertIsCallable($debugInfo['formatters'][0]);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
     public function testSetInvalidAction()
     {
+        $this->expectException(UnexpectedValueException::class);
+
         $this->query->read();
 
         $this->query->set([]);

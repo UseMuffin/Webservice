@@ -3,10 +3,13 @@
 namespace Muffin\Webservice\Test\TestCase\Webservice;
 
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Exception\MissingEndpointSchemaException;
+use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
 use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
+use UnexpectedValueException;
 
 class WebserviceTest extends TestCase
 {
@@ -71,12 +74,11 @@ class WebserviceTest extends TestCase
         ]));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage No driver has been defined
-     */
     public function testExecuteWithoutDriver()
     {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('No driver has been defined');
+
         $webservice = new TestWebservice();
 
         $query = new Query($webservice, new Endpoint());
@@ -121,48 +123,44 @@ class WebserviceTest extends TestCase
         $this->webservice->execute($query);
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeCreateQuery
-     */
     public function testExecuteWithoutCreate()
     {
+        $this->expectException(UnimplementedWebserviceMethodException::class);
+        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeCreateQuery');
+
         $query = new Query($this->webservice, new Endpoint());
         $query->create();
 
         $this->webservice->execute($query);
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeReadQuery
-     */
     public function testExecuteWithoutRead()
     {
+        $this->expectException(UnimplementedWebserviceMethodException::class);
+        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeReadQuery');
+
         $query = new Query($this->webservice, new Endpoint());
         $query->read();
 
         $this->webservice->execute($query);
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeUpdateQuery
-     */
     public function testExecuteWithoutUpdate()
     {
+        $this->expectException(UnimplementedWebserviceMethodException::class);
+        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeUpdateQuery');
+
         $query = new Query($this->webservice, new Endpoint());
         $query->update();
 
         $this->webservice->execute($query);
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException
-     * @expectedExceptionMessage Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeDeleteQuery
-     */
     public function testExecuteWithoutDelete()
     {
+        $this->expectException(UnimplementedWebserviceMethodException::class);
+        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeDeleteQuery');
+
         $query = new Query($this->webservice, new Endpoint());
         $query->delete();
 
@@ -199,7 +197,7 @@ class WebserviceTest extends TestCase
             ]
         ]);
 
-        $this->assertInternalType('array', $resources);
+        $this->assertIsArray($resources);
         $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resources[0]);
     }
 
@@ -220,11 +218,10 @@ class WebserviceTest extends TestCase
         ], $this->webservice->__debugInfo());
     }
 
-    /**
-     * @expectedException \Muffin\Webservice\Exception\MissingEndpointSchemaException
-     */
     public function testDescribeException()
     {
+        $this->expectException(MissingEndpointSchemaException::class);
+
         $this->webservice->describe('example');
     }
 }
