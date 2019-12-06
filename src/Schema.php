@@ -202,27 +202,6 @@ class Schema
     }
 
     /**
-     * Sets the type of a column, or returns its current type
-     * if none is passed.
-     *
-     * @param string $name The column to get the type of.
-     * @param string $type The type to set the column to.
-     * @return string|null Either the column type or null.
-     * @deprecated 2.0.0 Please use setColumnType or getColumnType instead.
-     */
-    public function columnType($name, $type = null)
-    {
-        if (!isset($this->_columns[$name])) {
-            return null;
-        }
-        if ($type !== null) {
-            $this->setColumnType($name, $type);
-        }
-
-        return $this->getColumnType($name);
-    }
-
-    /**
      * Set the type of a column
      *
      * @param string $name Column name
@@ -346,26 +325,6 @@ class Schema
         }
 
         return $primaryKeys;
-    }
-
-    /**
-     * Get/set the options for a endpoint.
-     *
-     * Endpoint options allow you to set platform specific endpoint level options.
-     *
-     * @param array|null $options The options to set, or null to read options.
-     * @return $this|array Either the endpoint instance, or an array of options when reading.
-     * @deprecated 2.0.0 Please use setOptions and getOptions instead.
-     */
-    public function options($options = null)
-    {
-        if ($options === null) {
-            return $this->getOptions();
-        }
-
-        $this->setOptions($options);
-
-        return $this;
     }
 
     /**

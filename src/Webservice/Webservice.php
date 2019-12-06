@@ -68,22 +68,6 @@ abstract class Webservice implements WebserviceInterface
     }
 
     /**
-     * Set the driver to use
-     *
-     * @param \Muffin\Webservice\AbstractDriver|null $driver The driver to use
-     * @return \Muffin\Webservice\AbstractDriver|$this
-     * @deprecated 2.0.0 Use setDriver() and getDriver() instead.
-     */
-    public function driver(?AbstractDriver $driver = null)
-    {
-        if ($driver === null) {
-            return $this->getDriver();
-        }
-
-        return $this->setDriver($driver);
-    }
-
-    /**
      * Set the webservice driver and return the instance for chaining
      *
      * @param \Muffin\Webservice\AbstractDriver $driver Instance of the driver
@@ -104,22 +88,6 @@ abstract class Webservice implements WebserviceInterface
     public function getDriver()
     {
         return $this->_driver;
-    }
-
-    /**
-     * Set the endpoint path to use
-     *
-     * @param string|null $endpoint The endpoint
-     * @return string|$this
-     * @deprecated 2.0.0 Use setEndpoint() and getEndpoint() instead.
-     */
-    public function endpoint($endpoint = null)
-    {
-        if ($endpoint === null) {
-            return $this->getEndpoint();
-        }
-
-        return $this->setEndpoint($endpoint);
     }
 
     /**

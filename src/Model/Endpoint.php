@@ -213,22 +213,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Returns the endpoint name or sets a new one
-     *
-     * @param string|null $endpoint the new endpoint name
-     * @return string
-     * @deprecated 2.0.0 use setName() and getName() instead.
-     */
-    public function endpoint($endpoint = null)
-    {
-        if ($endpoint !== null) {
-            $this->setName($endpoint);
-        }
-
-        return $this->getName();
-    }
-
-    /**
      * Set the name of this endpoint
      *
      * @param string $name The name for this endpoint instance
@@ -261,22 +245,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Returns the endpoint alias or sets a new one
-     *
-     * @param string|null $alias the new endpoint alias
-     * @return string
-     * @deprecated 2.0.0 Use getAlias and setAlias instead
-     */
-    public function alias($alias = null)
-    {
-        if ($alias !== null) {
-            $this->setAlias($alias);
-        }
-
-        return $this->getAlias();
-    }
-
-    /**
      * Alias a field with the endpoint's current alias.
      *
      * @param string $field The field to alias.
@@ -285,22 +253,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function aliasField($field)
     {
         return $this->getAlias() . '.' . $field;
-    }
-
-    /**
-     * Returns the endpoint registry key used to create this endpoint instance
-     *
-     * @param string|null $registryAlias the key used to access this object
-     * @return string
-     * @deprecated 2.0.0 Use setRegistryAlias()/getRegistryAlias() instead.
-     */
-    public function registryAlias($registryAlias = null)
-    {
-        if ($registryAlias !== null) {
-            $this->setRegistryAlias($registryAlias);
-        }
-
-        return $this->getRegistryAlias();
     }
 
     /**
@@ -331,22 +283,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Set the driver to use
-     *
-     * @param \Muffin\Webservice\AbstractDriver|null $connection The driver to use
-     * @return \Muffin\Webservice\AbstractDriver|\Muffin\Webservice\Connection
-     * @deprecated 2.0.0 Use setConnection() and getConnection() instead.
-     */
-    public function connection($connection = null)
-    {
-        if ($connection !== null) {
-            $this->setConnection($connection);
-        }
-
-        return $this->getConnection();
-    }
-
-    /**
      * Sets the connection driver.
      *
      * @param \Muffin\Webservice\Connection $connection Connection instance
@@ -367,30 +303,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function getConnection()
     {
         return $this->_connection;
-    }
-
-    /**
-     * Returns the schema endpoint object describing this endpoint's properties.
-     *
-     * If an \Muffin\Webservice\Schema is passed, it will be used for this endpoint
-     * instead of the default one.
-     *
-     * If an array is passed, a new \Muffin\Webservice\Schema will be constructed
-     * out of it and used as the schema for this endpoint.
-     *
-     * @param array|\Muffin\Webservice\Schema|null $schema New schema to be used for this endpoint
-     * @return \Muffin\Webservice\Schema
-     * @deprecated 2.0.0 Use setSchema() and getSchema() instead
-     */
-    public function schema($schema = null)
-    {
-        if ($schema === null) {
-            return $this->getSchema();
-        }
-
-        $this->setSchema($schema);
-
-        return $this->getSchema();
     }
 
     /**
@@ -474,22 +386,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Returns the primary key field name or sets a new one
-     *
-     * @param string|array|null $key sets a new name to be used as primary key
-     * @return string|array
-     * @deprecated 2.0.0 Use getPrimaryKey() and setPrimaryKey() instead
-     */
-    public function primaryKey($key = null)
-    {
-        if ($key !== null) {
-            $this->setPrimaryKey($key);
-        }
-
-        return $this->getPrimaryKey();
-    }
-
-    /**
      * Returns the primary key field name
      *
      * @param string|array|null $key sets a new name to be used as primary key
@@ -523,22 +419,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
 
         return $this->_primaryKey;
-    }
-
-    /**
-     * Returns the display field or sets a new one
-     *
-     * @param string|null $key sets a new name to be used as display field
-     * @return string
-     * @deprecated 2.0.0 Use setDisplayField and getDisplayField instead.
-     */
-    public function displayField($key = null)
-    {
-        if ($key !== null) {
-            $this->setDisplayField($key);
-        }
-
-        return $this->getDisplayField();
     }
 
     /**
@@ -579,23 +459,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
 
         return $this->_displayField;
-    }
-
-    /**
-     * Returns the class used to hydrate resources for this endpoint or sets a new one
-     *
-     * @param string|null $name the name of the class to use
-     * @throws \Muffin\Webservice\Exception\MissingResourceClassException when the entity class cannot be found
-     * @return string
-     * @deprecated 2.0.0 Use setResourceClassName() and getResourceClassName() instead.
-     */
-    public function resourceClass($name = null)
-    {
-        if ($name !== null) {
-            $this->setResourceClass($name);
-        }
-
-        return $this->getResourceClass();
     }
 
     /**
@@ -645,22 +508,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Returns the inflect method or sets a new one
-     *
-     * @param null|string $method The inflection method to use
-     * @return null|string
-     * @deprecated 2.0.0 Use setInflectionMethod() and getInflectionMethod() instead.
-     */
-    public function inflectionMethod($method = null)
-    {
-        if ($method !== null) {
-            $this->setInflectionMethod($method);
-        }
-
-        return $this->getInflectionMethod();
-    }
-
-    /**
      * Set a new inflection method
      *
      * @param string $method The name of the inflection method
@@ -681,28 +528,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function getInflectionMethod()
     {
         return $this->_inflectionMethod;
-    }
-
-    /**
-     * Returns an instance of the Webservice used
-     *
-     * @param \Muffin\Webservice\Webservice\WebserviceInterface|string|null $webservice The webservice to use
-     * @return $this|\Muffin\Webservice\Webservice\WebserviceInterface
-     * @deprecated 2.0.0 Use setWebservice() and getWebservice() instead.
-     */
-    public function webservice($webservice = null)
-    {
-        if ($webservice !== null) {
-            return $this->setWebservice($this->getName(), $webservice);
-        }
-
-        if ($webservice === null) {
-            return $this->getWebservice();
-        }
-
-        $this->_webservice = $webservice;
-
-        return $this;
     }
 
     /**

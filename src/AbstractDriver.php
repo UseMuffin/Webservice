@@ -58,22 +58,6 @@ abstract class AbstractDriver implements LoggerAwareInterface
     abstract public function initialize();
 
     /**
-     * Set or return an instance of the client used for communication
-     *
-     * @param object $client The client to use
-     * @return object
-     * @deprecated 2.0.0 Use setClient() and getClient() instead.
-     */
-    public function client($client = null)
-    {
-        if ($client === null) {
-            return $this->getClient();
-        }
-
-        return $this->setClient($client);
-    }
-
-    /**
      * Set the client instance this driver will use to make requests
      *
      * @param object $client Client instance
@@ -94,23 +78,6 @@ abstract class AbstractDriver implements LoggerAwareInterface
     public function getClient()
     {
         return $this->_client;
-    }
-
-    /**
-     * Set or get a instance of a webservice
-     *
-     * @param string $name The name of the webservice
-     * @param \Muffin\Webservice\Webservice\WebserviceInterface|null $webservice The instance of the webservice you'd like to set
-     * @return $this|\Muffin\Webservice\Webservice\WebserviceInterface
-     * @deprecated 2.0.0 Use setWebservice() or getWebservice() instead.
-     */
-    public function webservice($name, ?WebserviceInterface $webservice = null)
-    {
-        if ($webservice !== null) {
-            $this->setWebservice($name, $webservice);
-        }
-
-        return $this->getWebservice($name);
     }
 
     /**
@@ -154,18 +121,6 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Returns a logger instance
      *
-     * @return \Psr\Log\LoggerInterface
-     *
-     * @deprecated 1.4.0 Use getLogger() instead.
-     */
-    public function logger()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * Returns a logger instance
-     *
      * @return \Psr\Log\LoggerInterface|null
      */
     public function getLogger()
@@ -181,23 +136,6 @@ abstract class AbstractDriver implements LoggerAwareInterface
     public function configName()
     {
         return (string)$this->_config['name'];
-    }
-
-    /**
-     * Enables or disables query logging for this driver
-     *
-     * @param bool|null $enable whether to turn logging on or disable it. Use null to read current value.
-     * @return bool
-     *
-     * @deprecated 1.4.0 Use enableQueryLogging()/disableQueryLogging()/isQueryLoggingEnabled() instead.
-     */
-    public function logQueries($enable = null)
-    {
-        if ($enable === null) {
-            return $this->_logQueries;
-        }
-
-        $this->_logQueries = $enable;
     }
 
     /**
@@ -271,7 +209,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
     {
         return [
             'client' => $this->getClient(),
-            'logger' => $this->logger(),
+            'logger' => $this->getLogger(),
             'query_logging' => $this->isQueryLoggingEnabled(),
             'webservices' => array_keys($this->_webservices),
         ];
