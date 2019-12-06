@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
 interface ResourceBasedEntityInterface
 {
-
     /**
      * Apply the properties from a resource
      *

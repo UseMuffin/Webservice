@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -10,6 +12,7 @@
  * @link          http://cakephp.org CakePHP(tm) Project
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
@@ -53,29 +56,29 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => [
         'plugins' => [APP . 'Plugin' . DS],
-        'templates' => [APP . 'Template' . DS]
-    ]
+        'templates' => [APP . 'Template' . DS],
+    ],
 ]);
 Configure::write('Session', [
-    'defaults' => 'php'
+    'defaults' => 'php',
 ]);
 
 Cache::setConfig([
     '_cake_core_' => [
         'engine' => 'File',
         'prefix' => 'cake_core_',
-        'serialize' => true
+        'serialize' => true,
     ],
     '_cake_model_' => [
         'engine' => 'File',
         'prefix' => 'cake_model_',
-        'serialize' => true
+        'serialize' => true,
     ],
     'default' => [
         'engine' => 'File',
         'prefix' => 'default_',
-        'serialize' => true
-    ]
+        'serialize' => true,
+    ],
 ]);
 
 $config = [
@@ -97,7 +100,7 @@ Log::setConfig([
         'engine' => 'Cake\Log\Engine\FileLog',
         'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
         'file' => 'error',
-    ]
+    ],
 ]);
 
 Plugin::getCollection()->add(new \Muffin\Webservice\Plugin());

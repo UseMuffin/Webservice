@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\test_app\Webservice;
 
@@ -11,7 +12,6 @@ use Psr\Log\LoggerInterface;
  */
 class Logger implements LoggerInterface
 {
-
     /**
      * System is unusable.
      *

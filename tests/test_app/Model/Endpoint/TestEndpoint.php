@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\test_app\Model\Endpoint;
 
@@ -7,7 +8,6 @@ use Muffin\Webservice\Model\Endpoint;
 
 class TestEndpoint extends Endpoint
 {
-
     /**
      * Returns the default validator object. Subclasses can override this function
      * to add a default validation set to the validator object.

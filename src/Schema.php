@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice;
 
@@ -13,7 +14,6 @@ use Cake\Database\Type;
  */
 class Schema
 {
-
     /**
      * The name of the endpoint
      *
@@ -77,7 +77,7 @@ class Schema
         'null' => null,
         'default' => null,
         'comment' => null,
-        'primaryKey' => null
+        'primaryKey' => null,
     ];
 
     /**
@@ -304,7 +304,7 @@ class Schema
             return true;
         }
 
-        return ($this->_columns[$name]['null'] === true);
+        return $this->_columns[$name]['null'] === true;
     }
 
     /**

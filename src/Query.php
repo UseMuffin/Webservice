@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice;
 
@@ -14,34 +15,33 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 
 class Query implements IteratorAggregate, JsonSerializable, QueryInterface
 {
-
     use QueryTrait;
 
-    const ACTION_CREATE = 1;
-    const ACTION_READ = 2;
-    const ACTION_UPDATE = 3;
-    const ACTION_DELETE = 4;
+    public const ACTION_CREATE = 1;
+    public const ACTION_READ = 2;
+    public const ACTION_UPDATE = 3;
+    public const ACTION_DELETE = 4;
 
     /**
      * Indicates that the operation should append to the list
      *
      * @var int
      */
-    const APPEND = 0;
+    public const APPEND = 0;
 
     /**
      * Indicates that the operation should prepend to the list
      *
      * @var int
      */
-    const PREPEND = 1;
+    public const PREPEND = 1;
 
     /**
      * Indicates that the operation should overwrite the list
      *
      * @var bool
      */
-    const OVERWRITE = true;
+    public const OVERWRITE = true;
 
     /**
      * True if the beforeFind event has already been triggered for this query
@@ -68,7 +68,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         'order' => [],
         'set' => [],
         'where' => [],
-        'select' => []
+        'select' => [],
     ];
 
     /**
@@ -81,15 +81,15 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * The results from the webservice
      *
-     * @var ResultSet|null
+     * @var \Muffin\Webservice\ResultSet|null
      */
     protected $__resultSet;
 
     /**
      * Construct the query
      *
-     * @param WebserviceInterface $webservice The webservice to use
-     * @param Endpoint $endpoint The endpoint this is executed from
+     * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice to use
+     * @param \Muffin\Webservice\Model\Endpoint $endpoint The endpoint this is executed from
      */
     public function __construct(WebserviceInterface $webservice, Endpoint $endpoint)
     {
@@ -171,7 +171,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param \Muffin\Webservice\Model\Endpoint|null $endpoint The endpoint to use
      * @return \Muffin\Webservice\Model\Endpoint|$this
      */
-    public function endpoint(Endpoint $endpoint = null)
+    public function endpoint(?Endpoint $endpoint = null)
     {
         if ($endpoint === null) {
             return $this->getRepository();
@@ -188,7 +188,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param null|\Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice to use
      * @return \Muffin\Webservice\Webservice\WebserviceInterface|self
      */
-    public function webservice(WebserviceInterface $webservice = null)
+    public function webservice(?WebserviceInterface $webservice = null)
     {
         if ($webservice === null) {
             return $this->_webservice;
@@ -264,7 +264,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             return $this->clause('where');
         }
 
-        $this->_parts['where'] = (!$overwrite) ? Hash::merge($this->clause('where'), $conditions) : $conditions;
+        $this->_parts['where'] = !$overwrite ? Hash::merge($this->clause('where'), $conditions) : $conditions;
 
         return $this;
     }
@@ -406,7 +406,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function order($fields, $overwrite = false)
     {
-        $this->_parts['order'] = (!$overwrite) ? Hash::merge($this->clause('order'), $fields) : $fields;
+        $this->_parts['order'] = !$overwrite ? Hash::merge($this->clause('order'), $fields) : $fields;
 
         return $this;
     }
@@ -504,7 +504,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             $endpoint->dispatchEvent('Model.beforeFind', [
                 $this,
                 new ArrayObject($this->_options),
-                !$this->isEagerLoaded()
+                !$this->isEagerLoaded(),
             ]);
         }
     }
@@ -555,7 +555,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             'extraOptions' => $this->getOptions(),
             'conditions' => $this->where(),
             'repository' => $this->endpoint(),
-            'webservice' => $this->webservice()
+            'webservice' => $this->webservice(),
         ];
     }
 

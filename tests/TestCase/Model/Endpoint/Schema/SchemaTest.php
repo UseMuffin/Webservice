@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice\Test\TestCase\Model\Endpoint\Schema;
 
 use Cake\TestSuite\TestCase;
@@ -48,7 +50,7 @@ class SchemaTest extends TestCase
                 'null' => null,
                 'default' => null,
                 'comment' => null,
-                'primaryKey' => null
+                'primaryKey' => null,
             ],
             $this->schema->column('id')
         );

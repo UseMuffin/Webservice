@@ -1,4 +1,5 @@
 <?php
+
 use Cake\Datasource\FactoryLocator;
 use Muffin\Webservice\Model\EndpointLocator;
 

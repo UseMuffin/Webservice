@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
@@ -8,7 +9,6 @@ use Muffin\Webservice\ResultSet;
 
 class ResultSetTest extends TestCase
 {
-
     /**
      * @var ResultSet
      */
@@ -24,16 +24,16 @@ class ResultSetTest extends TestCase
         $this->resultSet = new ResultSet([
             new Resource([
                 'id' => 1,
-                'title' => 'Hello World'
+                'title' => 'Hello World',
             ]),
             new Resource([
                 'id' => 2,
-                'title' => 'New ORM'
+                'title' => 'New ORM',
             ]),
             new Resource([
                 'id' => 3,
-                'title' => 'Webservices'
-            ])
+                'title' => 'Webservices',
+            ]),
         ], 6);
     }
 

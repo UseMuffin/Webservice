@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Webservice;
 
@@ -19,7 +20,6 @@ use Psr\Log\LoggerInterface;
  */
 abstract class Webservice implements WebserviceInterface
 {
-
     /**
      * The driver to use to communicate with the webservice
      *
@@ -74,7 +74,7 @@ abstract class Webservice implements WebserviceInterface
      * @return \Muffin\Webservice\AbstractDriver|$this
      * @deprecated 2.0.0 Use setDriver() and getDriver() instead.
      */
-    public function driver(AbstractDriver $driver = null)
+    public function driver(?AbstractDriver $driver = null)
     {
         if ($driver === null) {
             return $this->getDriver();
@@ -155,7 +155,7 @@ abstract class Webservice implements WebserviceInterface
     public function addNestedResource($url, array $requiredFields)
     {
         $this->_nestedResources[$url] = [
-            'requiredFields' => $requiredFields
+            'requiredFields' => $requiredFields,
         ];
     }
 
@@ -168,7 +168,10 @@ abstract class Webservice implements WebserviceInterface
     public function nestedResource(array $conditions)
     {
         foreach ($this->_nestedResources as $url => $options) {
-            if (count(array_intersect_key(array_flip($options['requiredFields']), $conditions)) !== count($options['requiredFields'])) {
+            $fieldsInConditionsCount = count(array_intersect_key(array_flip($options['requiredFields']), $conditions));
+            $requiredFieldsCount = count($options['requiredFields']);
+
+            if ($fieldsInConditionsCount !== $requiredFieldsCount) {
                 continue;
             }
 
@@ -181,7 +184,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query
      *
-     * @param Query $query The query to execute
+     * @param \Muffin\Webservice\Query $query The query to execute
      * @param array $options The options to use
      *
      * @return \Muffin\Webservice\ResultSet|int|bool
@@ -210,8 +213,8 @@ abstract class Webservice implements WebserviceInterface
      */
     public function describe($endpoint)
     {
-        $shortName = App::shortName(get_class($this), 'Webservice', 'Webservice');
-        list($plugin, $name) = pluginSplit($shortName);
+        $shortName = App::shortName(static::class, 'Webservice', 'Webservice');
+        [$plugin, $name] = pluginSplit($shortName);
 
         $endpoint = Inflector::classify(str_replace('-', '_', $endpoint));
         $schemaShortName = implode('.', array_filter([$plugin, $endpoint]));
@@ -222,7 +225,7 @@ abstract class Webservice implements WebserviceInterface
 
         throw new MissingEndpointSchemaException([
             'schema' => $schemaShortName,
-            'webservice' => $shortName
+            'webservice' => $shortName,
         ]);
     }
 
@@ -261,8 +264,8 @@ abstract class Webservice implements WebserviceInterface
     protected function _executeCreateQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
-            'name' => get_class($this),
-            'method' => '_executeCreateQuery'
+            'name' => static::class,
+            'method' => '_executeCreateQuery',
         ]);
     }
 
@@ -278,8 +281,8 @@ abstract class Webservice implements WebserviceInterface
     protected function _executeReadQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
-            'name' => get_class($this),
-            'method' => '_executeReadQuery'
+            'name' => static::class,
+            'method' => '_executeReadQuery',
         ]);
     }
 
@@ -295,8 +298,8 @@ abstract class Webservice implements WebserviceInterface
     protected function _executeUpdateQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
-            'name' => get_class($this),
-            'method' => '_executeUpdateQuery'
+            'name' => static::class,
+            'method' => '_executeUpdateQuery',
         ]);
     }
 
@@ -312,8 +315,8 @@ abstract class Webservice implements WebserviceInterface
     protected function _executeDeleteQuery(Query $query, array $options = [])
     {
         throw new UnimplementedWebserviceMethodException([
-            'name' => get_class($this),
-            'method' => '_executeDeleteQuery'
+            'name' => static::class,
+            'method' => '_executeDeleteQuery',
         ]);
     }
 
@@ -346,7 +349,7 @@ abstract class Webservice implements WebserviceInterface
         }
 
         $logger->debug($query->endpoint(), [
-            'params' => $query->where()
+            'params' => $query->where(),
         ]);
     }
 

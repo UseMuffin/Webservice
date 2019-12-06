@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace TestPlugin\Webservice;
 
 use Muffin\Webservice\Model\Endpoint;
@@ -6,7 +8,6 @@ use Muffin\Webservice\Webservice\Webservice;
 
 class TestPluginWebservice extends Webservice
 {
-
     public function createResource($resourceClass, array $properties = [])
     {
         return $this->_createResource($resourceClass, $properties);

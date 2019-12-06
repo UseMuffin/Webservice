@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice;
 
 use Cake\Core\App;
@@ -9,8 +11,8 @@ use Muffin\Webservice\Exception\UnexpectedDriverException;
 /**
  * Class Connection
  *
- * @method \Muffin\Webservice\AbstractDriver setWebservice(string $name, Webservice\WebserviceInterface $webservice) Proxy method through to the Driver
- * @method Webservice\WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
+ * @method \Muffin\Webservice\AbstractDriver setWebservice(string $name, \Muffin\Webservice\Webservice\WebserviceInterface $webservice) Proxy method through to the Driver
+ * @method \Muffin\Webservice\Webservice\WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
  * @method string configName() Proxy method through to the Driver
  */
 class Connection
@@ -56,7 +58,8 @@ class Connection
                 throw new MissingConnectionException(['name' => $config['name']]);
             }
 
-            if (!$config['driver'] = App::className($config['service'], 'Webservice/Driver')) {
+            $config['driver'] = App::className($config['service'], 'Webservice/Driver');
+            if (!$config['driver']) {
                 throw new MissingDriverException(['driver' => $config['driver']]);
             }
         }

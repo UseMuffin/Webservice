@@ -1,14 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 
 class ResourceTest extends TestCase
 {
-
     public function testBasicConstruct()
     {
         $resource = new Resource([]);
@@ -27,10 +26,10 @@ class ResourceTest extends TestCase
     public function testConstructUseSettersOff()
     {
         $resource = new Resource([
-            'field' => 'text'
+            'field' => 'text',
         ], [
             'markClean' => true,
-            'useSetters' => false
+            'useSetters' => false,
         ]);
 
         $this->assertEquals('text', $resource->get('field'));

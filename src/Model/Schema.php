@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
 class Schema extends \Muffin\Webservice\Schema
 {
-
     /**
      * Constructor.
      *

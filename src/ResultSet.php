@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice;
 
@@ -7,7 +8,6 @@ use Cake\Datasource\ResultSetInterface;
 
 class ResultSet implements ResultSetInterface
 {
-
     use CollectionTrait;
 
     /**

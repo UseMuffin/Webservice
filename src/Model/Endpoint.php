@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
@@ -28,7 +29,6 @@ use Muffin\Webservice\Schema;
  */
 class Endpoint implements RepositoryInterface, EventListenerInterface, EventDispatcherInterface
 {
-
     use EventDispatcherTrait;
     use RulesAwareTrait;
     use ValidatorAwareTrait;
@@ -38,14 +38,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @var string
      */
-    const DEFAULT_VALIDATOR = 'default';
+    public const DEFAULT_VALIDATOR = 'default';
 
     /**
      * The alias this object is assigned to validators as.
      *
      * @var string
      */
-    const VALIDATOR_PROVIDER_NAME = 'endpoint';
+    public const VALIDATOR_PROVIDER_NAME = 'endpoint';
 
     /**
      * Connection instance this endpoint uses
@@ -187,7 +187,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public static function defaultConnectionName()
     {
-        $namespaceParts = explode('\\', get_called_class());
+        $namespaceParts = explode('\\', static::class);
         $plugin = array_slice(array_reverse($namespaceParts), 3, 2);
 
         return Inflector::underscore(current($plugin));
@@ -250,7 +250,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function getName()
     {
         if ($this->_name === null) {
-            $endpoint = namespaceSplit(get_class($this));
+            $endpoint = namespaceSplit(static::class);
             $endpoint = substr(end($endpoint), 0, -8);
 
             $inflectMethod = $this->getInflectionMethod();
@@ -625,10 +625,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     {
         if (!$this->_resourceClass) {
             $default = \Muffin\Webservice\Model\Resource::class;
-            $self = get_called_class();
+            $self = static::class;
             $parts = explode('\\', $self);
 
-            if ($self === __CLASS__ || count($parts) < 3) {
+            if ($self === self::class || count($parts) < 3) {
                 return $this->_resourceClass = $default;
             }
 
@@ -837,7 +837,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         $options += [
             'keyField' => $this->getPrimaryKey(),
             'valueField' => $this->getDisplayField(),
-            'groupField' => null
+            'groupField' => null,
         ];
 
         $options = $this->_setFieldMatchers(
@@ -934,9 +934,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
         $conditions = array_combine($key, $primaryKey);
 
-        $cacheConfig = isset($options['cache']) ? $options['cache'] : false;
-        $cacheKey = isset($options['key']) ? $options['key'] : false;
-        $finder = isset($options['finder']) ? $options['finder'] : 'all';
+        $cacheConfig = $options['cache'] ?? false;
+        $cacheKey = $options['key'] ?? false;
+        $finder = $options['finder'] ?? 'all';
         unset($options['key'], $options['cache'], $options['finder']);
 
         $query = $this->find($finder, $options)->where($conditions);
@@ -974,7 +974,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *   is persisted.
      * @return \Cake\Datasource\EntityInterface An entity.
      */
-    public function findOrCreate($search, callable $callback = null)
+    public function findOrCreate($search, ?callable $callback = null)
     {
         $query = $this->find()->where($search);
         $row = $query->first();
@@ -1043,7 +1043,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function exists($conditions): bool
     {
-        return ($this->find()->where($conditions)->count() > 0);
+        return $this->find()->where($conditions)->count() > 0;
     }
 
     /**
@@ -1106,7 +1106,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return false;
         }
 
-        if (($resource->isNew()) && ($result instanceof EntityInterface)) {
+        if ($resource->isNew() && ($result instanceof EntityInterface)) {
             return $result;
         }
 
@@ -1114,7 +1114,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
         return new $className($resource->toArray(), [
             'markNew' => false,
-            'markClean' => true
+            'markClean' => true,
         ]);
     }
 
@@ -1128,7 +1128,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function delete(EntityInterface $resource, $options = []): bool
     {
         return (bool)$this->query()->delete()->where([
-            $this->getPrimaryKey() => $resource->get($this->getPrimaryKey())
+            $this->getPrimaryKey() => $resource->get($this->getPrimaryKey()),
         ])->execute();
     }
 
@@ -1220,7 +1220,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         } elseif ($hasOr !== false) {
             $fields = explode('_or_', $fields);
             $conditions = [
-                'OR' => $makeConditions($fields, $args)
+                'OR' => $makeConditions($fields, $args),
             ];
         } elseif ($hasAnd !== false) {
             $fields = explode('_and_', $fields);
@@ -1446,7 +1446,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             'resourceClass' => $this->getResourceClass(),
             'defaultConnection' => $this->defaultConnectionName(),
             'connectionName' => $conn ? $conn->configName() : null,
-            'inflector' => $this->getInflectionMethod()
+            'inflector' => $this->getInflectionMethod(),
         ];
     }
 

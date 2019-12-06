@@ -1,16 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\test_app\Webservice;
 
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
-use Muffin\Webservice\Schema;
 use Muffin\Webservice\Webservice\Webservice;
 
 class EndpointTestWebservice extends Webservice
 {
-
     public $resources;
 
     public function initialize()
@@ -21,27 +20,27 @@ class EndpointTestWebservice extends Webservice
             new Resource([
                 'id' => 1,
                 'title' => 'Hello World',
-                'body' => 'Some text'
+                'body' => 'Some text',
             ], [
                 'markNew' => false,
-                'markClean' => true
+                'markClean' => true,
             ]),
             new Resource([
                 'id' => 2,
                 'title' => 'New ORM',
-                'body' => 'Some more text'
+                'body' => 'Some more text',
             ], [
                 'markNew' => false,
-                'markClean' => true
+                'markClean' => true,
             ]),
             new Resource([
                 'id' => 3,
                 'title' => 'Webservices',
-                'body' => 'Even more text'
+                'body' => 'Even more text',
             ], [
                 'markNew' => false,
-                'markClean' => true
-            ])
+                'markClean' => true,
+            ]),
         ];
     }
 
@@ -55,7 +54,7 @@ class EndpointTestWebservice extends Webservice
 
         $this->resources[] = new Resource($fields, [
             'markNew' => false,
-            'markClean' => true
+            'markClean' => true,
         ]);
 
         return true;
@@ -71,7 +70,7 @@ class EndpointTestWebservice extends Webservice
             }
 
             return new ResultSet([
-                $this->resources[$index]
+                $this->resources[$index],
             ], 1);
         }
         if (isset($query->where()[$query->endpoint()->aliasField('title')])) {
@@ -109,7 +108,7 @@ class EndpointTestWebservice extends Webservice
 
             unset($this->resources[$this->conditionsToIndex($conditions)]);
 
-            return ($exists) ? 1 : 0;
+            return $exists ? 1 : 0;
         } elseif (is_array($conditions['id'])) {
             $deleted = 0;
 

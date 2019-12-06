@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice;
 
 use ArrayObject;
@@ -15,7 +17,6 @@ use RuntimeException;
  */
 class Marshaller
 {
-
     /**
      * The endpoint instance this marshaller is for.
      *
@@ -49,11 +50,11 @@ class Marshaller
      */
     public function one(array $data, array $options = [])
     {
-        list($data, $options) = $this->_prepareDataAndOptions($data, $options);
+        [$data, $options] = $this->_prepareDataAndOptions($data, $options);
 
         $primaryKey = (array)$this->_endpoint->getPrimaryKey();
         $resourceClass = $this->_endpoint->getResourceClass();
-        /* @var \Muffin\Webservice\Model\Resource $entity */
+        /** @var \Muffin\Webservice\Model\Resource $entity */
         $entity = new $resourceClass();
         $entity->setSource($this->_endpoint->getRegistryAlias());
 
@@ -198,7 +199,7 @@ class Marshaller
      */
     public function merge(EntityInterface $entity, array $data, array $options = [])
     {
-        list($data, $options) = $this->_prepareDataAndOptions($data, $options);
+        [$data, $options] = $this->_prepareDataAndOptions($data, $options);
 
         $isNew = $entity->isNew();
         $keys = [];
@@ -272,7 +273,7 @@ class Marshaller
             ->groupBy(function ($el) use ($primary) {
                 $keys = [];
                 foreach ($primary as $key) {
-                    $keys[] = isset($el[$key]) ? $el[$key] : '';
+                    $keys[] = $el[$key] ?? '';
                 }
 
                 return implode(';', $keys);
@@ -282,7 +283,7 @@ class Marshaller
             })
             ->toArray();
 
-        $new = isset($indexed[null]) ? $indexed[null] : [];
+        $new = $indexed[null] ?? [];
         unset($indexed[null]);
         $output = [];
 

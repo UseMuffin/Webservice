@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\test_app\Webservice;
 
@@ -10,22 +11,21 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 
 class StaticWebservice implements WebserviceInterface
 {
-
     public function execute(Query $query, array $options = [])
     {
         return new ResultSet([
             new Resource([
                 'id' => 1,
-                'title' => 'Hello World'
+                'title' => 'Hello World',
             ]),
             new Resource([
                 'id' => 2,
-                'title' => 'New ORM'
+                'title' => 'New ORM',
             ]),
             new Resource([
                 'id' => 3,
-                'title' => 'Webservices'
-            ])
+                'title' => 'Webservices',
+            ]),
         ], 3);
     }
 
@@ -33,11 +33,11 @@ class StaticWebservice implements WebserviceInterface
     {
         return new Schema($endpoint, [
            'id' => [
-               'type' => 'integer'
+               'type' => 'integer',
            ],
             'title' => [
-                'type' => 'string'
-            ]
+                'type' => 'string',
+            ],
         ]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Exception;
 
@@ -6,7 +7,6 @@ use Cake\Core\Exception\Exception;
 
 class MissingEndpointSchemaException extends Exception
 {
-
     /**
      * Template string that has attributes sprintf()'ed into it.
      *

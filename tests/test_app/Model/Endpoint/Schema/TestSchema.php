@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\test_app\Model\Endpoint\Schema;
 
@@ -6,17 +7,16 @@ use Muffin\Webservice\Model\Schema;
 
 class TestSchema extends Schema
 {
-
     public function initialize()
     {
         $this->addColumn('id', [
-            'type' => 'int'
+            'type' => 'int',
         ]);
         $this->addColumn('title', [
-            'type' => 'string'
+            'type' => 'string',
         ]);
         $this->addColumn('body', [
-            'type' => 'string'
+            'type' => 'string',
         ]);
     }
 }

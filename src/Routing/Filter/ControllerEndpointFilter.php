@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Routing\Filter;
 
@@ -13,7 +14,6 @@ use Cake\Routing\DispatcherFilter;
  */
 class ControllerEndpointFilter extends DispatcherFilter
 {
-
     /**
      * Priority to use
      *

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\test_app\Webservice\Driver;
 
@@ -7,7 +8,6 @@ use Muffin\Webservice\Test\test_app\Webservice\EndpointTestWebservice;
 
 class Test extends AbstractDriver
 {
-
     /**
      * Initialize is used to easily extend the constructor.
      *

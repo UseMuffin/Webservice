@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
@@ -14,7 +15,6 @@ use RuntimeException;
  */
 class EndpointRegistry
 {
-
     /**
      * Instances that belong to the registry.
      *
@@ -73,7 +73,7 @@ class EndpointRegistry
             return self::$_instances[$alias];
         }
 
-        list(, $classAlias) = pluginSplit($alias);
+        [, $classAlias] = pluginSplit($alias);
         $options = ['alias' => $classAlias] + $options;
 
         if (empty($options['className'])) {
@@ -84,7 +84,7 @@ class EndpointRegistry
             $options['className'] = $className;
         } else {
             if (!isset($options['endpoint']) && strpos($options['className'], '\\') === false) {
-                list(, $endpoint) = pluginSplit($options['className']);
+                [, $endpoint] = pluginSplit($options['className']);
                 $options['endpoint'] = Inflector::underscore($endpoint);
             }
             $options['className'] = 'Muffin\Webservice\Model\Endpoint';

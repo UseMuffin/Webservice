@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice\Test\TestCase\Model;
 
 use Cake\Http\Client;
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
 use Muffin\Webservice\Test\test_app\Webservice\Logger;
 use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
@@ -14,7 +15,7 @@ class AbstractDriverTest extends TestCase
 {
     public function testWebserviceWithoutVendor()
     {
-        $driver = new TestPlugin;
+        $driver = new TestPlugin();
 
         $webservice = $driver->getWebservice('test_plugin');
         $this->assertInstanceOf('TestPlugin\Webservice\TestPluginWebservice', $webservice);
@@ -25,7 +26,7 @@ class AbstractDriverTest extends TestCase
 
     public function testWebserviceWithVendor()
     {
-        $driver = new SomePlugin;
+        $driver = new SomePlugin();
 
         $webservice = $driver->getWebservice('some_plugin');
         $this->assertInstanceOf('SomeVendor\SomePlugin\Webservice\SomePluginWebservice', $webservice);
@@ -69,7 +70,7 @@ class AbstractDriverTest extends TestCase
             'client' => $client,
             'logger' => $logger,
             'query_logging' => true,
-            'webservices' => ['example']
+            'webservices' => ['example'],
         ];
 
         $driver = new Test();

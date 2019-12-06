@@ -1,11 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
-use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 use RuntimeException;
 
 class EndpointRegistryTest extends TestCase
@@ -25,8 +24,8 @@ class EndpointRegistryTest extends TestCase
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',
-                'service' => 'test'
-            ])
+                'service' => 'test',
+            ]),
         ]);
 
         $this->assertInstanceOf(Endpoint::class, $result);
@@ -45,16 +44,16 @@ class EndpointRegistryTest extends TestCase
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',
-                'service' => 'test'
+                'service' => 'test',
             ]),
-            'displayField' => 'foo'
+            'displayField' => 'foo',
         ]);
 
         $this->assertInstanceOf(Endpoint::class, $result);
         $this->assertEquals('test', $result->endpoint());
 
         $result = EndpointRegistry::get('Test', [
-            'displayField' => 'foo'
+            'displayField' => 'foo',
         ]);
     }
 
@@ -63,7 +62,7 @@ class EndpointRegistryTest extends TestCase
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',
-                'service' => 'test'
+                'service' => 'test',
             ]),
         ]);
 
@@ -81,9 +80,9 @@ class EndpointRegistryTest extends TestCase
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',
-                'service' => 'test'
+                'service' => 'test',
             ]),
-            'className' => 'UnfindableClass'
+            'className' => 'UnfindableClass',
         ]);
 
         $this->assertInstanceOf(Endpoint::class, $result);
@@ -95,8 +94,8 @@ class EndpointRegistryTest extends TestCase
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',
-                'service' => 'test'
-            ])
+                'service' => 'test',
+            ]),
         ]);
 
         $this->assertInstanceOf(Endpoint::class, $result);
@@ -113,8 +112,8 @@ class EndpointRegistryTest extends TestCase
         $result = EndpointRegistry::get('Test', [
             'connection' => new Connection([
                 'name' => 'test',
-                'service' => 'test'
-            ])
+                'service' => 'test',
+            ]),
         ]);
 
         $this->assertInstanceOf(Endpoint::class, $result);

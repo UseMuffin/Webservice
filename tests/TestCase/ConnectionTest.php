@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\TestSuite\TestCase;
@@ -8,7 +10,6 @@ use Muffin\Webservice\Exception\MissingDriverException;
 
 class ConnectionTest extends TestCase
 {
-
     /**
      * @var Connection
      */
@@ -20,7 +21,7 @@ class ConnectionTest extends TestCase
 
         $this->connection = new Connection([
             'name' => 'test',
-            'service' => 'Test'
+            'service' => 'Test',
         ]);
     }
 
@@ -30,7 +31,7 @@ class ConnectionTest extends TestCase
 
         new Connection([
             'name' => 'test',
-            'service' => 'MissingDriver'
+            'service' => 'MissingDriver',
         ]);
     }
 

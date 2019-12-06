@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
@@ -70,7 +71,7 @@ class EndpointLocator
             return $this->_instances[$alias];
         }
 
-        list(, $classAlias) = pluginSplit($alias);
+        [, $classAlias] = pluginSplit($alias);
         $options = ['alias' => $classAlias] + $options;
 
         if (empty($options['className'])) {
@@ -81,7 +82,7 @@ class EndpointLocator
             $options['className'] = $className;
         } else {
             if (!isset($options['endpoint']) && strpos($options['className'], '\\') === false) {
-                list(, $endpoint) = pluginSplit($options['className']);
+                [, $endpoint] = pluginSplit($options['className']);
                 $options['endpoint'] = Inflector::underscore($endpoint);
             }
             $options['className'] = 'Muffin\Webservice\Model\Endpoint';
@@ -129,7 +130,7 @@ class EndpointLocator
             return $this->_config;
         }
 
-        return isset($this->_config[$alias]) ? $this->_config[$alias] : [];
+        return $this->_config[$alias] ?? [];
     }
 
     /**

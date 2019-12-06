@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Controller\Controller;
-use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\FactoryLocator;
 use Cake\TestSuite\TestCase;
@@ -23,7 +23,7 @@ class BootstrapTest extends TestCase
     {
         $connection = new Connection([
             'name' => 'test',
-            'service' => 'Test'
+            'service' => 'Test',
         ]);
         ConnectionManager::setConfig('test_app', $connection);
 
