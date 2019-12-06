@@ -321,7 +321,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return string
      */
-    public function getRegistryAlias()
+    public function getRegistryAlias(): string
     {
         if ($this->_registryAlias === null) {
             $this->_registryAlias = $this->getAlias();
@@ -466,7 +466,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $field The field to check for.
      * @return bool True if the field exists, false if it does not.
      */
-    public function hasField($field)
+    public function hasField($field): bool
     {
         $schema = $this->getSchema();
 
@@ -912,7 +912,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @return \Cake\Datasource\EntityInterface
      * @see \Cake\Datasource\RepositoryInterface::find()
      */
-    public function get($primaryKey, $options = [])
+    public function get($primaryKey, array $options = []): EntityInterface
     {
         $key = (array)$this->getPrimaryKey();
         $alias = $this->getAlias();
@@ -1011,7 +1011,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param mixed $conditions Conditions to be used, accepts anything Query::where() can take.
      * @return int Count Returns the affected rows.
      */
-    public function updateAll($fields, $conditions)
+    public function updateAll($fields, $conditions): int
     {
         return $this->query()->update()->where($conditions)->set($fields)->execute()->count();
     }
@@ -1029,7 +1029,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @see \Muffin\Webservice\Endpoint::delete()
      */
-    public function deleteAll($conditions)
+    public function deleteAll($conditions): int
     {
         return $this->query()->delete()->where($conditions)->execute();
     }
@@ -1041,7 +1041,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array|\ArrayAccess $conditions list of conditions to pass to the query
      * @return bool
      */
-    public function exists($conditions)
+    public function exists($conditions): bool
     {
         return ($this->find()->where($conditions)->count() > 0);
     }
@@ -1125,7 +1125,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array|\ArrayAccess $options The options for the delete.
      * @return bool
      */
-    public function delete(EntityInterface $resource, $options = [])
+    public function delete(EntityInterface $resource, $options = []): bool
     {
         return (bool)$this->query()->delete()->where([
             $this->getPrimaryKey() => $resource->get($this->getPrimaryKey())
@@ -1275,11 +1275,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * on the primary key data existing in the database when the entity
      * is saved. Until the entity is saved, it will be a detached record.
      *
-     * @param array|null $data The data to build an entity with.
+     * @param array $data The data to build an entity with.
      * @param array $options A list of options for the object hydration.
      * @return \Muffin\Webservice\Model\Resource
      */
-    public function newEntity($data = null, array $options = [])
+    public function newEntity(array $data = [], array $options = []): EntityInterface
     {
         if ($data === null) {
             $class = $this->getResourceClass();
@@ -1294,8 +1294,21 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
     /**
      * {@inheritDoc}
+     *
+     * @return \Cake\Datasource\EntityInterface
      */
-    public function newEntities(array $data, array $options = [])
+    public function newEmptyEntity(): EntityInterface
+    {
+        $class = $this->getResourceClass();
+        $entity = new $class([], ['source' => $this->getRegistryAlias()]);
+
+        return $entity;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function newEntities(array $data, array $options = []): array
     {
         $marshaller = $this->marshaller();
 
@@ -1320,7 +1333,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return \Cake\Datasource\EntityInterface
      */
-    public function patchEntity(EntityInterface $entity, array $data, array $options = [])
+    public function patchEntity(EntityInterface $entity, array $data, array $options = []): EntityInterface
     {
         $marshaller = $this->marshaller();
 
@@ -1346,7 +1359,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return array
      */
-    public function patchEntities($entities, array $data, array $options = [])
+    public function patchEntities(iterable $entities, array $data, array $options = []): array
     {
         $marshaller = $this->marshaller();
 
@@ -1377,7 +1390,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return array
      */
-    public function implementedEvents()
+    public function implementedEvents(): array
     {
         $eventMap = [
             'Model.beforeMarshal' => 'beforeMarshal',
@@ -1455,7 +1468,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->_alias;
     }

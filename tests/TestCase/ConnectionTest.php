@@ -12,7 +12,7 @@ class ConnectionTest extends TestCase
      */
     public $connection;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

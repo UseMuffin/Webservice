@@ -33,13 +33,6 @@ define('CONFIG', APP . 'config' . DS);
 define('CACHE', TMP);
 define('LOGS', TMP);
 
-$loader = new \Cake\Core\ClassLoader;
-$loader->register();
-
-$loader->addNamespace('TestApp', APP);
-$loader->addNamespace('SomeVendor\SomePlugin', APP . 'plugins' . DS . 'SomeVendor' . DS . 'SomePlugin' . DS . 'src');
-$loader->addNamespace('TestPlugin', APP . 'plugins' . DS . 'TestPlugin' . DS . 'src');
-
 require_once CORE_PATH . 'config/bootstrap.php';
 
 date_default_timezone_set('UTC');
@@ -109,5 +102,3 @@ Log::setConfig([
 
 Plugin::getCollection()->add(new \Muffin\Webservice\Plugin());
 require Plugin::getCollection()->get('Muffin/Webservice')->getConfigPath() . 'bootstrap.php';
-
-loadPHPUnitAliases();

@@ -10,14 +10,14 @@ class EndpointLocatorTest extends TestCase
      */
     private $Locator;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->Locator = new EndpointLocator();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

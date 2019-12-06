@@ -9,7 +9,7 @@ use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
 
 class EndpointRegistryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         EndpointRegistry::clear();
     }

@@ -22,7 +22,7 @@ class MarshallerTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $connection = new Connection([
             'name' => 'test',

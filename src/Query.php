@@ -245,7 +245,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param null $alias Not being used
      * @return array The field prefixed with the endpoint alias.
      */
-    public function aliasField($field, $alias = null)
+    public function aliasField(string $field, ?string $alias = null): array
     {
         return [$field => $field];
     }
@@ -451,7 +451,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         if ($this->action() !== self::ACTION_READ) {
             return 0;
@@ -462,7 +462,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         }
 
         if ($this->__resultSet) {
-            return $this->__resultSet->total();
+            return (int)$this->__resultSet->total();
         }
 
         return 0;

@@ -17,7 +17,7 @@ class TestEndpoint extends Endpoint
      *
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator->requirePresence('title')
             ->notEmpty('title')

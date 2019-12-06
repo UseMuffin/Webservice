@@ -11,7 +11,7 @@ class SchemaTest extends TestCase
      */
     private $schema;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->schema = new TestSchema('test');
     }
