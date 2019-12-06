@@ -1,6 +1,6 @@
 {
     "name": "muffin/webservice",
-    "description": "Extremely simplistic webservices for CakePHP 3",
+    "description": "Simplistic webservices for CakePHP",
     "type": "cakephp-plugin",
     "keywords": [
         "cakephp",
@@ -39,11 +39,11 @@
         "irc": "irc://irc.freenode.org/muffin"
     },
     "require": {
-        "cakephp/cakephp": "^3.6"
+        "cakephp/cakephp": "4.x-dev"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "^3.0",
-        "phpunit/phpunit": "^5.7.14|^6.0"
+        "cakephp/cakephp-codesniffer": "dev-next",
+        "phpunit/phpunit": "~8.4.0"
     },
     "autoload": {
         "psr-4": {
