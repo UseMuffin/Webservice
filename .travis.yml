@@ -10,7 +10,6 @@ dist: xenial
 env:
   global:
     - DEFAULT=1
-    - CODECOVERAGE=0
 
 services:
   - mysql
@@ -21,34 +20,32 @@ matrix:
 
   include:
     - php: 7.2
-      env: CODECOVERAGE=1 DEFAULT=0
-
-    - php: 7.2
       env: PHPCS=1 DEFAULT=0
 
     - php: 7.2
       env: STATIC_ANALYSIS=1 DEFAULT=0
 
     - php: 7.2
-      env: PREFER_LOWEST=1
+      env: PREFER_LOWEST=1 DEFAULT=0
 
 before_script:
-  - if [[ $TRAVIS_PHP_VERSION != 7.2 ]]; then phpenv config-rm xdebug.ini; fi
+  - if [[ $TRAVIS_PHP_VERSION != 7.3 ]]; then phpenv config-rm xdebug.ini; fi
 
-  - if [[ $STATIC_ANALYSIS = 1 ]]; then composer require --dev phpstan/phpstan:^0.12 psalm/phar:^3.7; fi
-  - if [[ $STATIC_ANALYSIS != 1 ]]; then composer install --no-interaction; fi
+  - if [[ $STATIC_ANALYSIS == 1 ]]; then composer require --dev phpstan/phpstan:^0.12 psalm/phar:^3.7; fi
+  - if [[ $PREFER_LOWEST == 1 ]]; then composer update --no-interaction --prefer-lowest --prefer-stable --prefer-dist; fi
+  - if [[ $PREFER_LOWEST != 1 ]]; then composer install --no-interaction; fi
 
 script:
-  - if [[ $CODECOVERAGE = 1 ]]; then ./vendor/bin/phpunit --coverage-clover=clover.xml; fi
-  - if [[ $DEFAULT = 1 ]]; then ./vendor/bin/phpunit; fi
+  - if [[ $TRAVIS_PHP_VERSION == 7.3 ]]; then ./vendor/bin/phpunit --coverage-clover=clover.xml; fi
+  - if [[ $DEFAULT == 1 || $PREFER_LOWEST == 1 ]]; then ./vendor/bin/phpunit; fi
 
-  - if [[ $PHPCS = 1 ]]; then ./vendor/bin/phpcs -p --extensions=php --standard=vendor/cakephp/cakephp-codesniffer/CakePHP ./src ./tests; fi
+  - if [[ $PHPCS == 1 ]]; then ./vendor/bin/phpcs -p --extensions=php --standard=vendor/cakephp/cakephp-codesniffer/CakePHP ./src ./tests; fi
 
-  - if [[ $STATIC_ANALYSIS = 1 ]]; then vendor/bin/phpstan.phar analyse src; fi
-  - if [[ $STATIC_ANALYSIS = 1 ]]; then vendor/bin/psalm.phar analyse src; fi
+  - if [[ $STATIC_ANALYSIS == 1 ]]; then vendor/bin/phpstan.phar analyse src; fi
+  - if [[ $STATIC_ANALYSIS == 1 ]]; then vendor/bin/psalm.phar analyse src; fi
 
 after_success:
-- if [[ $CODECOVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
+- if [[ $TRAVIS_PHP_VERSION == 7.3 ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 notifications:
   email: false
