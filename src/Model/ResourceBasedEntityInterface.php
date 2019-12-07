@@ -11,7 +11,7 @@ interface ResourceBasedEntityInterface
      * @param \Muffin\Webservice\Model\Resource $resource The resource to apply the properties from
      * @return void
      */
-    public function applyResource(Resource $resource);
+    public function applyResource(Resource $resource): void;
 
     /**
      * Creates a instance if the current entity with the values of a resouce

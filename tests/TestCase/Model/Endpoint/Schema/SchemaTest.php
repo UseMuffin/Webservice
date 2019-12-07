@@ -40,7 +40,7 @@ class SchemaTest extends TestCase
         $this->assertEquals(['id', 'title', 'body'], $this->schema->columns());
     }
 
-    public function testColumn()
+    public function testGetColumn()
     {
         $this->assertEquals(
             [
@@ -52,7 +52,7 @@ class SchemaTest extends TestCase
                 'comment' => null,
                 'primaryKey' => null,
             ],
-            $this->schema->column('id')
+            $this->schema->getColumn('id')
         );
     }
 

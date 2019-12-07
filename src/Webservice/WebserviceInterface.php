@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Webservice;
 
 use Muffin\Webservice\Query;
+use Muffin\Webservice\Schema;
 
 /**
  * Describes a webservice used to call a API
@@ -28,5 +29,5 @@ interface WebserviceInterface
      * @return \Muffin\Webservice\Schema The schema to use
      * @throws \Muffin\Webservice\Exception\MissingEndpointSchemaException If no schema can be found
      */
-    public function describe($endpoint);
+    public function describe(string $endpoint): Schema;
 }

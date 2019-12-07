@@ -45,7 +45,7 @@ class EndpointLocator
      * @param \Muffin\Webservice\Model\Endpoint $object The table to set.
      * @return \Muffin\Webservice\Model\Endpoint
      */
-    public function set($alias, Endpoint $object)
+    public function set(string $alias, Endpoint $object)
     {
         return $this->_instances[$alias] = $object;
     }
@@ -58,7 +58,7 @@ class EndpointLocator
      * @return \Muffin\Webservice\Model\Endpoint
      * @throws \RuntimeException If the registry alias is already in use.
      */
-    public function get($alias, array $options = [])
+    public function get(string $alias, array $options = []): Endpoint
     {
         if (isset($this->_instances[$alias])) {
             if (!empty($options) && $this->_options[$alias] !== $options) {
@@ -85,19 +85,22 @@ class EndpointLocator
                 [, $endpoint] = pluginSplit($options['className']);
                 $options['endpoint'] = Inflector::underscore($endpoint);
             }
-            $options['className'] = 'Muffin\Webservice\Model\Endpoint';
+            $options['className'] = Endpoint::class;
         }
 
         if (empty($options['connection'])) {
-            if ($options['className'] !== 'Muffin\Webservice\Model\Endpoint') {
+            if ($options['className'] !== Endpoint::class) {
                 $connectionName = $options['className']::defaultConnectionName();
             } else {
+                /** @psalm-suppress PossiblyNullArgument */
                 $pluginParts = explode('/', pluginSplit($alias)[0]);
 
                 $connectionName = Inflector::underscore(end($pluginParts));
             }
 
             $options['connection'] = ConnectionManager::get($connectionName);
+        } elseif (is_string($options['connection'])) {
+            $options['connection'] = ConnectionManager::get($options['connection']);
         }
 
         $options['registryAlias'] = $alias;
@@ -113,7 +116,7 @@ class EndpointLocator
      * @param string $alias The alias to check for.
      * @return bool
      */
-    public function exists($alias)
+    public function exists(string $alias): bool
     {
         return isset($this->_instances[$alias]);
     }
@@ -124,7 +127,7 @@ class EndpointLocator
      * @param string|null $alias Endpoint alias
      * @return array
      */
-    public function getConfig($alias = null)
+    public function getConfig(?string $alias = null): array
     {
         if ($alias === null) {
             return $this->_config;
@@ -175,7 +178,7 @@ class EndpointLocator
      *
      * @return void
      */
-    public function clear()
+    public function clear(): void
     {
         $this->_instances = [];
         $this->_options = [];
@@ -188,7 +191,7 @@ class EndpointLocator
      * @param string $alias String alias of the endpoint
      * @return void
      */
-    public function remove($alias)
+    public function remove($alias): void
     {
         unset(
             $this->_instances[$alias],
@@ -203,8 +206,11 @@ class EndpointLocator
      * @param array $options The alias to check for.
      * @return \Muffin\Webservice\Model\Endpoint
      */
-    protected function _create(array $options)
+    protected function _create(array $options): Endpoint
     {
-        return new $options['className']($options);
+        /** @psalm-var class-string<\Muffin\Webservice\Model\Endpoint> $className */
+        $className = $options['className'];
+
+        return new $className($options);
     }
 }

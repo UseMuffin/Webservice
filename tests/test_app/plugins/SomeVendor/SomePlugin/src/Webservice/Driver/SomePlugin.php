@@ -12,7 +12,7 @@ class SomePlugin extends AbstractDriver
      *
      * @return void
      */
-    public function initialize()
+    public function initialize(): void
     {
     }
 }

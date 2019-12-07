@@ -9,7 +9,6 @@ use Cake\Event\EventManager;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Exception\MissingResourceClassException;
-use Muffin\Webservice\Exception\UnexpectedDriverException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
@@ -25,12 +24,12 @@ class EndpointTest extends TestCase
     /**
      * @var \Muffin\Webservice\Connection
      */
-    public $connection;
+    protected $connection;
 
     /**
      * @var Endpoint
      */
-    public $endpoint;
+    protected $endpoint;
 
     /**
      * @inheritDoc
@@ -269,7 +268,6 @@ class EndpointTest extends TestCase
     public function testConnection()
     {
         $endpoint = new Endpoint(['endpoint' => 'users']);
-        $this->assertNull($endpoint->getConnection());
         $endpoint->setConnection($this->connection);
         $this->assertSame($this->connection, $endpoint->getConnection());
     }
@@ -444,24 +442,6 @@ class EndpointTest extends TestCase
         $this->assertTrue($this->endpoint->hasField('title'));
     }
 
-    /**
-     * Fake an incorrect return of the schema to check the exception
-     */
-    public function testGetPrimaryKeyException()
-    {
-        $this->expectException(UnexpectedDriverException::class);
-
-        $endpoint = $this->getMockBuilder(Endpoint::class)
-            ->setMethods(['getSchema'])
-            ->getMock();
-
-        $endpoint->expects($this->once())
-            ->method('getSchema')
-            ->willReturn(false);
-
-        $endpoint->getPrimaryKey();
-    }
-
     public function testSetWebservice()
     {
         $testWebservice = new TestWebservice();
@@ -469,22 +449,6 @@ class EndpointTest extends TestCase
 
         $this->assertInstanceOf(Endpoint::class, $return);
         $this->assertInstanceOf(WebserviceInterface::class, $this->endpoint->getWebservice());
-    }
-
-    public function testSetWebserviceException()
-    {
-        $this->expectException(UnexpectedDriverException::class);
-
-        $endpoint = $this->getMockBuilder(Endpoint::class)
-            ->setMethods(['getConnection'])
-            ->getMock();
-
-        $endpoint->expects($this->once())
-            ->method('getConnection')
-            ->willReturn(false);
-
-        $testWebservice = new TestWebservice();
-        $endpoint->setWebservice('test', $testWebservice);
     }
 
     public function testHasFinder()

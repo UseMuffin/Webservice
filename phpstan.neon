@@ -1,12 +1,32 @@
 parameters:
-    level: 4
+    level: 5
+    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
-        - '#Method Muffin\\Webservice\\Query::endpoint\(\) should return \$this\(Muffin\\Webservice\\Query\)|Muffin\\Webservice\\Model\\Endpoint but returns Cake\Datasource\RepositoryInterface#'
-        - '#Call to an undefined method Cake\\Datasource\\RepositoryInterface::callFinder\(\)#'
-        - '#Call to an undefined method Cake\\Datasource\\RepositoryInterface::dispatchEvent\(\)#'
-        - '#Method Muffin\\Webservice\\Query::offset\(\) should return \$this\(Cake\\Datasource\\QueryInterface\) but returns \$this\(Muffin\\Webservice\\Query\)#'
-        - '#Return type \(array\) of method Muffin\\Webservice\\Query::aliasField\(\) should be compatible with return type \(string\) of method Cake\\Datasource\\QueryInterface::aliasField\(\)#'
-        - '#Call to an undefined method Cake\\Datasource\\RepositoryInterface::getName\(\)#'
-        - '#Call to an undefined method Traversable::count\(\)#'
-        - '#Strict comparison using === between string and null will always evaluate to false#'
-        - '#Negated boolean expression is always false#'
+        -
+            message: "#^PHPDoc tag @var does not specify variable name\\.$#"
+            count: 2
+            path: src/AbstractDriver.php
+        -
+            message: "#^Call to an undefined method object\\:\\:validate\\(\\)\\.$#"
+            count: 1
+            path: src/Marshaller.php
+        -
+            message: "#^Method Muffin\\\\Webservice\\\\Query\\:\\:getEndpoint\\(\\) should return Muffin\\\\Webservice\\\\Model\\\\Endpoint but returns Cake\\\\Datasource\\\\RepositoryInterface\\.$#"
+            count: 1
+            path: src/Query.php
+        -
+            message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\|true\\.$#"
+            count: 1
+            path: src/Query.php
+        -
+            message: "#^PHPDoc tag @var does not specify variable name\\.$#"
+            count: 1
+            path: src/Webservice/Webservice.php
+        -
+            message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:callFinder\\(\\)\\.$#"
+            count: 1
+            path: src/Query.php
+        -
+            message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:getName\\(\\)\\.$#"
+            count: 1
+            path: src/Query.php

@@ -8,6 +8,7 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\QueryInterface;
 use Cake\Datasource\QueryTrait;
 use Cake\Utility\Hash;
+use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
 use Muffin\Webservice\Model\Endpoint;
@@ -81,7 +82,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * The results from the webservice
      *
-     * @var \Muffin\Webservice\ResultSet|null
+     * @var \Cake\Datasource\ResultSetInterface|int|bool
      */
     protected $__resultSet;
 
@@ -93,8 +94,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function __construct(WebserviceInterface $webservice, Endpoint $endpoint)
     {
-        $this->webservice($webservice);
-        $this->endpoint($endpoint);
+        $this->setWebservice($webservice);
+        $this->setEndpoint($endpoint);
     }
 
     /**
@@ -156,7 +157,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param string $name name of the clause to be returned
      * @return mixed
      */
-    public function clause($name)
+    public function clause(string $name)
     {
         if (isset($this->_parts[$name])) {
             return $this->_parts[$name];
@@ -168,35 +169,50 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Set the endpoint to be used
      *
-     * @param \Muffin\Webservice\Model\Endpoint|null $endpoint The endpoint to use
-     * @return \Muffin\Webservice\Model\Endpoint|$this
+     * @param \Muffin\Webservice\Model\Endpoint $endpoint The endpoint to use
+     * @return $this
+     * @psalm-suppress LessSpecificReturnStatement
      */
-    public function endpoint(?Endpoint $endpoint = null)
+    public function setEndpoint(Endpoint $endpoint)
     {
-        if ($endpoint === null) {
-            return $this->getRepository();
-        }
-
         $this->repository($endpoint);
 
         return $this;
     }
 
     /**
+     * Set the endpoint to be used
+     *
+     * @return \Muffin\Webservice\Model\Endpoint
+     * @psalm-suppress MoreSpecificReturnType
+     */
+    public function getEndpoint(): Endpoint
+    {
+        /** @psalm-suppress LessSpecificReturnStatement */
+        return $this->getRepository();
+    }
+
+    /**
      * Set the webservice to be used
      *
-     * @param null|\Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice to use
-     * @return \Muffin\Webservice\Webservice\WebserviceInterface|self
+     * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice to use
+     * @return $this
      */
-    public function webservice(?WebserviceInterface $webservice = null)
+    public function setWebservice(WebserviceInterface $webservice)
     {
-        if ($webservice === null) {
-            return $this->_webservice;
-        }
-
         $this->_webservice = $webservice;
 
         return $this;
+    }
+
+    /**
+     * Get the webservice used
+     *
+     * @return \Muffin\Webservice\Webservice\WebserviceInterface
+     */
+    public function getWebservice()
+    {
+        return $this->_webservice;
     }
 
     /**
@@ -217,6 +233,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function find($finder, array $options = [])
     {
+        /** @psalm-suppress UndefinedInterfaceMethod */
         return $this->getRepository()->callFinder($finder, $this, $options);
     }
 
@@ -232,6 +249,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         if ($entity) {
             return $entity;
         }
+        /** @psalm-suppress UndefinedInterfaceMethod */
         throw new RecordNotFoundException(sprintf(
             'Record not found in endpoint "%s"',
             $this->getRepository()->getName()
@@ -242,7 +260,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Alias a field with the endpoint's current alias.
      *
      * @param string $field The field to alias.
-     * @param null $alias Not being used
+     * @param string|null $alias Not being used
      * @return array The field prefixed with the endpoint alias.
      */
     public function aliasField(string $field, ?string $alias = null): array
@@ -254,11 +272,12 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Apply conditions to the query
      *
      * @param array|null $conditions The conditions to apply
-     * @param array|null $types Not used
+     * @param array $types Not used
      * @param bool $overwrite Whether to overwrite the current conditions
-     * @return $this|array
+     * @return $this
+     * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function where($conditions = null, $types = [], $overwrite = false)
+    public function where($conditions = null, array $types = [], bool $overwrite = false)
     {
         if ($conditions === null) {
             return $this->clause('where');
@@ -272,13 +291,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Add AND conditions to the query
      *
-     * @param string|array|\Cake\Database\ExpressionInterface|callable $conditions The conditions to add with AND.
+     * @param string|array $conditions The conditions to add with AND.
      * @param array $types associative array of type names used to bind values to query
+     * @return $this
      * @see \Cake\Database\Query::where()
      * @see \Cake\Database\Type
-     * @return $this
+     * @psalm-suppress PossiblyInvalidArgument
      */
-    public function andWhere($conditions, $types = [])
+    public function andWhere($conditions, array $types = [])
     {
         $this->where($conditions, $types);
 
@@ -288,15 +308,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Charge this query's action
      *
-     * @param int|null $action Action to use
-     * @return $this|int
+     * @param int $action Action to use
+     * @return $this
      */
-    public function action($action = null)
+    public function action(int $action)
     {
-        if ($action === null) {
-            return $this->clause('action');
-        }
-
         $this->_parts['action'] = $action;
 
         return $this;
@@ -316,11 +332,12 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *  the current limit clause will be used.
      * @return $this
      */
-    public function page($page = null, $limit = null)
+    public function page(int $page, ?int $limit = null)
     {
-        if ($page === null) {
-            return $this->clause('page');
+        if ($page < 1) {
+            throw new InvalidArgumentException('Pages must start at 1.');
         }
+
         if ($limit !== null) {
             $this->limit($limit);
         }
@@ -344,13 +361,10 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @param int $limit number of records to be returned
      * @return $this
+     * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function limit($limit = null)
+    public function limit($limit)
     {
-        if ($limit === null) {
-            return $this->clause('limit');
-        }
-
         $this->_parts['limit'] = $limit;
 
         return $this;
@@ -368,7 +382,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             return $this->clause('set');
         }
 
-        if (!in_array($this->action(), [self::ACTION_CREATE, self::ACTION_UPDATE])) {
+        if (!in_array($this->clause('action'), [self::ACTION_CREATE, self::ACTION_UPDATE])) {
             throw new \UnexpectedValueException(__('The action of this query needs to be either create update'));
         }
 
@@ -453,7 +467,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function count(): int
     {
-        if ($this->action() !== self::ACTION_READ) {
+        if ($this->clause('action') !== self::ACTION_READ) {
             return 0;
         }
 
@@ -462,6 +476,10 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         }
 
         if ($this->__resultSet) {
+            /**
+             * @psalm-suppress UndefinedInterfaceMethod
+             * @psalm-suppress PossiblyInvalidMethodCall
+             */
             return (int)$this->__resultSet->total();
         }
 
@@ -498,7 +516,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function triggerBeforeFind()
     {
-        if (!$this->_beforeFindFired && $this->action() === self::ACTION_READ) {
+        if (!$this->_beforeFindFired && $this->clause('action') === self::ACTION_READ) {
+            /** @var \Muffin\Webservice\Model\Endpoint $endpoint */
             $endpoint = $this->getRepository();
             $this->_beforeFindFired = true;
             $endpoint->dispatchEvent('Model.beforeFind', [
@@ -512,7 +531,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Execute the query
      *
-     * @return \Traversable
+     * @return bool|int|\Cake\Datasource\ResultSetInterface
      */
     public function execute()
     {
@@ -522,12 +541,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Executes this query and returns a traversable object containing the results
      *
-     * @return \Traversable
+     * @return bool|int|\Cake\Datasource\ResultSetInterface
+     * @psalm-suppress TraitMethodSignatureMismatch
      */
     protected function _execute()
     {
         $this->triggerBeforeFind();
         if ($this->__resultSet) {
+            /** @psalm-var class-string<\Cake\Datasource\ResultSetInterface> $decorator */
             $decorator = $this->_decoratorClass();
 
             return new $decorator($this->__resultSet);
@@ -545,17 +566,17 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     {
         return [
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
-            'action' => $this->action(),
+            'action' => $this->clause('action'),
             'formatters' => $this->_formatters,
             'offset' => $this->clause('offset'),
-            'page' => $this->page(),
-            'limit' => $this->limit(),
+            'page' => $this->clause('page'),
+            'limit' => $this->clause('limit'),
             'set' => $this->set(),
             'sort' => $this->clause('order'),
             'extraOptions' => $this->getOptions(),
             'conditions' => $this->where(),
-            'repository' => $this->endpoint(),
-            'webservice' => $this->webservice(),
+            'repository' => $this->getEndpoint(),
+            'webservice' => $this->getWebservice(),
         ];
     }
 
@@ -578,8 +599,9 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param bool $overwrite whether to reset fields with passed list or not
      * @return $this
      * @see \Cake\Database\Query::select
+     * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function select($fields = [], $overwrite = false)
+    public function select($fields = [], bool $overwrite = false)
     {
         if (!is_string($fields) && is_callable($fields)) {
             $fields = $fields($this);

@@ -10,9 +10,9 @@ use Muffin\Webservice\Webservice\Webservice;
 
 class EndpointTestWebservice extends Webservice
 {
-    public $resources;
+    protected $resources;
 
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
 
@@ -73,11 +73,11 @@ class EndpointTestWebservice extends Webservice
                 $this->resources[$index],
             ], 1);
         }
-        if (isset($query->where()[$query->endpoint()->aliasField('title')])) {
+        if (isset($query->where()[$query->getEndpoint()->aliasField('title')])) {
             $resources = [];
 
             foreach ($this->resources as $resource) {
-                if ($resource->title !== $query->where()[$query->endpoint()->aliasField('title')]) {
+                if ($resource->title !== $query->where()[$query->getEndpoint()->aliasField('title')]) {
                     continue;
                 }
 

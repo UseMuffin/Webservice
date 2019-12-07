@@ -18,6 +18,8 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
+use Muffin\Webservice\Connection;
+use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
 
 require_once 'vendor/autoload.php';
 
@@ -82,13 +84,12 @@ Cache::setConfig([
 ]);
 
 $config = [
-    'url' => 'sqlite:/' . TMP . 'webservice_test.sqlite',
-    'timezone' => 'UTC',
+    'className' => Connection::class,
+    'driver' => Test::class,
 ];
 
 // Use the test connection for 'debug_kit' as well.
 ConnectionManager::setConfig('test', $config);
-ConnectionManager::setConfig('test_webservice', $config);
 
 Log::setConfig([
     'debug' => [

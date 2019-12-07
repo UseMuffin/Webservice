@@ -11,6 +11,7 @@ use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 abstract class AbstractDriver implements LoggerAwareInterface
@@ -18,8 +19,18 @@ abstract class AbstractDriver implements LoggerAwareInterface
     use InstanceConfigTrait;
     use LoggerAwareTrait;
 
+    /**
+     * Client
+     *
+     * @var object
+     */
     protected $_client;
 
+    /**
+     * Default config
+     *
+     * @var array
+     */
     protected $_defaultConfig = [];
 
     /**
@@ -41,7 +52,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @param array $config Custom configuration.
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         if (!empty($config)) {
             $this->setConfig($config);
@@ -55,7 +66,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return void
      */
-    abstract public function initialize();
+    abstract public function initialize(): void;
 
     /**
      * Set the client instance this driver will use to make requests
@@ -63,7 +74,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @param object $client Client instance
      * @return $this
      */
-    public function setClient($client)
+    public function setClient(object $client)
     {
         $this->_client = $client;
 
@@ -75,7 +86,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return object
      */
-    public function getClient()
+    public function getClient(): object
     {
         return $this->_client;
     }
@@ -87,7 +98,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice Instance of the webservice
      * @return $this
      */
-    public function setWebservice($name, WebserviceInterface $webservice)
+    public function setWebservice(string $name, WebserviceInterface $webservice)
     {
         $this->_webservices[$name] = $webservice;
 
@@ -98,9 +109,9 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * Fetch a webservice instance from the driver registry
      *
      * @param string $name Registry alias to fetch
-     * @return \Muffin\Webservice\Webservice\WebserviceInterface|null
+     * @return \Muffin\Webservice\Webservice\WebserviceInterface
      */
-    public function getWebservice($name)
+    public function getWebservice(string $name): WebserviceInterface
     {
         if (!isset($this->_webservices[$name])) {
             [$pluginName] = pluginSplit(App::shortName(static::class, 'Webservice/Driver'));
@@ -119,11 +130,25 @@ abstract class AbstractDriver implements LoggerAwareInterface
     }
 
     /**
+     * Sets a logger
+     *
+     * @param \Psr\Log\LoggerInterface $logger Logger object
+     * @return $this
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
      * Returns a logger instance
      *
      * @return \Psr\Log\LoggerInterface|null
      */
-    public function getLogger()
+    public function getLogger(): ?LoggerInterface
     {
         return $this->logger;
     }
@@ -133,7 +158,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return string
      */
-    public function configName()
+    public function configName(): string
     {
         return (string)$this->_config['name'];
     }
@@ -167,7 +192,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return bool
      */
-    public function isQueryLoggingEnabled()
+    public function isQueryLoggingEnabled(): bool
     {
         return $this->_logQueries;
     }
@@ -225,10 +250,11 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @return \Muffin\Webservice\Webservice\WebserviceInterface
      * @throws \Muffin\Webservice\Exception\MissingWebserviceClassException If no webservice class can be found
      */
-    protected function _createWebservice($className, array $options = [])
+    protected function _createWebservice(string $className, array $options = []): WebserviceInterface
     {
         $webservice = App::className($className, 'Webservice', 'Webservice');
         if ($webservice) {
+            /** @psalm-var \Muffin\Webservice\Webservice\WebserviceInterface */
             return new $webservice($options);
         }
 
@@ -242,6 +268,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
 
         $fallbackWebservice = App::className($fallbackWebserviceClass, 'Webservice', 'Webservice');
         if ($fallbackWebservice) {
+            /** @psalm-var \Muffin\Webservice\Webservice\WebserviceInterface */
             return new $fallbackWebservice($options);
         }
 

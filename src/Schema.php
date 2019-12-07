@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice;
 
-use Cake\Database\Type;
+use Cake\Database\TypeFactory;
 
 /**
  * Represents a single endpoint in a database schema.
@@ -111,7 +111,7 @@ class Schema
      * @param string $endpoint The endpoint name.
      * @param array $columns The list of columns for the schema.
      */
-    public function __construct($endpoint, array $columns = [])
+    public function __construct(string $endpoint, array $columns = [])
     {
         $this->_repository = $endpoint;
         foreach ($columns as $field => $definition) {
@@ -124,7 +124,7 @@ class Schema
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->_repository;
     }
@@ -158,7 +158,7 @@ class Schema
      * @param array|string $attrs The attributes for the column.
      * @return $this
      */
-    public function addColumn($name, $attrs)
+    public function addColumn(string $name, $attrs)
     {
         if (is_string($attrs)) {
             $attrs = ['type' => $attrs];
@@ -179,7 +179,7 @@ class Schema
      *
      * @return array
      */
-    public function columns()
+    public function columns(): array
     {
         return array_keys($this->_columns);
     }
@@ -190,7 +190,7 @@ class Schema
      * @param string $name The column name.
      * @return array|null Column data or null.
      */
-    public function column($name)
+    public function getColumn(string $name): ?array
     {
         if (!isset($this->_columns[$name])) {
             return null;
@@ -202,13 +202,24 @@ class Schema
     }
 
     /**
+     * Check if schema has column
+     *
+     * @param string $name The column name.
+     * @return bool
+     */
+    public function hasColumn(string $name): bool
+    {
+        return isset($this->_columns[$name]);
+    }
+
+    /**
      * Set the type of a column
      *
      * @param string $name Column name
      * @param string $type Type to set for the column
      * @return $this
      */
-    public function setColumnType($name, $type)
+    public function setColumnType(string $name, string $type)
     {
         $this->_columns[$name]['type'] = $type;
         $this->_typeMap[$name] = $type;
@@ -222,7 +233,7 @@ class Schema
      * @param string $name Column name
      * @return null|string
      */
-    public function getColumnType($name)
+    public function getColumnType(string $name): ?string
     {
         if (!isset($this->_columns[$name])) {
             return null;
@@ -239,7 +250,7 @@ class Schema
      * @param string $column The column name to get the base type from
      * @return string|null The base type name
      */
-    public function baseColumnType($column)
+    public function baseColumnType(string $column): ?string
     {
         if (isset($this->_columns[$column]['baseType'])) {
             return $this->_columns[$column]['baseType'];
@@ -251,8 +262,8 @@ class Schema
             return null;
         }
 
-        if (Type::getMap($type)) {
-            $type = Type::build($type)->getBaseType();
+        if (TypeFactory::getMap($type)) {
+            $type = TypeFactory::build($type)->getBaseType();
         }
 
         return $this->_columns[$column]['baseType'] = $type;
@@ -264,7 +275,7 @@ class Schema
      *
      * @return array
      */
-    public function typeMap()
+    public function typeMap(): array
     {
         return $this->_typeMap;
     }
@@ -277,7 +288,7 @@ class Schema
      * @param string $name The column to get the type of.
      * @return bool Whether or not the field is nullable.
      */
-    public function isNullable($name)
+    public function isNullable(string $name): bool
     {
         if (!isset($this->_columns[$name])) {
             return true;
@@ -291,7 +302,7 @@ class Schema
      *
      * @return array
      */
-    public function defaultValues()
+    public function defaultValues(): array
     {
         $defaults = [];
         foreach ($this->_columns as $name => $data) {
@@ -313,7 +324,7 @@ class Schema
      * @return array Column name(s) for the primary key. An
      *   empty list will be returned when the endpoint has no primary key.
      */
-    public function primaryKey()
+    public function primaryKey(): array
     {
         $primaryKeys = [];
         foreach ($this->_columns as $name => $data) {
@@ -345,7 +356,7 @@ class Schema
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->_options;
     }

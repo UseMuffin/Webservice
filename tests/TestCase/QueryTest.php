@@ -31,25 +31,25 @@ class QueryTest extends TestCase
 
     public function testAction()
     {
-        $this->assertNull($this->query->action());
+        $this->assertNull($this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->action(Query::ACTION_READ));
-        $this->assertEquals(Query::ACTION_READ, $this->query->action());
+        $this->assertEquals(Query::ACTION_READ, $this->query->clause('action'));
     }
 
     public function testActionMethods()
     {
         $this->assertEquals($this->query, $this->query->create());
-        $this->assertEquals(Query::ACTION_CREATE, $this->query->action());
+        $this->assertEquals(Query::ACTION_CREATE, $this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->read());
-        $this->assertEquals(Query::ACTION_READ, $this->query->action());
+        $this->assertEquals(Query::ACTION_READ, $this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->update());
-        $this->assertEquals(Query::ACTION_UPDATE, $this->query->action());
+        $this->assertEquals(Query::ACTION_UPDATE, $this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->delete());
-        $this->assertEquals(Query::ACTION_DELETE, $this->query->action());
+        $this->assertEquals(Query::ACTION_DELETE, $this->query->clause('action'));
     }
 
     public function testAliasField()
@@ -87,8 +87,8 @@ class QueryTest extends TestCase
             ],
             'customOption' => 'value',
         ]));
-        $this->assertEquals(1, $this->query->page());
-        $this->assertEquals(2, $this->query->limit());
+        $this->assertEquals(1, $this->query->clause('page'));
+        $this->assertEquals(2, $this->query->clause('limit'));
         $this->assertEquals([
             'field' => 'ASC',
         ], $this->query->clause('order'));
@@ -99,8 +99,8 @@ class QueryTest extends TestCase
 
     public function testFind()
     {
-        $this->query->endpoint()->setPrimaryKey('id');
-        $this->query->endpoint()->setDisplayField('title');
+        $this->query->getEndpoint()->setPrimaryKey('id');
+        $this->query->getEndpoint()->setDisplayField('title');
 
         $this->assertEquals($this->query, $this->query->find('list'));
 
@@ -187,7 +187,7 @@ class QueryTest extends TestCase
                     'title' => 'Webservices',
                 ]),
             ], 3)));
-        $this->query->webservice($mockWebservice);
+        $this->query->setWebservice($mockWebservice);
 
         $this->query->execute();
 

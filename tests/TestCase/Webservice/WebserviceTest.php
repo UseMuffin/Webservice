@@ -10,7 +10,6 @@ use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
 use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
-use UnexpectedValueException;
 
 class WebserviceTest extends TestCase
 {
@@ -69,21 +68,9 @@ class WebserviceTest extends TestCase
         $this->assertEquals('/articles/16-10-2015', $this->webservice->nestedResource([
             'date' => '16-10-2015',
         ]));
-        $this->assertFalse($this->webservice->nestedResource([
+        $this->assertNull($this->webservice->nestedResource([
             'title' => 'hello',
         ]));
-    }
-
-    public function testExecuteWithoutDriver()
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('No driver has been defined');
-
-        $webservice = new TestWebservice();
-
-        $query = new Query($webservice, new Endpoint());
-
-        $webservice->execute($query);
     }
 
     public function testExecuteLoggingWithLogger()
@@ -212,10 +199,12 @@ class WebserviceTest extends TestCase
 
     public function testDebugInfo()
     {
-        $this->assertEquals([
+        $expected = [
             'driver' => $this->webservice->getDriver(),
-            'endpoint' => $this->webservice->getEndpoint(),
-        ], $this->webservice->__debugInfo());
+            'endpoint' => null,
+        ];
+
+        $this->assertEquals($expected, $this->webservice->__debugInfo());
     }
 
     public function testDescribeException()

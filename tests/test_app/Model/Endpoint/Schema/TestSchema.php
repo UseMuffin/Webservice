@@ -7,7 +7,7 @@ use Muffin\Webservice\Model\Schema;
 
 class TestSchema extends Schema
 {
-    public function initialize()
+    public function initialize(): void
     {
         $this->addColumn('id', [
             'type' => 'int',

@@ -5,6 +5,7 @@ namespace Muffin\Webservice\Test\test_app\Webservice\Driver;
 
 use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Test\test_app\Webservice\EndpointTestWebservice;
+use Muffin\Webservice\Webservice\WebserviceInterface;
 
 class Test extends AbstractDriver
 {
@@ -13,14 +14,14 @@ class Test extends AbstractDriver
      *
      * @return void
      */
-    public function initialize()
+    public function initialize(): void
     {
     }
 
     /**
      * @inheritDoc
      */
-    protected function _createWebservice($className, array $options = [])
+    protected function _createWebservice(string $className, array $options = []): WebserviceInterface
     {
         return new EndpointTestWebservice($options);
     }

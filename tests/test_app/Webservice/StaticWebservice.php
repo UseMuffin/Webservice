@@ -29,7 +29,7 @@ class StaticWebservice implements WebserviceInterface
         ], 3);
     }
 
-    public function describe($endpoint)
+    public function describe(string $endpoint): Schema
     {
         return new Schema($endpoint, [
            'id' => [

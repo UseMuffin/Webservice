@@ -45,16 +45,16 @@ class Marshaller
      *
      * @param array $data The data to hydrate.
      * @param array $options List of options
-     * @return \Muffin\Webservice\Model\Resource
+     * @return \Cake\Datasource\EntityInterface
      * @see \Muffin\Webservice\Model\Endpoint::newEntity()
      */
-    public function one(array $data, array $options = [])
+    public function one(array $data, array $options = []): EntityInterface
     {
         [$data, $options] = $this->_prepareDataAndOptions($data, $options);
 
         $primaryKey = (array)$this->_endpoint->getPrimaryKey();
+        /** @psalm-var class-string<\Muffin\Webservice\Model\Resource> */
         $resourceClass = $this->_endpoint->getResourceClass();
-        /** @var \Muffin\Webservice\Model\Resource $entity */
         $entity = new $resourceClass();
         $entity->setSource($this->_endpoint->getRegistryAlias());
 
@@ -105,7 +105,7 @@ class Marshaller
      * @return array The list of validation errors.
      * @throws \RuntimeException If no validator can be created.
      */
-    protected function _validate($data, $options, $isNew)
+    protected function _validate(array $data, array $options, bool $isNew): array
     {
         if (!$options['validate']) {
             return [];
@@ -137,7 +137,7 @@ class Marshaller
      * @param array $options The options passed to this marshaller.
      * @return array An array containing prepared data and options.
      */
-    protected function _prepareDataAndOptions($data, $options)
+    protected function _prepareDataAndOptions(array $data, array $options): array
     {
         $options += ['validate' => true];
 
@@ -164,10 +164,10 @@ class Marshaller
      *
      * @param array $data The data to hydrate.
      * @param array $options List of options
-     * @return array An array of hydrated records.
+     * @return \Cake\Datasource\EntityInterface[] An array of hydrated records.
      * @see \Muffin\Webservice\Model\Endpoint::newEntities()
      */
-    public function many(array $data, array $options = [])
+    public function many(array $data, array $options = []): array
     {
         $output = [];
         foreach ($data as $record) {
@@ -197,7 +197,7 @@ class Marshaller
      * @param array $options List of options.
      * @return \Cake\Datasource\EntityInterface
      */
-    public function merge(EntityInterface $entity, array $data, array $options = [])
+    public function merge(EntityInterface $entity, array $data, array $options = []): EntityInterface
     {
         [$data, $options] = $this->_prepareDataAndOptions($data, $options);
 
@@ -263,9 +263,9 @@ class Marshaller
      *   data merged in
      * @param array $data list of arrays to be merged into the entities
      * @param array $options List of options.
-     * @return array
+     * @return \Cake\Datasource\EntityInterface[]
      */
-    public function mergeMany($entities, array $data, array $options = [])
+    public function mergeMany($entities, array $data, array $options = []): array
     {
         $primary = (array)$this->_endpoint->getPrimaryKey();
 
@@ -283,7 +283,12 @@ class Marshaller
             })
             ->toArray();
 
+        /** @psalm-suppress NullArrayOffset */
         $new = $indexed[null] ?? [];
+        /**
+         * @psalm-suppress PossiblyNullArrayOffset
+         * @psalm-suppress NullArrayOffset
+         */
         unset($indexed[null]);
         $output = [];
 
@@ -293,7 +298,7 @@ class Marshaller
             }
 
             $key = implode(';', $entity->extract($primary));
-            if ($key === null || !isset($indexed[$key])) {
+            if ($key === '' || !isset($indexed[$key])) {
                 continue;
             }
 

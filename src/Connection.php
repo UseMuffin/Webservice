@@ -30,14 +30,16 @@ class Connection
      * @param array $config Custom configuration.
      * @throws \Muffin\Webservice\Exception\UnexpectedDriverException If the driver is not an instance of `Muffin\Webservice\AbstractDriver`.
      */
-    public function __construct($config)
+    public function __construct(array $config)
     {
         $config = $this->_normalizeConfig($config);
+        /** @psalm-var class-string<\Muffin\Webservice\AbstractDriver> */
         $driver = $config['driver'];
         unset($config['driver'], $config['service']);
 
         $this->_driver = new $driver($config);
 
+        /** @psalm-suppress TypeDoesNotContainType */
         if (!($this->_driver instanceof AbstractDriver)) {
             throw new UnexpectedDriverException(['driver' => $driver]);
         }
@@ -51,7 +53,7 @@ class Connection
      * @throws \Muffin\Webservice\Exception\MissingConnectionException If the connection does not exist.
      * @throws \Muffin\Webservice\Exception\MissingDriverException If the driver does not exist.
      */
-    protected function _normalizeConfig($config)
+    protected function _normalizeConfig(array $config): array
     {
         if (empty($config['driver'])) {
             if (empty($config['service'])) {

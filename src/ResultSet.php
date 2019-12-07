@@ -44,7 +44,7 @@ class ResultSet implements ResultSetInterface
      * @param array $resources The resources to attach
      * @param int|null $total The total amount of resources available
      */
-    public function __construct(array $resources, $total = null)
+    public function __construct(array $resources, ?int $total = null)
     {
         $this->_results = array_values($resources);
         $this->_total = $total;
@@ -163,7 +163,7 @@ class ResultSet implements ResultSetInterface
      *
      * @return int|null
      */
-    public function total()
+    public function total(): ?int
     {
         return $this->_total;
     }
