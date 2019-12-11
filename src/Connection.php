@@ -7,6 +7,7 @@ use Cake\Core\App;
 use Muffin\Webservice\Exception\MissingConnectionException;
 use Muffin\Webservice\Exception\MissingDriverException;
 use Muffin\Webservice\Exception\UnexpectedDriverException;
+use Muffin\Webservice\Webservice\Driver\AbstractDriver;
 
 /**
  * Class Connection

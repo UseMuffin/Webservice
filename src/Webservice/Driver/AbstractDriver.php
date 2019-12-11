@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice;
+namespace Muffin\Webservice\Webservice\Driver;
 
 use Cake\Core\App;
 use Cake\Core\InstanceConfigTrait;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace TestPlugin\Webservice\Driver;
 
-use Muffin\Webservice\AbstractDriver;
+use Muffin\Webservice\Webservice\Driver\AbstractDriver;
 
 class TestPlugin extends AbstractDriver
 {

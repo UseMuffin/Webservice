@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace TestApp\Webservice\Driver;
 
-use Muffin\Webservice\AbstractDriver;
+use Muffin\Webservice\Webservice\Driver\AbstractDriver;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use TestApp\Webservice\EndpointTestWebservice;
 

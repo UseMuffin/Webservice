@@ -6,13 +6,13 @@ namespace Muffin\Webservice\Webservice;
 use Cake\Core\App;
 use Cake\Utility\Inflector;
 use Cake\Utility\Text;
-use Muffin\Webservice\AbstractDriver;
 use Muffin\Webservice\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\Schema;
+use Muffin\Webservice\Webservice\Driver\AbstractDriver;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
