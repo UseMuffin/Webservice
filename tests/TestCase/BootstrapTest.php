@@ -7,7 +7,7 @@ use Cake\Controller\Controller;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\FactoryLocator;
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Connection;
+use Muffin\Webservice\Datasource\Connection;
 use Muffin\Webservice\Model\EndpointLocator;
 use TestApp\Model\Endpoint\TestEndpoint;
 

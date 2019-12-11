@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\ResultSet;
 
 class ResultSetTest extends TestCase
 {
@@ -56,7 +56,7 @@ class ResultSetTest extends TestCase
     {
         $unserialized = unserialize(serialize($this->resultSet));
 
-        $this->assertInstanceOf('\Muffin\Webservice\ResultSet', $unserialized);
+        $this->assertInstanceOf(ResultSet::class, $unserialized);
     }
 
     /**

@@ -6,8 +6,8 @@ namespace Muffin\Webservice\Test\TestCase;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Entity;
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Connection;
-use Muffin\Webservice\Marshaller;
+use Muffin\Webservice\Datasource\Connection;
+use Muffin\Webservice\Datasource\Marshaller;
 use Muffin\Webservice\Model\Resource;
 use TestApp\Model\Endpoint\TestEndpoint;
 

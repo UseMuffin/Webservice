@@ -6,8 +6,8 @@ namespace Muffin\Webservice\Webservice\Driver;
 use Cake\Core\App;
 use Cake\Core\InstanceConfigTrait;
 use Cake\Utility\Inflector;
-use Muffin\Webservice\Exception\MissingWebserviceClassException;
-use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
+use Muffin\Webservice\Webservice\Exception\MissingWebserviceClassException;
+use Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -204,7 +204,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @param array $args Arguments to pass-through.
      * @return mixed
      * @throws \RuntimeException If the client object has not been initialized.
-     * @throws \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException If the method does not exist in the client.
+     * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException If the method does not exist in the client.
      */
     public function __call($method, $args)
     {
@@ -248,7 +248,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @param string $className Class name of the webservice to initialize
      * @param array $options Set of options to pass to the constructor
      * @return \Muffin\Webservice\Webservice\WebserviceInterface
-     * @throws \Muffin\Webservice\Exception\MissingWebserviceClassException If no webservice class can be found
+     * @throws \Muffin\Webservice\Webservice\Exception\MissingWebserviceClassException If no webservice class can be found
      */
     protected function _createWebservice(string $className, array $options = []): WebserviceInterface
     {

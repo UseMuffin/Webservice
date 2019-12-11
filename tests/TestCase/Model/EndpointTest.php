@@ -7,11 +7,12 @@ use BadMethodCallException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\EventManager;
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Connection;
-use Muffin\Webservice\Exception\MissingResourceClassException;
+use Muffin\Webservice\Datasource\Connection;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\Schema;
 use Muffin\Webservice\Model\Endpoint;
+use Muffin\Webservice\Model\Exception\MissingResourceClassException;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\Query;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use SomeVendor\SomePlugin\Model\Endpoint\PluginEndpoint;
 use TestApp\Model\Endpoint\AppEndpoint;
@@ -80,7 +81,7 @@ class EndpointTest extends TestCase
     {
         $query = $this->endpoint->find();
 
-        $this->assertInstanceOf('\Muffin\Webservice\Query', $query);
+        $this->assertInstanceOf(Query::class, $query);
     }
 
     public function testFindByTitle()
@@ -387,7 +388,7 @@ class EndpointTest extends TestCase
         $schema = ['id' => ['type' => 'integer']];
         $endpoint->setSchema($schema);
         $this->assertEquals(
-            new \Muffin\Webservice\Schema('another', $schema),
+            new Schema('another', $schema),
             $endpoint->getSchema()
         );
     }
@@ -401,7 +402,7 @@ class EndpointTest extends TestCase
             ->select($fields)
             ->where($conditions);
 
-        $this->assertInstanceOf('\Muffin\Webservice\Query', $query);
+        $this->assertInstanceOf(Query::class, $query);
         $this->assertSame($fields, $query->clause('select'));
         $this->assertSame($conditions, $query->clause('where'));
     }

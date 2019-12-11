@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Test\TestCase\Webservice;
 
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Exception\MissingEndpointSchemaException;
-use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
+use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Model\Endpoint;
-use Muffin\Webservice\Query;
+use Muffin\Webservice\Model\Exception\MissingEndpointSchemaException;
+use Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException;
 use TestApp\Webservice\Driver\Test;
 use TestApp\Webservice\TestWebservice;
 

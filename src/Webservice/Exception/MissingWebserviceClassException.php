@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Exception;
+namespace Muffin\Webservice\Webservice\Exception;
 
 use Cake\Core\Exception\Exception;
 

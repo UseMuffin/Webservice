@@ -6,13 +6,13 @@ namespace Muffin\Webservice\Webservice;
 use Cake\Core\App;
 use Cake\Utility\Inflector;
 use Cake\Utility\Text;
-use Muffin\Webservice\Exception\MissingEndpointSchemaException;
-use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\Schema;
 use Muffin\Webservice\Model\Endpoint;
+use Muffin\Webservice\Model\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\Query;
-use Muffin\Webservice\Schema;
 use Muffin\Webservice\Webservice\Driver\AbstractDriver;
+use Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -26,7 +26,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * The driver to use to communicate with the webservice
      *
-     * @var \Muffin\Webservice\AbstractDriver
+     * @var \Muffin\Webservice\Webservice\Driver\AbstractDriver
      */
     protected $_driver;
 
@@ -73,7 +73,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Set the webservice driver and return the instance for chaining
      *
-     * @param \Muffin\Webservice\AbstractDriver $driver Instance of the driver
+     * @param \Muffin\Webservice\Webservice\Driver\AbstractDriver $driver Instance of the driver
      * @return $this
      */
     public function setDriver(AbstractDriver $driver)
@@ -86,7 +86,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Get this webservices driver
      *
-     * @return \Muffin\Webservice\AbstractDriver
+     * @return \Muffin\Webservice\Webservice\Driver\AbstractDriver
      */
     public function getDriver(): AbstractDriver
     {
@@ -159,10 +159,10 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query
      *
-     * @param \Muffin\Webservice\Query $query The query to execute
+     * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
      *
-     * @return \Muffin\Webservice\ResultSet|int|bool
+     * @return \Muffin\Webservice\Datasource\ResultSet|int|bool
      */
     public function execute(Query $query, array $options = [])
     {
@@ -181,7 +181,7 @@ abstract class Webservice implements WebserviceInterface
      * Returns a schema for the provided endpoint
      *
      * @param string $endpoint The endpoint to get the schema for
-     * @return \Muffin\Webservice\Schema The schema to use
+     * @return \Muffin\Webservice\Datasource\Schema The schema to use
      */
     public function describe(string $endpoint): Schema
     {
@@ -192,7 +192,7 @@ abstract class Webservice implements WebserviceInterface
         $schemaShortName = implode('.', array_filter([$plugin, $endpoint]));
         $schemaClassName = App::className($schemaShortName, 'Model/Endpoint/Schema', 'Schema');
         if ($schemaClassName) {
-            /** @var \Muffin\Webservice\Schema */
+            /** @var \Muffin\Webservice\Datasource\Schema */
             return new $schemaClassName($endpoint);
         }
 
@@ -205,9 +205,9 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Execute the appropriate method for a query
      *
-     * @param \Muffin\Webservice\Query $query The query to execute
+     * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return bool|int|\Muffin\Webservice\ResultSet
+     * @return bool|int|\Muffin\Webservice\Datasource\ResultSet
      * @psalm-suppress NullableReturnStatement
      * @psalm-suppress InvalidNullableReturnType
      */
@@ -230,10 +230,10 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the create action
      *
-     * @param \Muffin\Webservice\Query $query The query to execute
+     * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
      * @return bool|void
-     * @throws \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
+     * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
     protected function _executeCreateQuery(Query $query, array $options = [])
@@ -247,10 +247,10 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the read action
      *
-     * @param \Muffin\Webservice\Query $query The query to execute
+     * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return \Muffin\Webservice\ResultSet|bool|void
-     * @throws \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
+     * @return \Muffin\Webservice\Datasource\ResultSet|bool|void
+     * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
     protected function _executeReadQuery(Query $query, array $options = [])
@@ -264,10 +264,10 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the update action
      *
-     * @param \Muffin\Webservice\Query $query The query to execute
+     * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
      * @return int|bool|void
-     * @throws \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
+     * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
     protected function _executeUpdateQuery(Query $query, array $options = [])
@@ -281,10 +281,10 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Executes a query with the delete action
      *
-     * @param \Muffin\Webservice\Query $query The query to execute
+     * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
      * @return int|bool|void
-     * @throws \Muffin\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
+     * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
     protected function _executeDeleteQuery(Query $query, array $options = [])
@@ -316,7 +316,7 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Logs a query to the specified logger
      *
-     * @param \Muffin\Webservice\Query $query The query to log
+     * @param \Muffin\Webservice\Datasource\Query $query The query to log
      * @param \Psr\Log\LoggerInterface $logger The logger instance to use
      * @return void
      */

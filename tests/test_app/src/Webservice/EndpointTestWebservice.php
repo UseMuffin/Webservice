@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace TestApp\Webservice;
 
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\Query;
-use Muffin\Webservice\ResultSet;
 use Muffin\Webservice\Webservice\Webservice;
 
 class EndpointTestWebservice extends Webservice

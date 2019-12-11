@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Webservice;
 
-use Muffin\Webservice\Query;
-use Muffin\Webservice\Schema;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\Schema;
 
 /**
  * Describes a webservice used to call a API
@@ -16,9 +16,9 @@ interface WebserviceInterface
     /**
      * Executes a query
      *
-     * @param \Muffin\Webservice\Query $query The query to execute
+     * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return \Muffin\Webservice\ResultSet|int|bool
+     * @return \Muffin\Webservice\Datasource\ResultSet|int|bool
      */
     public function execute(Query $query, array $options = []);
 
@@ -26,8 +26,8 @@ interface WebserviceInterface
      * Returns a schema for the provided endpoint
      *
      * @param string $endpoint The endpoint to get the schema for
-     * @return \Muffin\Webservice\Schema The schema to use
-     * @throws \Muffin\Webservice\Exception\MissingEndpointSchemaException If no schema can be found
+     * @return \Muffin\Webservice\Datasource\Schema The schema to use
+     * @throws \Muffin\Webservice\Model\Exception\MissingEndpointSchemaException If no schema can be found
      */
     public function describe(string $endpoint): Schema;
 }

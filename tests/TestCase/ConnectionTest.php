@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Connection;
-use Muffin\Webservice\Exception\MissingConnectionException;
-use Muffin\Webservice\Exception\MissingDriverException;
+use Muffin\Webservice\Datasource\Connection;
+use Muffin\Webservice\Datasource\Exception\MissingConnectionException;
+use Muffin\Webservice\Webservice\Exception\MissingDriverException;
 
 class ConnectionTest extends TestCase
 {

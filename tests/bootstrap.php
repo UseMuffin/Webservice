@@ -18,7 +18,7 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
-use Muffin\Webservice\Connection;
+use Muffin\Webservice\Datasource\Connection;
 use TestApp\Webservice\Driver\Test as TestDriver;
 
 require_once 'vendor/autoload.php';

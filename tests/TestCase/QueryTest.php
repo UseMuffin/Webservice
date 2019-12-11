@@ -5,10 +5,10 @@ namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Database\Expression\Comparison;
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\Query;
-use Muffin\Webservice\ResultSet;
 use TestApp\Webservice\StaticWebservice;
 use UnexpectedValueException;
 

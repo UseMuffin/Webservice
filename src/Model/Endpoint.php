@@ -16,11 +16,11 @@ use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
-use Muffin\Webservice\Connection;
-use Muffin\Webservice\Exception\MissingResourceClassException;
-use Muffin\Webservice\Marshaller;
-use Muffin\Webservice\Query;
-use Muffin\Webservice\Schema;
+use Muffin\Webservice\Datasource\Connection;
+use Muffin\Webservice\Datasource\Marshaller;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\Schema;
+use Muffin\Webservice\Model\Exception\MissingResourceClassException;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 
 /**
@@ -51,14 +51,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Connection instance this endpoint uses
      *
-     * @var \Muffin\Webservice\Connection $connection Connection instance
+     * @var \Muffin\Webservice\Datasource\Connection $connection Connection instance
      */
     protected $_connection;
 
     /**
      * The schema object containing a description of this endpoint fields
      *
-     * @var \Muffin\Webservice\Schema
+     * @var \Muffin\Webservice\Datasource\Schema
      */
     protected $_schema;
 
@@ -287,7 +287,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Sets the connection driver.
      *
-     * @param \Muffin\Webservice\Connection $connection Connection instance
+     * @param \Muffin\Webservice\Datasource\Connection $connection Connection instance
      * @return $this
      */
     public function setConnection(Connection $connection)
@@ -300,7 +300,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Returns the connection driver.
      *
-     * @return \Muffin\Webservice\Connection
+     * @return \Muffin\Webservice\Datasource\Connection
      */
     public function getConnection(): Connection
     {
@@ -316,7 +316,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * If an array is passed, a new \Muffin\Webservice\Schema will be constructed
      * out of it and used as the schema for this endpoint.
      *
-     * @param \Muffin\Webservice\Schema|array $schema Either an array of fields and config, or a schema object
+     * @param \Muffin\Webservice\Datasource\Schema|array $schema Either an array of fields and config, or a schema object
      * @return $this
      */
     public function setSchema($schema)
@@ -333,7 +333,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Returns the schema endpoint object describing this endpoint's properties.
      *
-     * @return \Muffin\Webservice\Schema
+     * @return \Muffin\Webservice\Datasource\Schema
      */
     public function getSchema(): Schema
     {
@@ -362,8 +362,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * }
      * ```
      *
-     * @param \Muffin\Webservice\Schema $schema The schema definition fetched from webservice.
-     * @return \Muffin\Webservice\Schema the altered schema
+     * @param \Muffin\Webservice\Datasource\Schema $schema The schema definition fetched from webservice.
+     * @return \Muffin\Webservice\Datasource\Schema the altered schema
      * @api
      */
     protected function _initializeSchema(Schema $schema): Schema
@@ -404,7 +404,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Get the endpoints primary key, if one is not set, fetch it from the schema
      *
      * @return array|string
-     * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
+     * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
      */
     public function getPrimaryKey()
     {
@@ -437,7 +437,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Get the endpoints current display field
      *
      * @return string|string[]
-     * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
+     * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
      */
     public function getDisplayField()
     {
@@ -462,7 +462,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @param string $name Name of the class to use
      * @return $this
-     * @throws \Muffin\Webservice\Exception\MissingResourceClassException If the resource class specified does not exist
+     * @throws \Muffin\Webservice\Model\Exception\MissingResourceClassException If the resource class specified does not exist
      */
     public function setResourceClass(string $name)
     {
@@ -536,7 +536,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $alias Alias for the webservice
      * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice instance
      * @return $this
-     * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no driver exists for the endpoint
+     * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no driver exists for the endpoint
      */
     public function setWebservice(string $alias, WebserviceInterface $webservice)
     {
@@ -572,7 +572,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @param string $type the type of query to perform
      * @param array $options An array that will be passed to Query::applyOptions()
-     * @return \Muffin\Webservice\Query
+     * @return \Muffin\Webservice\Datasource\Query
      */
     public function find(string $type = 'all', array $options = []): Query
     {
@@ -587,9 +587,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * By default findAll() applies no conditions, you
      * can override this method in subclasses to modify how `find('all')` works.
      *
-     * @param \Muffin\Webservice\Query $query The query to find with
+     * @param \Muffin\Webservice\Datasource\Query $query The query to find with
      * @param array $options The options to use for the find
-     * @return \Muffin\Webservice\Query The query builder
+     * @return \Muffin\Webservice\Datasource\Query The query builder
      */
     public function findAll(Query $query, array $options): Query
     {
@@ -649,9 +649,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * ]
      * ```
      *
-     * @param \Muffin\Webservice\Query $query The query to find with
+     * @param \Muffin\Webservice\Datasource\Query $query The query to find with
      * @param array $options The options for the find
-     * @return \Muffin\Webservice\Query The query builder
+     * @return \Muffin\Webservice\Datasource\Query The query builder
      */
     public function findList(Query $query, array $options): Query
     {
@@ -814,7 +814,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Creates a new Query instance for this repository
      *
-     * @return \Muffin\Webservice\Query
+     * @return \Muffin\Webservice\Datasource\Query
      */
     public function query(): Query
     {
@@ -977,9 +977,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * if no query is passed a new one will be created and returned
      *
      * @param string $type name of the finder to be called
-     * @param \Muffin\Webservice\Query $query The query object to apply the finder options to
+     * @param \Muffin\Webservice\Datasource\Query $query The query object to apply the finder options to
      * @param array $options List of options to pass to the finder
-     * @return \Muffin\Webservice\Query
+     * @return \Muffin\Webservice\Datasource\Query
      * @throws \BadMethodCallException If the requested finder cannot be found
      */
     public function callFinder(string $type, Query $query, array $options = []): Query
@@ -1084,9 +1084,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Override this method if you want a endpoint object to use custom
      * marshalling logic.
      *
-     * @return \Muffin\Webservice\Marshaller
-     *
-     * @see \Muffin\Webservice\Marshaller
+     * @return \Muffin\Webservice\Datasource\Marshaller
      */
     public function marshaller(): Marshaller
     {

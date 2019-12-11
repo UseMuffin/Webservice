@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Exception;
+namespace Muffin\Webservice\Datasource\Exception;
 
 use Cake\Core\Exception\Exception;
 
-class MissingDriverException extends Exception
+class MissingConnectionException extends Exception
 {
     /**
      * Template string that has attributes sprintf()'ed into it.
      *
      * @var string
      */
-    protected $_messageTemplate = 'Webservice driver %s could not be found.';
+    protected $_messageTemplate = 'No `%` connection configured.';
 }
