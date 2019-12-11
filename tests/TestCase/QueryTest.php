@@ -9,7 +9,7 @@ use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
 use Muffin\Webservice\ResultSet;
-use Muffin\Webservice\Test\test_app\Webservice\StaticWebservice;
+use TestApp\Webservice\StaticWebservice;
 use UnexpectedValueException;
 
 class QueryTest extends TestCase
@@ -166,7 +166,7 @@ class QueryTest extends TestCase
     public function testExecuteTwice()
     {
         $mockWebservice = $this
-            ->getMockBuilder('\Muffin\Webservice\Test\test_app\Webservice\StaticWebservice')
+            ->getMockBuilder('\TestApp\Webservice\StaticWebservice')
             ->setMethods([
                 'execute',
             ])

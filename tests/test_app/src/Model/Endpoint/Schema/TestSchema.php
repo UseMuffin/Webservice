@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Test\test_app\Model\Endpoint\Schema;
+namespace TestApp\Model\Endpoint\Schema;
 
 use Muffin\Webservice\Model\Schema;
 

@@ -9,7 +9,7 @@ use Cake\Datasource\FactoryLocator;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Connection;
 use Muffin\Webservice\Model\EndpointLocator;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
+use TestApp\Model\Endpoint\TestEndpoint;
 
 class BootstrapTest extends TestCase
 {

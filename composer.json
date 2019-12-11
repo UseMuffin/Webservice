@@ -53,7 +53,7 @@
     "autoload-dev": {
         "psr-4": {
             "Muffin\\Webservice\\Test\\": "tests",
-            "TestApp\\": "tests/test_app",
+            "TestApp\\": "tests/test_app/src",
             "SomeVendor\\SomePlugin\\": "tests/test_app/plugins/SomeVendor/SomePlugin/src",
             "TestPlugin\\": "tests/test_app/plugins/TestPlugin/src"
         }

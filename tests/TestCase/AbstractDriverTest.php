@@ -5,10 +5,10 @@ namespace Muffin\Webservice\Test\TestCase\Model;
 
 use Cake\Http\Client;
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
-use Muffin\Webservice\Test\test_app\Webservice\Logger;
-use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
 use SomeVendor\SomePlugin\Webservice\Driver\SomePlugin;
+use TestApp\Webservice\Driver\Test;
+use TestApp\Webservice\Logger;
+use TestApp\Webservice\TestWebservice;
 use TestPlugin\Webservice\Driver\TestPlugin;
 
 class AbstractDriverTest extends TestCase

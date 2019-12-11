@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Test\TestCase\Model\Endpoint\Schema;
 
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\Schema\TestSchema;
+use TestApp\Model\Endpoint\Schema\TestSchema;
 
 class SchemaTest extends TestCase
 {

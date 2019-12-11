@@ -12,12 +12,12 @@ use Muffin\Webservice\Exception\MissingResourceClassException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\AppEndpoint;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\ExampleEndpoint;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
-use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
 use Muffin\Webservice\Webservice\WebserviceInterface;
 use SomeVendor\SomePlugin\Model\Endpoint\PluginEndpoint;
+use TestApp\Model\Endpoint\AppEndpoint;
+use TestApp\Model\Endpoint\ExampleEndpoint;
+use TestApp\Model\Endpoint\TestEndpoint;
+use TestApp\Webservice\TestWebservice;
 
 class EndpointTest extends TestCase
 {
@@ -424,7 +424,7 @@ class EndpointTest extends TestCase
             'resourceClass' => 'Example',
         ]);
 
-        $this->assertSame('Muffin\Webservice\Test\test_app\Model\Resource\Example', $endpoint->getResourceClass());
+        $this->assertSame('TestApp\Model\Resource\Example', $endpoint->getResourceClass());
     }
 
     public function testSetResourceMissingClass()
@@ -488,6 +488,6 @@ class EndpointTest extends TestCase
     {
         $endpoint = new ExampleEndpoint();
 
-        $this->assertEquals('Muffin\Webservice\Test\test_app\Model\Resource\Example', $endpoint->getResourceClass());
+        $this->assertEquals('TestApp\Model\Resource\Example', $endpoint->getResourceClass());
     }
 }

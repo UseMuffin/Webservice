@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Test\test_app\Webservice;
+namespace TestApp\Webservice;
 
 use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Query;

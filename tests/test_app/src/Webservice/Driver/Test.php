@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Test\test_app\Webservice\Driver;
+namespace TestApp\Webservice\Driver;
 
 use Muffin\Webservice\AbstractDriver;
-use Muffin\Webservice\Test\test_app\Webservice\EndpointTestWebservice;
 use Muffin\Webservice\Webservice\WebserviceInterface;
+use TestApp\Webservice\EndpointTestWebservice;
 
 class Test extends AbstractDriver
 {

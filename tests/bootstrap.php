@@ -19,7 +19,7 @@ use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Muffin\Webservice\Connection;
-use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
+use TestApp\Webservice\Driver\Test as TestDriver;
 
 require_once 'vendor/autoload.php';
 
@@ -45,7 +45,7 @@ mb_internal_encoding('UTF-8');
 
 Configure::write('debug', true);
 Configure::write('App', [
-    'namespace' => 'Muffin\\Webservice\\Test\\test_app',
+    'namespace' => 'TestApp',
     'encoding' => 'UTF-8',
     'base' => false,
     'baseUrl' => false,
@@ -85,7 +85,7 @@ Cache::setConfig([
 
 $config = [
     'className' => Connection::class,
-    'driver' => Test::class,
+    'driver' => TestDriver::class,
 ];
 
 // Use the test connection for 'debug_kit' as well.

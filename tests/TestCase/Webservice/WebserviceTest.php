@@ -8,8 +8,8 @@ use Muffin\Webservice\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Query;
-use Muffin\Webservice\Test\test_app\Webservice\Driver\Test;
-use Muffin\Webservice\Test\test_app\Webservice\TestWebservice;
+use TestApp\Webservice\Driver\Test;
+use TestApp\Webservice\TestWebservice;
 
 class WebserviceTest extends TestCase
 {
@@ -113,7 +113,7 @@ class WebserviceTest extends TestCase
     public function testExecuteWithoutCreate()
     {
         $this->expectException(UnimplementedWebserviceMethodException::class);
-        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeCreateQuery');
+        $this->expectExceptionMessage('Webservice TestApp\Webservice\TestWebservice does not implement _executeCreateQuery');
 
         $query = new Query($this->webservice, new Endpoint());
         $query->create();
@@ -124,7 +124,7 @@ class WebserviceTest extends TestCase
     public function testExecuteWithoutRead()
     {
         $this->expectException(UnimplementedWebserviceMethodException::class);
-        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeReadQuery');
+        $this->expectExceptionMessage('Webservice TestApp\Webservice\TestWebservice does not implement _executeReadQuery');
 
         $query = new Query($this->webservice, new Endpoint());
         $query->read();
@@ -135,7 +135,7 @@ class WebserviceTest extends TestCase
     public function testExecuteWithoutUpdate()
     {
         $this->expectException(UnimplementedWebserviceMethodException::class);
-        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeUpdateQuery');
+        $this->expectExceptionMessage('Webservice TestApp\Webservice\TestWebservice does not implement _executeUpdateQuery');
 
         $query = new Query($this->webservice, new Endpoint());
         $query->update();
@@ -146,7 +146,7 @@ class WebserviceTest extends TestCase
     public function testExecuteWithoutDelete()
     {
         $this->expectException(UnimplementedWebserviceMethodException::class);
-        $this->expectExceptionMessage('Webservice Muffin\Webservice\Test\test_app\Webservice\TestWebservice does not implement _executeDeleteQuery');
+        $this->expectExceptionMessage('Webservice TestApp\Webservice\TestWebservice does not implement _executeDeleteQuery');
 
         $query = new Query($this->webservice, new Endpoint());
         $query->delete();

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Test\test_app\Model\Resource;
+namespace TestApp\Model\Resource;
 
 use Muffin\Webservice\Model\Resource;
 
