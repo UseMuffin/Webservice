@@ -116,5 +116,4 @@ class EndpointAfterSaveCallbackTest extends TestCase
             'body' => 'Woot'
         ], $editedResource2->toArray());
     }
-
 }

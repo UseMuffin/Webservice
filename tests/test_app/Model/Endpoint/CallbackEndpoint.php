@@ -47,7 +47,7 @@ class CallbackEndpoint extends Endpoint
      * @param Event $event
      * @param EntityInterface $entity
      * @return EntityInterface
-    */
+     */
     public function afterDelete(Event $event, EntityInterface $entity)
     {
         $entity = $this->get(6);
@@ -57,5 +57,4 @@ class CallbackEndpoint extends Endpoint
 
         return $entity;
     }
-
 }
