@@ -1109,7 +1109,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         $event = $this->dispatchEvent('Model.afterSave', compact('resource', 'options'));
 
         if ($event->isStopped()) {
-            return $event->result;
+            return $event->getResult();
         }
 
         if (($resource->isNew()) && ($result instanceof EntityInterface)) {
@@ -1133,9 +1133,23 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function delete(EntityInterface $resource, $options = [])
     {
-        return (bool)$this->query()->delete()->where([
+        $event = $this->dispatchEvent('Model.beforeDelete', compact('resource', 'options'));
+
+        if ($event->isStopped()) {
+            return $event->getResult();
+        }
+
+        $result = (bool)$this->query()->delete()->where([
             $this->getPrimaryKey() => $resource->get($this->getPrimaryKey())
         ])->execute();
+
+        $event = $this->dispatchEvent('Model.afterDelete', compact('resource', 'options'));
+
+        if ($event->isStopped()) {
+            return $event->getResult();
+        }
+
+        return $result;
     }
 
     /**
