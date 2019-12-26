@@ -31,8 +31,8 @@ bin/cake plugin load Muffin/Webservice
 <?php
 namespace App\Webservice\Driver;
 
-use Cake\Network\Http\Client;
-use Muffin\Webservice\AbstractDriver;
+use Cake\Http\Client;
+use Muffin\Webservice\Driver\AbstractDriver;
 
 class Articles extends AbstractDriver
 {
@@ -54,8 +54,8 @@ class Articles extends AbstractDriver
 <?php
 namespace App\Webservice;
 
-use Muffin\Webservice\Query;
-use Muffin\Webservice\ResultSet;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Webservice\Webservice;
 
 class ArticlesWebservice extends Webservice
@@ -110,7 +110,6 @@ class Article extends Resource
 <?php
 namespace App\Controller;
 
-use Cake\Event\Event;
 use Muffin\Webservice\Model\EndpointLocator;
 
 class ArticlesController extends AppController
