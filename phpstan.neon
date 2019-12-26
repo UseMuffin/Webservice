@@ -1,32 +1,19 @@
 parameters:
-    level: 5
+    level: 6
     checkGenericClassInNonGenericObjectType: false
+    checkMissingIterableValueType: false
     ignoreErrors:
-        -
-            message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-            count: 2
-            path: src/AbstractDriver.php
-        -
-            message: "#^Call to an undefined method object\\:\\:validate\\(\\)\\.$#"
-            count: 1
-            path: src/Marshaller.php
-        -
-            message: "#^Method Muffin\\\\Webservice\\\\Query\\:\\:getEndpoint\\(\\) should return Muffin\\\\Webservice\\\\Model\\\\Endpoint but returns Cake\\\\Datasource\\\\RepositoryInterface\\.$#"
-            count: 1
-            path: src/Query.php
-        -
-            message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\|true\\.$#"
-            count: 1
-            path: src/Query.php
-        -
-            message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-            count: 1
-            path: src/Webservice/Webservice.php
         -
             message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:callFinder\\(\\)\\.$#"
             count: 1
-            path: src/Query.php
+            path: src/Datasource/Query.php
+
         -
             message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:getName\\(\\)\\.$#"
             count: 1
-            path: src/Query.php
+            path: src/Datasource/Query.php
+
+        -
+            message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\|true\\.$#"
+            count: 1
+            path: src/Datasource/Query.php

@@ -51,7 +51,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Connection instance this endpoint uses
      *
-     * @var \Muffin\Webservice\Datasource\Connection $connection Connection instance
+     * @var \Muffin\Webservice\Datasource\Connection
      */
     protected $_connection;
 
