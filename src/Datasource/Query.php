@@ -392,7 +392,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function offset($num)
     {

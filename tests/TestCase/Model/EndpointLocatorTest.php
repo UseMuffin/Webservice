@@ -77,7 +77,7 @@ class EndpointLocatorTest extends TestCase
             ->method('getAlias')
             ->willReturn('First');
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Muffin\Webservice\Model\Endpoint $first */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Muffin\Webservice\Model\Endpoint $second */
         $second = $this->getMockBuilder(Endpoint::class)
             ->setConstructorArgs([['alias' => 'Second']])
             ->setMethods(['getAlias'])

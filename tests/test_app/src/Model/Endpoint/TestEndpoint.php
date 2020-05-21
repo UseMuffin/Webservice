@@ -14,7 +14,6 @@ class TestEndpoint extends Endpoint
      *
      * @param \Cake\Validation\Validator $validator The validator that can be modified to
      * add some rules to it.
-     *
      * @return \Cake\Validation\Validator
      */
     public function validationDefault(Validator $validator): Validator

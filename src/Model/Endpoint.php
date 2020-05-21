@@ -184,7 +184,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * instance is created through the EndpointRegistry without a connection.
      *
      * @return string
-     *
      * @see \Muffin\Webservice\Model\EndpointRegistry::get()
      */
     public static function defaultConnectionName(): string
@@ -765,7 +764,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if ($cacheConfig) {
             if (!$cacheKey) {
                 $cacheKey = sprintf(
-                    "get:%s.%s%s",
+                    'get:%s.%s%s',
                     $this->getConnection()->configName(),
                     $this->getName(),
                     json_encode($primaryKey)
@@ -849,7 +848,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @param mixed $conditions Conditions to be used, accepts anything Query::where() can take.
      * @return int Count of affected rows.
-     *
      * @see \Muffin\Webservice\Endpoint::delete()
      * @psalm-suppress InvalidReturnStatement
      * @psalm-suppress InvalidReturnType
@@ -1127,7 +1125,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function newEntities(array $data, array $options = []): array
     {
@@ -1151,7 +1149,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * data merged in
      * @param array $data key value list of fields to be merged into the resource
      * @param array $options A list of options for the object hydration.
-     *
      * @return \Cake\Datasource\EntityInterface
      */
     public function patchEntity(EntityInterface $entity, array $data, array $options = []): EntityInterface
@@ -1177,7 +1174,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * data merged in
      * @param array $data list of arrays to be merged into the entities
      * @param array $options A list of options for the objects hydration.
-     *
      * @return array
      * @psalm-return array<array-key, \Cake\Datasource\EntityInterface>
      */

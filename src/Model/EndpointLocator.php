@@ -12,6 +12,7 @@ use RuntimeException;
  * Class EndpointLocator
  *
  * Should implement the LocatorInterface
+ *
  * @see \Cake\ORM\Locator\LocatorInterface
  * @see https://github.com/cakephp/cakephp/issues/12014
  */
