@@ -5,7 +5,9 @@ namespace Muffin\Webservice\Model;
 
 use Cake\Core\App;
 use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use Cake\Utility\Inflector;
+use Muffin\Webservice\Datasource\Connection;
 use RuntimeException;
 
 /**
@@ -99,9 +101,9 @@ class EndpointLocator
                 $connectionName = Inflector::underscore(end($pluginParts));
             }
 
-            $options['connection'] = ConnectionManager::get($connectionName);
+            $options['connection'] = $this->getConnection($connectionName);
         } elseif (is_string($options['connection'])) {
-            $options['connection'] = ConnectionManager::get($options['connection']);
+            $options['connection'] = $this->getConnection($options['connection']);
         }
 
         $options['registryAlias'] = $alias;
@@ -109,6 +111,26 @@ class EndpointLocator
         $this->_options[$alias] = $options;
 
         return $this->_instances[$alias];
+    }
+
+    /**
+     * Get connection instance.
+     *
+     * @param string $connectionName Connection name.
+     * @return \Muffin\Webservice\Datasource\Connection
+     */
+    protected function getConnection(string $connectionName): Connection
+    {
+        try {
+            /** @var \Muffin\Webservice\Datasource\Connection */
+            return ConnectionManager::get($connectionName);
+        } catch (MissingDatasourceConfigException $e) {
+            $message = $e->getMessage()
+                . ' You can override Endpoint::defaultConnectionName() to return the connection name you want.';
+
+            /** @psalm-suppress PossiblyInvalidArgument */
+            throw new MissingDatasourceConfigException($message, $e->getCode(), $e->getPrevious());
+        }
     }
 
     /**
