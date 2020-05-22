@@ -12,7 +12,6 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 abstract class AbstractDriver implements LoggerAwareInterface
 {
