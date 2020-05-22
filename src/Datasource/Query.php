@@ -414,7 +414,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * By default this function will append any passed argument to the list of fields
      * to be selected, unless the second argument is set to true.
      *
-     * @param array|string $fields fields to be added to the list
+     * @param array|\Cake\Database\ExpressionInterface|\Closure|string $fields fields to be added to the list
      * @param bool $overwrite whether to reset order with field list or not
      * @return $this
      */
@@ -496,7 +496,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * $singleUser = $query->first();
      * ```
      *
-     * @return mixed the first result from the ResultSet
+     * @return \Cake\Datasource\EntityInterface|array|null the first result from the ResultSet
      */
     public function first()
     {
@@ -543,6 +543,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return bool|int|\Cake\Datasource\ResultSetInterface
      * @psalm-suppress TraitMethodSignatureMismatch
+     * @psalm-suppress ImplementedReturnTypeMismatch
      */
     protected function _execute()
     {

@@ -14,6 +14,7 @@ use Cake\Datasource\RulesChecker;
 use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
+use Cake\ORM\Exception\PersistenceFailedException;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
 use Muffin\Webservice\Datasource\Connection;
@@ -792,7 +793,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param callable|null $callback A callback that will be invoked for newly
      *   created entities. This callback will be called *before* the entity
      *   is persisted.
-     * @return \Cake\Datasource\EntityInterface An entity.
+     * @return \Cake\Datasource\EntityInterface|array An entity.
+     * @throws \Cake\ORM\Exception\PersistenceFailedException When the entity couldn't be saved
      */
     public function findOrCreate($search, ?callable $callback = null)
     {
@@ -801,13 +803,19 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if ($row) {
             return $row;
         }
+
         $entity = $this->newEntity();
         $entity->set($search, ['guard' => false]);
         if ($callback) {
             $callback($entity);
         }
 
-        return $this->save($entity) ?: $entity;
+        $result = $this->save($entity);
+        if ($result === false) {
+            throw new PersistenceFailedException($entity, ['findOrCreate']);
+        }
+
+        return $entity;
     }
 
     /**
@@ -1047,7 +1055,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $conditions = [
                 'OR' => $makeConditions($fields, $args),
             ];
-        } elseif ($hasAnd !== false) {
+        } else {
             $fields = explode('_and_', $fields);
             $conditions = $makeConditions($fields, $args);
         }

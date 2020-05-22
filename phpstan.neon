@@ -14,6 +14,6 @@ parameters:
             path: src/Datasource/Query.php
 
         -
-            message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\|true\\.$#"
+            message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\<1, max\\>\\|int\\<min, \\-1\\>\\|true\\.$#"
             count: 1
             path: src/Datasource/Query.php
