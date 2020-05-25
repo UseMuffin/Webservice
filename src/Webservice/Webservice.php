@@ -345,7 +345,7 @@ abstract class Webservice implements WebserviceInterface
             return;
         }
 
-        $logger->debug($query->endpoint(), [
+        $logger->debug($query->endpoint()->getName(), [
             'params' => $query->where(),
         ]);
     }

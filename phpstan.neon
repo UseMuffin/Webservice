@@ -1,12 +1,59 @@
 parameters:
-    level: 4
+    level: 6
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
-        - '#Method Muffin\\Webservice\\Query::endpoint\(\) should return \$this\(Muffin\\Webservice\\Query\)|Muffin\\Webservice\\Model\\Endpoint but returns Cake\Datasource\RepositoryInterface#'
-        - '#Call to an undefined method Cake\\Datasource\\RepositoryInterface::callFinder\(\)#'
-        - '#Call to an undefined method Cake\\Datasource\\RepositoryInterface::dispatchEvent\(\)#'
-        - '#Method Muffin\\Webservice\\Query::offset\(\) should return \$this\(Cake\\Datasource\\QueryInterface\) but returns \$this\(Muffin\\Webservice\\Query\)#'
-        - '#Return type \(array\) of method Muffin\\Webservice\\Query::aliasField\(\) should be compatible with return type \(string\) of method Cake\\Datasource\\QueryInterface::aliasField\(\)#'
-        - '#Call to an undefined method Cake\\Datasource\\RepositoryInterface::getName\(\)#'
-        - '#Call to an undefined method Traversable::count\(\)#'
-        - '#Strict comparison using === between string and null will always evaluate to false#'
-        - '#Negated boolean expression is always false#'
+        -
+            message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
+            count: 1
+            path: src/Marshaller.php
+
+        -
+            message: "#^Negated boolean expression is always false\\.$#"
+            count: 3
+            path: src/Model/Endpoint.php
+
+        -
+            message: "#^Result of \\|\\| is always true\\.$#"
+            count: 1
+            path: src/Model/Endpoint.php
+
+        -
+            message: "#^Unreachable statement \\- code above always terminates\\.$#"
+            count: 1
+            path: src/Model/Endpoint.php
+
+        -
+            message: "#^Call to an undefined method Traversable\\:\\:count\\(\\)\\.$#"
+            count: 1
+            path: src/Model/Endpoint.php
+
+        -
+            message: "#^Parameter \\#1 \\$connection of method Muffin\\\\Webservice\\\\Model\\\\Endpoint\\:\\:setConnection\\(\\) expects Muffin\\\\Webservice\\\\Connection, Muffin\\\\Webservice\\\\AbstractDriver given\\.$#"
+            count: 1
+            path: src/Model/Endpoint.php
+
+        -
+            message: "#^Method Muffin\\\\Webservice\\\\Query\\:\\:endpoint\\(\\) should return \\$this\\(Muffin\\\\Webservice\\\\Query\\)\\|Muffin\\\\Webservice\\\\Model\\\\Endpoint but returns Cake\\\\Datasource\\\\RepositoryInterface\\.$#"
+            count: 1
+            path: src/Query.php
+
+        -
+            message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:callFinder\\(\\)\\.$#"
+            count: 1
+            path: src/Query.php
+
+        -
+            message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:getName\\(\\)\\.$#"
+            count: 1
+            path: src/Query.php
+
+        -
+            message: "#^Return type \\(array\\) of method Muffin\\\\Webservice\\\\Query\\:\\:aliasField\\(\\) should be compatible with return type \\(string\\) of method Cake\\\\Datasource\\\\QueryInterface\\:\\:aliasField\\(\\)$#"
+            count: 1
+            path: src/Query.php
+
+        -
+            message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:dispatchEvent\\(\\)\\.$#"
+            count: 1
+            path: src/Query.php

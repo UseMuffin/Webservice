@@ -49,7 +49,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Connection instance this endpoint uses
      *
-     * @var \Muffin\Webservice\Connection|null $connection Connection instance
+     * @var \Muffin\Webservice\Connection
      */
     protected $_connection;
 
@@ -635,9 +635,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $name = implode('\\', array_slice($parts, 0, -1)) . '\Resource\\' . $alias;
             if (!class_exists($name)) {
                 return $this->_resourceClass = $default;
-            } else {
-                return $this->_resourceClass = $name;
             }
+
+            return $this->_resourceClass = $name;
         }
 
         return $this->_resourceClass;
@@ -695,13 +695,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return $this->setWebservice($this->getName(), $webservice);
         }
 
-        if ($webservice === null) {
-            return $this->getWebservice();
-        }
-
-        $this->_webservice = $webservice;
-
-        return $this;
+        return $this->getWebservice();
     }
 
     /**

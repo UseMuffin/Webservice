@@ -16,8 +16,18 @@ abstract class AbstractDriver implements LoggerAwareInterface
     use InstanceConfigTrait;
     use LoggerAwareTrait;
 
+    /**
+     * Client
+     *
+     * @var object
+     */
     protected $_client;
 
+    /**
+     * Default config
+     *
+     * @var array
+     */
     protected $_defaultConfig = [];
 
     /**
@@ -195,7 +205,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
             return $this->_logQueries;
         }
 
-        $this->_logQueries = $enable;
+        return $this->_logQueries = $enable;
     }
 
     /**
