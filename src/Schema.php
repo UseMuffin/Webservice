@@ -77,7 +77,7 @@ class Schema
         'null' => null,
         'default' => null,
         'comment' => null,
-        'primaryKey' => null
+        'primaryKey' => null,
     ];
 
     /**

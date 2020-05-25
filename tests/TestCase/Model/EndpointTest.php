@@ -36,12 +36,12 @@ class EndpointTest extends TestCase
 
         $this->connection = new Connection([
             'name' => 'test',
-            'service' => 'Test'
+            'service' => 'Test',
         ]);
         $this->endpoint = new TestEndpoint([
             'connection' => $this->connection,
             'primaryKey' => 'id',
-            'displayField' => 'title'
+            'displayField' => 'title',
         ]);
     }
 
@@ -84,10 +84,10 @@ class EndpointTest extends TestCase
         $this->assertEquals(new Resource([
             'id' => 3,
             'title' => 'Webservices',
-            'body' => 'Even more text'
+            'body' => 'Even more text',
         ], [
             'markNew' => false,
-            'markClean' => true
+            'markClean' => true,
         ]), $this->endpoint->findByTitle('Webservices')->first());
     }
 
@@ -96,16 +96,16 @@ class EndpointTest extends TestCase
         $this->assertEquals([
             1 => 'Hello World',
             2 => 'New ORM',
-            3 => 'Webservices'
+            3 => 'Webservices',
         ], $this->endpoint->find('list')->toArray());
 
         $this->assertEquals([
             'Hello World' => 'Some text',
             'New ORM' => 'Some more text',
-            'Webservices' => 'Even more text'
+            'Webservices' => 'Even more text',
         ], $this->endpoint->find('list', [
             'keyField' => 'title',
-            'valueField' => 'body'
+            'valueField' => 'body',
         ])->toArray());
     }
 
@@ -136,7 +136,7 @@ class EndpointTest extends TestCase
         $resource = new Resource([
             'id' => 4,
             'title' => 'Loads of fun',
-            'body' => 'Woot'
+            'body' => 'Woot',
         ]);
 
         $savedResource = $this->endpoint->save($resource);
@@ -148,13 +148,13 @@ class EndpointTest extends TestCase
         $this->assertEquals([
             'id' => 4,
             'title' => 'Loads of fun',
-            'body' => 'Woot'
+            'body' => 'Woot',
         ], $newResource->toArray());
 
         $invalidResource = new Resource([
             'id' => 'Hello',
             'title' => 'Loads of fun',
-            'body' => 'Woot'
+            'body' => 'Woot',
         ]);
 
         $savedInvalidResource = $this->endpoint->save($invalidResource);
@@ -190,7 +190,7 @@ class EndpointTest extends TestCase
     public function testDeleteAll()
     {
         $amount = $this->endpoint->deleteAll([
-            'id' => [1, 2, 3]
+            'id' => [1, 2, 3],
         ]);
 
         $this->assertEquals(3, $amount);
@@ -202,10 +202,10 @@ class EndpointTest extends TestCase
     {
         $this->assertEquals(new Resource([
             'title' => 'New entity',
-            'body' => 'New entity body'
+            'body' => 'New entity body',
         ]), $this->endpoint->newEntity([
             'title' => 'New entity',
-            'body' => 'New entity body'
+            'body' => 'New entity body',
         ]));
     }
 
@@ -214,21 +214,21 @@ class EndpointTest extends TestCase
         $this->assertEquals([
             new Resource([
                 'title' => 'New entity',
-                'body' => 'New entity body'
+                'body' => 'New entity body',
             ]),
             new Resource([
                 'title' => 'Second new entity',
-                'body' => 'Second new entity body'
-            ])
+                'body' => 'Second new entity body',
+            ]),
         ], $this->endpoint->newEntities([
             [
                 'title' => 'New entity',
-                'body' => 'New entity body'
+                'body' => 'New entity body',
             ],
             [
                 'title' => 'Second new entity',
-                'body' => 'Second new entity body'
-            ]
+                'body' => 'Second new entity body',
+            ],
         ]));
     }
 
@@ -286,7 +286,7 @@ class EndpointTest extends TestCase
             'endpoint' => 'users',
             'schema' => [
                 'id' => ['type' => 'integer', 'primaryKey' => true],
-            ]
+            ],
         ]);
         $this->assertEquals('id', $endpoint->getPrimaryKey());
         $endpoint->setPrimaryKey('thingID');
@@ -307,8 +307,8 @@ class EndpointTest extends TestCase
             'endpoint' => 'users',
             'schema' => [
                 'foo' => ['type' => 'string'],
-                'name' => ['type' => 'string']
-            ]
+                'name' => ['type' => 'string'],
+            ],
         ]);
         $this->assertEquals('name', $endpoint->getDisplayField());
     }
@@ -324,8 +324,8 @@ class EndpointTest extends TestCase
             'endpoint' => 'users',
             'schema' => [
                 'foo' => ['type' => 'string'],
-                'title' => ['type' => 'string']
-            ]
+                'title' => ['type' => 'string'],
+            ],
         ]);
         $this->assertEquals('title', $endpoint->getDisplayField());
     }
@@ -342,7 +342,7 @@ class EndpointTest extends TestCase
             'schema' => [
                 'id' => ['type' => 'string', 'primaryKey' => true],
                 'foo' => ['type' => 'string'],
-            ]
+            ],
         ]);
         $this->assertEquals('id', $endpoint->getDisplayField());
     }
@@ -359,7 +359,7 @@ class EndpointTest extends TestCase
             'schema' => [
                 'id' => ['type' => 'string', 'primaryKey' => true],
                 'foo' => ['type' => 'string'],
-            ]
+            ],
         ]);
         $this->assertEquals('id', $endpoint->getDisplayField());
         $endpoint->setDisplayField('foo');
@@ -401,7 +401,7 @@ class EndpointTest extends TestCase
         $eventManager = $this->getMockBuilder(EventManager::class)->getMock();
         $endpoint = new Endpoint([
             'endpoint' => 'another',
-            'eventManager' => $eventManager
+            'eventManager' => $eventManager,
         ]);
 
         $this->assertSame($eventManager, $endpoint->getEventManager());
@@ -411,7 +411,7 @@ class EndpointTest extends TestCase
     {
         $endpoint = new Endpoint([
             'name' => 'example',
-            'resourceClass' => 'Example'
+            'resourceClass' => 'Example',
         ]);
 
         $this->assertSame('Muffin\Webservice\Test\test_app\Model\Resource\Example', $endpoint->getResourceClass());
@@ -424,7 +424,7 @@ class EndpointTest extends TestCase
     {
         new Endpoint([
             'name' => 'example',
-            'resourceClass' => 'Missing'
+            'resourceClass' => 'Missing',
         ]);
     }
 
@@ -504,7 +504,7 @@ class EndpointTest extends TestCase
             'resourceClass' => 'Muffin\\Webservice\\Model\\Resource',
             'defaultConnection' => 'test_app',
             'connectionName' => 'test',
-            'inflector' => 'underscore'
+            'inflector' => 'underscore',
         ];
         $result = $this->endpoint->__debugInfo();
 

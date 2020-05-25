@@ -7,7 +7,6 @@ use Cake\Datasource\ResultSetInterface;
 
 class ResultSet implements ResultSetInterface
 {
-
     use CollectionTrait;
 
     /**

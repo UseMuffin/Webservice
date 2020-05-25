@@ -14,7 +14,6 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 
 class Query implements IteratorAggregate, JsonSerializable, QueryInterface
 {
-
     use QueryTrait;
 
     const ACTION_CREATE = 1;
@@ -68,7 +67,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         'order' => [],
         'set' => [],
         'where' => [],
-        'select' => []
+        'select' => [],
     ];
 
     /**
@@ -504,7 +503,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             $endpoint->dispatchEvent('Model.beforeFind', [
                 $this,
                 new ArrayObject($this->_options),
-                !$this->isEagerLoaded()
+                !$this->isEagerLoaded(),
             ]);
         }
     }
@@ -555,7 +554,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             'extraOptions' => $this->getOptions(),
             'conditions' => $this->where(),
             'repository' => $this->endpoint(),
-            'webservice' => $this->webservice()
+            'webservice' => $this->webservice(),
         ];
     }
 

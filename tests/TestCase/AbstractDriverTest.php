@@ -14,7 +14,7 @@ class AbstractDriverTest extends TestCase
 {
     public function testWebserviceWithoutVendor()
     {
-        $driver = new TestPlugin;
+        $driver = new TestPlugin();
 
         $webservice = $driver->getWebservice('test_plugin');
         $this->assertInstanceOf('TestPlugin\Webservice\TestPluginWebservice', $webservice);
@@ -25,7 +25,7 @@ class AbstractDriverTest extends TestCase
 
     public function testWebserviceWithVendor()
     {
-        $driver = new SomePlugin;
+        $driver = new SomePlugin();
 
         $webservice = $driver->getWebservice('some_plugin');
         $this->assertInstanceOf('SomeVendor\SomePlugin\Webservice\SomePluginWebservice', $webservice);
@@ -69,7 +69,7 @@ class AbstractDriverTest extends TestCase
             'client' => $client,
             'logger' => $logger,
             'query_logging' => true,
-            'webservices' => ['example']
+            'webservices' => ['example'],
         ];
 
         $driver = new Test();

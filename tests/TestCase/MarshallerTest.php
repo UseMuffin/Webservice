@@ -26,12 +26,12 @@ class MarshallerTest extends TestCase
     {
         $connection = new Connection([
             'name' => 'test',
-            'service' => 'Test'
+            'service' => 'Test',
         ]);
         $endpoint = new TestEndpoint([
             'connection' => $connection,
             'primaryKey' => 'id',
-            'displayField' => 'title'
+            'displayField' => 'title',
         ]);
 
         $this->marshaller = new Marshaller($endpoint);
@@ -42,7 +42,7 @@ class MarshallerTest extends TestCase
         $result = $this->marshaller->one(
             [
                 'title' => 'Testing one',
-                'body' => 'Testing the marshaller'
+                'body' => 'Testing the marshaller',
             ]
         );
 
@@ -57,10 +57,10 @@ class MarshallerTest extends TestCase
             [
                 'id' => '',
                 'title' => 'Testing one',
-                'body' => 'Testing the marshaller'
+                'body' => 'Testing the marshaller',
             ],
             [
-                'fieldList' => ['title']
+                'fieldList' => ['title'],
             ]
         );
 
@@ -74,10 +74,10 @@ class MarshallerTest extends TestCase
         $result = $this->marshaller->one(
             [
                 'title' => 'Testing one',
-                'body' => 'Testing the marshaller'
+                'body' => 'Testing the marshaller',
             ],
             [
-                'accessibleFields' => ['body' => false]
+                'accessibleFields' => ['body' => false],
             ]
         );
 
@@ -91,7 +91,7 @@ class MarshallerTest extends TestCase
         $result = $this->marshaller->one(
             [
                 'title' => 'Testing one',
-                'body' => 'Testing the marshaller'
+                'body' => 'Testing the marshaller',
             ],
             [
                 'fieldList' => [],
@@ -108,10 +108,10 @@ class MarshallerTest extends TestCase
         $result = $this->marshaller->one(
             [
                 'title' => 'Testing one',
-                'body' => 'Testing the marshaller'
+                'body' => 'Testing the marshaller',
             ],
             [
-                'accessibleFields' => ['title' => false, 'body' => false]
+                'accessibleFields' => ['title' => false, 'body' => false],
             ]
         );
 
@@ -130,11 +130,11 @@ class MarshallerTest extends TestCase
         $result = $this->marshaller->one(
             [
                 'title' => 'Testing one',
-                'body' => 'Testing the marshaller'
+                'body' => 'Testing the marshaller',
             ],
             [
                 'fieldList' => ['title', 'body'],
-                'accessibleFields' => ['title' => false, 'body' => false]
+                'accessibleFields' => ['title' => false, 'body' => false],
             ]
         );
 
@@ -148,7 +148,7 @@ class MarshallerTest extends TestCase
         $result = $this->marshaller->one(
             [
                 'title' => 'Testing one',
-                'body' => 'Foo'
+                'body' => 'Foo',
             ]
         );
 
@@ -172,13 +172,13 @@ class MarshallerTest extends TestCase
         $result = $this->marshaller->many([
             [
                 'title' => 'First',
-                'body' => 'First body'
+                'body' => 'First body',
             ],
             [
                 'title' => 'Second',
-                'body' => 'Second body'
+                'body' => 'Second body',
             ],
-            'Non array value'
+            'Non array value',
         ]);
 
         $this->assertNotEmpty($result);
@@ -199,12 +199,12 @@ class MarshallerTest extends TestCase
         $entity = new Entity([
             'id' => 1,
             'title' => 'Testing',
-            'body' => 'The test body'
+            'body' => 'The test body',
         ]);
 
         $data = [
             'title' => 'Changed the title',
-            'body' => 'Changed the body'
+            'body' => 'Changed the body',
         ];
 
         $result = $this->marshaller->merge($entity, $data);
@@ -219,13 +219,13 @@ class MarshallerTest extends TestCase
         $entity = new Entity([
             'id' => 1,
             'title' => 'Testing',
-            'body' => 'Longer body'
+            'body' => 'Longer body',
         ]);
         $entity->isNew(false);
 
         $data = [
             'title' => 'Changed the title',
-            'body' => 'Foo'
+            'body' => 'Foo',
         ];
 
         $result = $this->marshaller->merge($entity, $data);
@@ -245,12 +245,12 @@ class MarshallerTest extends TestCase
         $entity = new Entity([
             'id' => 1,
             'title' => 'Testing',
-            'body' => 'Longer body'
+            'body' => 'Longer body',
         ]);
 
         $data = [
             'title' => 'Changed the title',
-            'body' => 'Changed the body'
+            'body' => 'Changed the body',
         ];
 
         $result = $this->marshaller->merge(
@@ -259,7 +259,7 @@ class MarshallerTest extends TestCase
             [
                 'fieldList' => ['title'],
                 'accessibleFields' => ['title' => true, 'body' => false],
-                'validate' => false
+                'validate' => false,
             ]
         );
 

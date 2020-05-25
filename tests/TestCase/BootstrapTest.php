@@ -23,7 +23,7 @@ class BootstrapTest extends TestCase
     {
         $connection = new Connection([
             'name' => 'test',
-            'service' => 'Test'
+            'service' => 'Test',
         ]);
         ConnectionManager::setConfig('test_app', $connection);
 

@@ -10,13 +10,13 @@ class TestSchema extends Schema
     public function initialize()
     {
         $this->addColumn('id', [
-            'type' => 'int'
+            'type' => 'int',
         ]);
         $this->addColumn('title', [
-            'type' => 'string'
+            'type' => 'string',
         ]);
         $this->addColumn('body', [
-            'type' => 'string'
+            'type' => 'string',
         ]);
     }
 }

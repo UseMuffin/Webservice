@@ -8,7 +8,6 @@ use Cake\Datasource\InvalidPropertyInterface;
 
 class Resource implements EntityInterface, InvalidPropertyInterface
 {
-
     use EntityTrait;
 
     /**
@@ -37,7 +36,7 @@ class Resource implements EntityInterface, InvalidPropertyInterface
             'markClean' => false,
             'markNew' => null,
             'guard' => false,
-            'source' => null
+            'source' => null,
         ];
 
         if (!empty($options['source'])) {
@@ -57,7 +56,7 @@ class Resource implements EntityInterface, InvalidPropertyInterface
         if (!empty($properties)) {
             $this->set($properties, [
                 'setter' => $options['useSetters'],
-                'guard' => $options['guard']
+                'guard' => $options['guard'],
             ]);
         }
 

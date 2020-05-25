@@ -45,7 +45,7 @@ class EndpointLocatorTest extends TestCase
     {
         $this->Locator->get('Test', [
             'registryAlias' => 'Test',
-            'connection' => 'test'
+            'connection' => 'test',
         ]);
 
         $this->Locator->setConfig('Test', ['foo' => 'bar']);
@@ -55,7 +55,7 @@ class EndpointLocatorTest extends TestCase
     {
         $multiAliasConfig = [
             'Test' => ['foo' => 'bar'],
-            'Example' => ['foo' => 'bar']
+            'Example' => ['foo' => 'bar'],
         ];
 
         $result = $this->Locator->setConfig($multiAliasConfig);
@@ -122,7 +122,7 @@ class EndpointLocatorTest extends TestCase
         $result = $this->Locator->get('First', [
             'className' => Endpoint::class,
             'registryAlias' => 'First',
-            'connection' => 'test'
+            'connection' => 'test',
         ]);
         $this->assertInstanceOf(Endpoint::class, $result);
 
@@ -133,7 +133,7 @@ class EndpointLocatorTest extends TestCase
     {
         $result = $this->Locator->get('Test', [
             'registryAlias' => 'Test',
-            'connection' => 'test'
+            'connection' => 'test',
         ]);
 
         $this->assertInstanceOf(Endpoint::class, $result);
@@ -143,7 +143,7 @@ class EndpointLocatorTest extends TestCase
     {
         $result = $this->Locator->get('Test', [
             'connection' => 'test',
-            'className' => 'UnfindableClass'
+            'className' => 'UnfindableClass',
         ]);
 
         $this->assertInstanceOf(Endpoint::class, $result);

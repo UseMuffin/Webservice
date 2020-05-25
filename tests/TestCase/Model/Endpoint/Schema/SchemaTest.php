@@ -48,7 +48,7 @@ class SchemaTest extends TestCase
                 'null' => null,
                 'default' => null,
                 'comment' => null,
-                'primaryKey' => null
+                'primaryKey' => null,
             ],
             $this->schema->column('id')
         );

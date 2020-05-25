@@ -155,7 +155,7 @@ abstract class Webservice implements WebserviceInterface
     public function addNestedResource($url, array $requiredFields)
     {
         $this->_nestedResources[$url] = [
-            'requiredFields' => $requiredFields
+            'requiredFields' => $requiredFields,
         ];
     }
 
@@ -222,7 +222,7 @@ abstract class Webservice implements WebserviceInterface
 
         throw new MissingEndpointSchemaException([
             'schema' => $schemaShortName,
-            'webservice' => $shortName
+            'webservice' => $shortName,
         ]);
     }
 
@@ -262,7 +262,7 @@ abstract class Webservice implements WebserviceInterface
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
-            'method' => '_executeCreateQuery'
+            'method' => '_executeCreateQuery',
         ]);
     }
 
@@ -279,7 +279,7 @@ abstract class Webservice implements WebserviceInterface
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
-            'method' => '_executeReadQuery'
+            'method' => '_executeReadQuery',
         ]);
     }
 
@@ -296,7 +296,7 @@ abstract class Webservice implements WebserviceInterface
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
-            'method' => '_executeUpdateQuery'
+            'method' => '_executeUpdateQuery',
         ]);
     }
 
@@ -313,7 +313,7 @@ abstract class Webservice implements WebserviceInterface
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => get_class($this),
-            'method' => '_executeDeleteQuery'
+            'method' => '_executeDeleteQuery',
         ]);
     }
 
@@ -346,7 +346,7 @@ abstract class Webservice implements WebserviceInterface
         }
 
         $logger->debug($query->endpoint(), [
-            'params' => $query->where()
+            'params' => $query->where(),
         ]);
     }
 

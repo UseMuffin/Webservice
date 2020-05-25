@@ -18,7 +18,7 @@ class ConnectionTest extends TestCase
 
         $this->connection = new Connection([
             'name' => 'test',
-            'service' => 'Test'
+            'service' => 'Test',
         ]);
     }
 
@@ -29,7 +29,7 @@ class ConnectionTest extends TestCase
     {
         new Connection([
             'name' => 'test',
-            'service' => 'MissingDriver'
+            'service' => 'MissingDriver',
         ]);
     }
 

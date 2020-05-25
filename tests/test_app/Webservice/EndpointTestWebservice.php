@@ -21,27 +21,27 @@ class EndpointTestWebservice extends Webservice
             new Resource([
                 'id' => 1,
                 'title' => 'Hello World',
-                'body' => 'Some text'
+                'body' => 'Some text',
             ], [
                 'markNew' => false,
-                'markClean' => true
+                'markClean' => true,
             ]),
             new Resource([
                 'id' => 2,
                 'title' => 'New ORM',
-                'body' => 'Some more text'
+                'body' => 'Some more text',
             ], [
                 'markNew' => false,
-                'markClean' => true
+                'markClean' => true,
             ]),
             new Resource([
                 'id' => 3,
                 'title' => 'Webservices',
-                'body' => 'Even more text'
+                'body' => 'Even more text',
             ], [
                 'markNew' => false,
-                'markClean' => true
-            ])
+                'markClean' => true,
+            ]),
         ];
     }
 
@@ -55,7 +55,7 @@ class EndpointTestWebservice extends Webservice
 
         $this->resources[] = new Resource($fields, [
             'markNew' => false,
-            'markClean' => true
+            'markClean' => true,
         ]);
 
         return true;
@@ -71,7 +71,7 @@ class EndpointTestWebservice extends Webservice
             }
 
             return new ResultSet([
-                $this->resources[$index]
+                $this->resources[$index],
             ], 1);
         }
         if (isset($query->where()[$query->endpoint()->aliasField('title')])) {

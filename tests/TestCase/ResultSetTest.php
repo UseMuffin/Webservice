@@ -24,16 +24,16 @@ class ResultSetTest extends TestCase
         $this->resultSet = new ResultSet([
             new Resource([
                 'id' => 1,
-                'title' => 'Hello World'
+                'title' => 'Hello World',
             ]),
             new Resource([
                 'id' => 2,
-                'title' => 'New ORM'
+                'title' => 'New ORM',
             ]),
             new Resource([
                 'id' => 3,
-                'title' => 'Webservices'
-            ])
+                'title' => 'Webservices',
+            ]),
         ], 6);
     }
 

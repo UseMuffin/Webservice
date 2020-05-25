@@ -16,16 +16,16 @@ class StaticWebservice implements WebserviceInterface
         return new ResultSet([
             new Resource([
                 'id' => 1,
-                'title' => 'Hello World'
+                'title' => 'Hello World',
             ]),
             new Resource([
                 'id' => 2,
-                'title' => 'New ORM'
+                'title' => 'New ORM',
             ]),
             new Resource([
                 'id' => 3,
-                'title' => 'Webservices'
-            ])
+                'title' => 'Webservices',
+            ]),
         ], 3);
     }
 
@@ -33,11 +33,11 @@ class StaticWebservice implements WebserviceInterface
     {
         return new Schema($endpoint, [
            'id' => [
-               'type' => 'integer'
+               'type' => 'integer',
            ],
             'title' => [
-                'type' => 'string'
-            ]
+                'type' => 'string',
+            ],
         ]);
     }
 }

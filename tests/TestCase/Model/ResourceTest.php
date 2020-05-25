@@ -21,7 +21,7 @@ class ResourceTest extends TestCase
         $endpoint = new Endpoint();
 
         $resource = new Resource([], [
-            'source' => $endpoint
+            'source' => $endpoint,
         ]);
         $this->assertEquals($endpoint, $resource->getSource());
     }
@@ -29,10 +29,10 @@ class ResourceTest extends TestCase
     public function testConstructUseSettersOff()
     {
         $resource = new Resource([
-            'field' => 'text'
+            'field' => 'text',
         ], [
             'markClean' => true,
-            'useSetters' => false
+            'useSetters' => false,
         ]);
 
         $this->assertEquals('text', $resource->get('field'));

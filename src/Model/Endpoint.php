@@ -28,7 +28,6 @@ use Muffin\Webservice\Schema;
  */
 class Endpoint implements RepositoryInterface, EventListenerInterface, EventDispatcherInterface
 {
-
     use EventDispatcherTrait;
     use RulesAwareTrait;
     use ValidatorAwareTrait;
@@ -837,7 +836,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         $options += [
             'keyField' => $this->getPrimaryKey(),
             'valueField' => $this->getDisplayField(),
-            'groupField' => null
+            'groupField' => null,
         ];
 
         $options = $this->_setFieldMatchers(
@@ -1114,7 +1113,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
         return new $className($resource->toArray(), [
             'markNew' => false,
-            'markClean' => true
+            'markClean' => true,
         ]);
     }
 
@@ -1128,7 +1127,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function delete(EntityInterface $resource, $options = [])
     {
         return (bool)$this->query()->delete()->where([
-            $this->getPrimaryKey() => $resource->get($this->getPrimaryKey())
+            $this->getPrimaryKey() => $resource->get($this->getPrimaryKey()),
         ])->execute();
     }
 
@@ -1220,7 +1219,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         } elseif ($hasOr !== false) {
             $fields = explode('_or_', $fields);
             $conditions = [
-                'OR' => $makeConditions($fields, $args)
+                'OR' => $makeConditions($fields, $args),
             ];
         } elseif ($hasAnd !== false) {
             $fields = explode('_and_', $fields);
@@ -1433,7 +1432,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             'resourceClass' => $this->getResourceClass(),
             'defaultConnection' => $this->defaultConnectionName(),
             'connectionName' => $conn ? $conn->configName() : null,
-            'inflector' => $this->getInflectionMethod()
+            'inflector' => $this->getInflectionMethod(),
         ];
     }
 

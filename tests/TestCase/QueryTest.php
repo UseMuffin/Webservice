@@ -72,7 +72,7 @@ class QueryTest extends TestCase
     {
         $this->assertEquals(new Resource([
             'id' => 1,
-            'title' => 'Hello World'
+            'title' => 'Hello World',
         ]), $this->query->first());
     }
 
@@ -82,17 +82,17 @@ class QueryTest extends TestCase
             'page' => 1,
             'limit' => 2,
             'order' => [
-                'field' => 'ASC'
+                'field' => 'ASC',
             ],
-            'customOption' => 'value'
+            'customOption' => 'value',
         ]));
         $this->assertEquals(1, $this->query->page());
         $this->assertEquals(2, $this->query->limit());
         $this->assertEquals([
-            'field' => 'ASC'
+            'field' => 'ASC',
         ], $this->query->clause('order'));
         $this->assertEquals([
-            'customOption' => 'value'
+            'customOption' => 'value',
         ], $this->query->getOptions());
     }
 
@@ -123,10 +123,10 @@ class QueryTest extends TestCase
         $this->query->update();
 
         $this->assertEquals($this->query, $this->query->set([
-            'field' => 'value'
+            'field' => 'value',
         ]));
         $this->assertEquals([
-            'field' => 'value'
+            'field' => 'value',
         ], $this->query->set());
     }
 
@@ -155,11 +155,11 @@ class QueryTest extends TestCase
     public function testOrder()
     {
         $this->assertEquals($this->query, $this->query->order([
-            'field' => 'ASC'
+            'field' => 'ASC',
         ]));
 
         $this->assertEquals([
-            'field' => 'ASC'
+            'field' => 'ASC',
         ], $this->query->clause('order'));
     }
 
@@ -168,7 +168,7 @@ class QueryTest extends TestCase
         $mockWebservice = $this
             ->getMockBuilder('\Muffin\Webservice\Test\test_app\Webservice\StaticWebservice')
             ->setMethods([
-                'execute'
+                'execute',
             ])
             ->getMock();
         $mockWebservice->expects($this->once())
@@ -176,16 +176,16 @@ class QueryTest extends TestCase
             ->will($this->returnValue(new ResultSet([
                 new Resource([
                     'id' => 1,
-                    'title' => 'Hello World'
+                    'title' => 'Hello World',
                 ]),
                 new Resource([
                     'id' => 2,
-                    'title' => 'New ORM'
+                    'title' => 'New ORM',
                 ]),
                 new Resource([
                     'id' => 3,
-                    'title' => 'Webservices'
-                ])
+                    'title' => 'Webservices',
+                ]),
             ], 3)));
         $this->query->webservice($mockWebservice);
 
@@ -209,7 +209,7 @@ class QueryTest extends TestCase
             'extraOptions' => [],
             'conditions' => [],
             'repository' => new Endpoint(),
-            'webservice' => new StaticWebservice()
+            'webservice' => new StaticWebservice(),
         ], $this->query->__debugInfo());
     }
 
@@ -218,7 +218,7 @@ class QueryTest extends TestCase
         $expected = [
             ['id' => 1, 'title' => 'Hello World'],
             ['id' => 2, 'title' => 'New ORM'],
-            ['id' => 3, 'title' => 'Webservices']
+            ['id' => 3, 'title' => 'Webservices'],
         ];
 
         $this->assertEquals(json_encode($expected), json_encode($this->query));
@@ -228,7 +228,7 @@ class QueryTest extends TestCase
     {
         $conditions = [
             'foo' => 'bar',
-            'baz' => 2
+            'baz' => 2,
         ];
         $this->query->andWhere($conditions);
 

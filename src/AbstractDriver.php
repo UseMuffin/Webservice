@@ -13,7 +13,6 @@ use RuntimeException;
 
 abstract class AbstractDriver implements LoggerAwareInterface
 {
-
     use InstanceConfigTrait;
     use LoggerAwareTrait;
 
@@ -254,7 +253,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
         if (!method_exists($this->getClient(), $method)) {
             throw new UnimplementedWebserviceMethodException([
                 'name' => $this->getConfig('name'),
-                'method' => $method
+                'method' => $method,
             ]);
         }
 
@@ -272,7 +271,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
             'client' => $this->getClient(),
             'logger' => $this->logger(),
             'query_logging' => $this->isQueryLoggingEnabled(),
-            'webservices' => array_keys($this->_webservices)
+            'webservices' => array_keys($this->_webservices),
         ];
     }
 
@@ -308,7 +307,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
 
         throw new MissingWebserviceClassException([
             'class' => $className,
-            'fallbackClass' => $fallbackWebserviceClass
+            'fallbackClass' => $fallbackWebserviceClass,
         ]);
     }
 }
