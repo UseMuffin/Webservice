@@ -83,13 +83,14 @@ Cache::setConfig([
     ],
 ]);
 
-$config = [
+if (!getenv('DB_DSN')) {
+    putenv('DB_DSN=sqlite:///:memory:');
+}
+
+ConnectionManager::setConfig('test', [
     'className' => Connection::class,
     'driver' => TestDriver::class,
-];
-
-// Use the test connection for 'debug_kit' as well.
-ConnectionManager::setConfig('test', $config);
+] + ConnectionManager::parseDsn(env('DB_DSN')));
 
 Log::setConfig([
     'debug' => [

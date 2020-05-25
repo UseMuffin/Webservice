@@ -1,7 +1,7 @@
 parameters:
     level: 6
-    checkGenericClassInNonGenericObjectType: false
     checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
         -
             message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:callFinder\\(\\)\\.$#"

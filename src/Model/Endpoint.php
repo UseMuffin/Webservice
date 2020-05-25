@@ -499,9 +499,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $name = implode('\\', array_slice($parts, 0, -1)) . '\Resource\\' . $alias;
             if (!class_exists($name)) {
                 return $this->_resourceClass = $default;
-            } else {
-                return $this->_resourceClass = $name;
             }
+
+            return $this->_resourceClass = $name;
         }
 
         return $this->_resourceClass;
