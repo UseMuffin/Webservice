@@ -85,14 +85,12 @@ Cache::setConfig([
     ],
 ]);
 
-$config = [
-    'url' => 'sqlite:/' . TMP . 'webservice_test.sqlite',
-    'timezone' => 'UTC',
-];
+if (!getenv('DB_DSN')) {
+    putenv('DB_DSN=sqlite:///:memory:');
+}
 
-// Use the test connection for 'debug_kit' as well.
-ConnectionManager::setConfig('test', $config);
-ConnectionManager::setConfig('test_webservice', $config);
+ConnectionManager::setConfig('test', ['url' => getenv('DB_DSN')]);
+ConnectionManager::setConfig('test_webservice', ['url' => getenv('DB_DSN')]);
 
 Log::setConfig([
     'debug' => [
