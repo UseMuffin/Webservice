@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
+use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use Cake\TestSuite\TestCase;
 use RuntimeException;
+use TestApp\Model\Endpoint\TestEndpoint;
 
 class EndpointLocatorTest extends TestCase
 {
@@ -113,6 +115,18 @@ class EndpointLocatorTest extends TestCase
 
         $result = $this->Locator->get($first->getAlias());
         $this->assertSame($first, $result);
+    }
+
+    public function testGetException()
+    {
+        $this->expectException(MissingDatasourceConfigException::class);
+        $this->expectExceptionMessage(
+            'The datasource configuration "non-existent" was not found.'
+            . ' You can override Endpoint::defaultConnectionName() to return the connection name you want.'
+        );
+
+        $locator = new EndpointLocator();
+        $locator->get('Foo', ['className' => TestEndpoint::class, 'connection' => 'non-existent']);
     }
 
     public function testGetWithExistingObject()
