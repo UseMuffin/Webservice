@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
-use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Muffin\Webservice\Datasource\Connection;
@@ -104,6 +103,3 @@ Log::setConfig([
         'file' => 'error',
     ],
 ]);
-
-Plugin::getCollection()->add(new \Muffin\Webservice\Plugin());
-require Plugin::getCollection()->get('Muffin/Webservice')->getConfigPath() . 'bootstrap.php';

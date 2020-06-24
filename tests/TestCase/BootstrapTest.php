@@ -13,6 +13,11 @@ use TestApp\Model\Endpoint\TestEndpoint;
 
 class BootstrapTest extends TestCase
 {
+    public function setUp(): void
+    {
+        $this->loadPlugins(['Muffin/Webservice']);
+    }
+
     /**
      * Test that the plugins bootstrap is correctly registering the Endpoint
      * repository type with the factory locator
@@ -38,7 +43,6 @@ class BootstrapTest extends TestCase
     {
         $result = FactoryLocator::get('Endpoint');
 
-        $this->assertInstanceOf(EndpointLocator::class, $result[0]);
-        $this->assertSame('get', $result[1]);
+        $this->assertInstanceOf(EndpointLocator::class, $result);
     }
 }
