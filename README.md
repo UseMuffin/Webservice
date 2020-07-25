@@ -23,6 +23,25 @@ bin/cake plugin load Muffin/Webservice
 
 ## Usage
 
+In your `app.php`, configure your `app` service like any other configuration,
+by adding a new element to the configure array:
+
+```php
+    'Webservices' => [
+        'app' => [
+            'className' => \Muffin\Webservice\Connection::class,
+            'service' => 'Articles',
+            // Any additional keys will be set as Driver's config.
+        ]
+    ]
+```
+
+You will also need to load the webservices in your `bootstrap.php` file:
+
+```php
+ConnectionManager::config(Configure::consume('Webservices'));
+```
+
 ### As an ORM
 
 #### Create driver
