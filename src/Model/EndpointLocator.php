@@ -75,7 +75,7 @@ class EndpointLocator extends AbstractLocator
                 $connectionName = $options['className']::defaultConnectionName();
             } else {
                 if (strpos($alias, '.') === false) {
-                    $connectionName = 'app';
+                    $connectionName = 'webservice';
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
                     $pluginParts = explode('/', pluginSplit($alias)[0]);
