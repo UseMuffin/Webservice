@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
-use Cake\Database\Expression\Comparison;
+use Cake\Database\Expression\ComparisonExpression;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Datasource\ResultSet;
@@ -265,13 +265,13 @@ class QueryTest extends TestCase
 
     public function testSelectWithExpression()
     {
-        $exp = new Comparison('upvotes', 50, 'integer', '>=');
+        $exp = new ComparisonExpression('upvotes', 50, 'integer', '>=');
         $this->query->select($exp);
 
-        /** @var Comparison $comparisonClause */
+        /** @var ComparisonExpression $comparisonClause */
         $comparisonClause = $this->query->clause('select')[0];
 
-        $this->assertInstanceOf(Comparison::class, $comparisonClause);
+        $this->assertInstanceOf(ComparisonExpression::class, $comparisonClause);
         $this->assertEquals(50, $comparisonClause->getValue());
         $this->assertEquals('>=', $comparisonClause->getOperator());
     }
