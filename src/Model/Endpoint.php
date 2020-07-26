@@ -190,9 +190,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public static function defaultConnectionName(): string
     {
         $namespaceParts = explode('\\', static::class);
-        $plugin = array_slice(array_reverse($namespaceParts), 3, 2);
+        $plugin = current(array_slice(array_reverse($namespaceParts), 3, 2));
 
-        return Inflector::underscore(current($plugin));
+        if ($plugin === 'App') {
+            return 'webservice';
+        }
+
+        return Inflector::underscore($plugin);
     }
 
     /**

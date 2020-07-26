@@ -74,10 +74,13 @@ class EndpointLocator extends AbstractLocator
             if ($options['className'] !== Endpoint::class) {
                 $connectionName = $options['className']::defaultConnectionName();
             } else {
-                /** @psalm-suppress PossiblyNullArgument */
-                $pluginParts = explode('/', pluginSplit($alias)[0]);
-
-                $connectionName = Inflector::underscore(end($pluginParts));
+                if (strpos($alias, '.') === false) {
+                    $connectionName = 'webservice';
+                } else {
+                    /** @psalm-suppress PossiblyNullArgument */
+                    $pluginParts = explode('/', pluginSplit($alias)[0]);
+                    $connectionName = Inflector::underscore(end($pluginParts));
+                }
             }
 
             $options['connection'] = $this->getConnection($connectionName);
