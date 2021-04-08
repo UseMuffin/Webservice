@@ -76,7 +76,7 @@ class WebserviceTest extends TestCase
     public function testExecuteLoggingWithLogger()
     {
         $logger = $this->getMockBuilder('Cake\Log\Engine\ConsoleLog')
-            ->setMethods([
+            ->onlyMethods([
                 'debug',
             ])
             ->getMock();
@@ -94,7 +94,7 @@ class WebserviceTest extends TestCase
     public function testExecuteLoggingWithLoggerEnabled()
     {
         $logger = $this->getMockBuilder('Cake\Log\Engine\ConsoleLog')
-            ->setMethods([
+            ->onlyMethods([
                 'debug',
             ])
             ->getMock();
