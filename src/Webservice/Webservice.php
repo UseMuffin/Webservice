@@ -161,7 +161,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return \Muffin\Webservice\Datasource\ResultSet|int|bool
+     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
      */
     public function execute(Query $query, array $options = [])
     {
@@ -206,7 +206,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return bool|int|\Muffin\Webservice\Datasource\ResultSet
+     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
      * @psalm-suppress NullableReturnStatement
      * @psalm-suppress InvalidNullableReturnType
      */
@@ -231,7 +231,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return bool|void
+     * @return bool|\Muffin\Webservice\Model\Resource
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
@@ -248,7 +248,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return \Muffin\Webservice\Datasource\ResultSet|bool|void
+     * @return bool|\Muffin\Webservice\Datasource\ResultSet
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
@@ -265,7 +265,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return int|bool|void
+     * @return int|bool|\Muffin\Webservice\Model\Resource
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
@@ -282,7 +282,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return int|bool|void
+     * @return int|bool
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */

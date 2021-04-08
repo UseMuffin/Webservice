@@ -846,7 +846,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function updateAll($fields, $conditions): int
     {
-        /** @psalm-suppress PossiblyInvalidMethodCall */
+        /** @psalm-suppress PossiblyInvalidMethodCall, PossiblyUndefinedMethod */
         return $this->query()->update()->where($conditions)->set($fields)->execute()->count();
     }
 

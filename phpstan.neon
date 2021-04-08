@@ -16,6 +16,6 @@ parameters:
 			path: src/Datasource/Query.php
 
 		-
-			message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\<min, \\-1\\>\\|int\\<1, max\\>\\|true\\.$#"
+			message: "#^Method Muffin\\\\Webservice\\\\Datasource\\\\Query\\:\\:execute\\(\\) should return bool\\|int\\|Muffin\\\\Webservice\\\\Datasource\\\\ResultSet\\|Muffin\\\\Webservice\\\\Model\\\\Resource but returns Cake\\\\Datasource\\\\ResultSetInterface\\.$#"
 			count: 1
 			path: src/Datasource/Query.php

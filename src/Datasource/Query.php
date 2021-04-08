@@ -83,7 +83,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * The results from the webservice
      *
-     * @var \Cake\Datasource\ResultSetInterface|int|bool
+     * @var bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
      */
     protected $__resultSet;
 
@@ -477,10 +477,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         }
 
         if ($this->__resultSet) {
-            /**
-             * @psalm-suppress UndefinedInterfaceMethod
-             * @psalm-suppress PossiblyInvalidMethodCall
-             */
+            /** @psalm-suppress PossiblyInvalidMethodCall, PossiblyUndefinedMethod */
             return (int)$this->__resultSet->total();
         }
 
@@ -532,11 +529,13 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Execute the query
      *
-     * @return bool|int|\Cake\Datasource\ResultSetInterface
+     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
+     * @psalm-suppress MoreSpecificReturnType
      */
     public function execute()
     {
         if ($this->clause('action') === self::ACTION_READ) {
+            /** @psalm-suppress LessSpecificReturnStatement */
             return $this->_execute();
         }
 
