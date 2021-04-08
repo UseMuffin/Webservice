@@ -1,19 +1,21 @@
 parameters:
-    level: 6
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
-    ignoreErrors:
-        -
-            message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:callFinder\\(\\)\\.$#"
-            count: 1
-            path: src/Datasource/Query.php
+	level: 6
+	checkMissingIterableValueType: false
+	checkGenericClassInNonGenericObjectType: false
+	paths:
+		- src/
+	ignoreErrors:
+		-
+			message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:callFinder\\(\\)\\.$#"
+			count: 1
+			path: src/Datasource/Query.php
 
-        -
-            message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:getName\\(\\)\\.$#"
-            count: 1
-            path: src/Datasource/Query.php
+		-
+			message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:getName\\(\\)\\.$#"
+			count: 1
+			path: src/Datasource/Query.php
 
-        -
-            message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\<1, max\\>\\|int\\<min, \\-1\\>\\|true\\.$#"
-            count: 1
-            path: src/Datasource/Query.php
+		-
+			message: "#^Cannot call method total\\(\\) on Cake\\\\Datasource\\\\ResultSetInterface\\|int\\<min, \\-1\\>\\|int\\<1, max\\>\\|true\\.$#"
+			count: 1
+			path: src/Datasource/Query.php

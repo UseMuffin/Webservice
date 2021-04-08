@@ -4,5 +4,6 @@
 .gitignore export-ignore
 .travis.yml export-ignore
 tests export-ignore
-phpstan.neon
-psalm.xml
+phpstan.neon export-ignore
+psalm.xml export-ignore
+.github export-ignore

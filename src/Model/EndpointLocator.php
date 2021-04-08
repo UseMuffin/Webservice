@@ -20,14 +20,14 @@ class EndpointLocator extends AbstractLocator
      * Set an Endpoint instance to the locator.
      *
      * @param string $alias The alias to set.
-     * @param \Muffin\Webservice\Model\Endpoint $object The table to set.
+     * @param \Muffin\Webservice\Model\Endpoint $repository The repository to set.
      * @return \Muffin\Webservice\Model\Endpoint
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-suppress MoreSpecificReturnType
      */
-    public function set(string $alias, RepositoryInterface $object): Endpoint
+    public function set(string $alias, RepositoryInterface $repository): Endpoint
     {
-        return $this->instances[$alias] = $object;
+        return $this->instances[$alias] = $repository;
     }
 
     /**

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Webservice\Exception;
 
-use Cake\Core\Exception\Exception;
+use Cake\Core\Exception\CakeException;
 
-class MissingDriverException extends Exception
+class MissingDriverException extends CakeException
 {
     /**
      * Template string that has attributes sprintf()'ed into it.
