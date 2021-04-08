@@ -18,7 +18,7 @@ interface WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return \Muffin\Webservice\Datasource\ResultSet|int|bool
+     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
      */
     public function execute(Query $query, array $options = []);
 

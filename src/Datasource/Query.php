@@ -81,11 +81,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     protected $_webservice;
 
     /**
-     * The results from the webservice
+     * The result from the webservice
      *
-     * @var \Cake\Datasource\ResultSetInterface|int|bool
+     * @var bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
      */
-    protected $__resultSet;
+    protected $_result;
 
     /**
      * Construct the query
@@ -472,16 +472,13 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             return 0;
         }
 
-        if (!$this->__resultSet) {
+        if (!$this->_result) {
             $this->_execute();
         }
 
-        if ($this->__resultSet) {
-            /**
-             * @psalm-suppress UndefinedInterfaceMethod
-             * @psalm-suppress PossiblyInvalidMethodCall
-             */
-            return (int)$this->__resultSet->total();
+        if ($this->_result) {
+            /** @psalm-suppress PossiblyInvalidMethodCall, PossiblyUndefinedMethod */
+            return (int)$this->_result->total();
         }
 
         return 0;
@@ -501,7 +498,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function first()
     {
-        if (!$this->__resultSet) {
+        if (!$this->_result) {
             $this->limit(1);
         }
 
@@ -532,15 +529,17 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Execute the query
      *
-     * @return bool|int|\Cake\Datasource\ResultSetInterface
+     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
+     * @psalm-suppress MoreSpecificReturnType
      */
     public function execute()
     {
         if ($this->clause('action') === self::ACTION_READ) {
+            /** @psalm-suppress LessSpecificReturnStatement */
             return $this->_execute();
         }
 
-        return $this->__resultSet = $this->_webservice->execute($this);
+        return $this->_result = $this->_webservice->execute($this);
     }
 
     /**
@@ -551,15 +550,15 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     protected function _execute(): ResultSetInterface
     {
         $this->triggerBeforeFind();
-        if ($this->__resultSet) {
+        if ($this->_result) {
             /** @psalm-var class-string<\Cake\Datasource\ResultSetInterface> $decorator */
             $decorator = $this->_decoratorClass();
 
-            return new $decorator($this->__resultSet);
+            return new $decorator($this->_result);
         }
 
         /** @var \Cake\Datasource\ResultSetInterface */
-        return $this->__resultSet = $this->_webservice->execute($this);
+        return $this->_result = $this->_webservice->execute($this);
     }
 
     /**
