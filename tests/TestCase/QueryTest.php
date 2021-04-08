@@ -167,10 +167,11 @@ class QueryTest extends TestCase
     {
         $mockWebservice = $this
             ->getMockBuilder('\TestApp\Webservice\StaticWebservice')
-            ->setMethods([
+            ->onlyMethods([
                 'execute',
             ])
             ->getMock();
+
         $mockWebservice->expects($this->once())
             ->method('execute')
             ->will($this->returnValue(new ResultSet([
@@ -187,7 +188,10 @@ class QueryTest extends TestCase
                     'title' => 'Webservices',
                 ]),
             ], 3)));
-        $this->query->setWebservice($mockWebservice);
+
+        $this->query
+            ->setWebservice($mockWebservice)
+            ->action(Query::ACTION_READ);
 
         $this->query->execute();
 
