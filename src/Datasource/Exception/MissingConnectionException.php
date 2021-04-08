@@ -12,5 +12,5 @@ class MissingConnectionException extends Exception
      *
      * @var string
      */
-    protected $_messageTemplate = 'No `%` connection configured.';
+    protected $_messageTemplate = 'No `%s` connection configured.';
 }
