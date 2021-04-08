@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Model\Exception;
 
-use Cake\Core\Exception\Exception;
+use Cake\Core\Exception\CakeException;
 
-class MissingResourceClassException extends Exception
+class MissingResourceClassException extends CakeException
 {
     protected $_messageTemplate = 'Resource class %s could not be found.';
 }

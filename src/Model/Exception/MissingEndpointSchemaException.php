@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Model\Exception;
 
-use Cake\Core\Exception\Exception;
+use Cake\Core\Exception\CakeException;
 
-class MissingEndpointSchemaException extends Exception
+class MissingEndpointSchemaException extends CakeException
 {
     /**
      * Template string that has attributes sprintf()'ed into it.
