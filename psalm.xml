@@ -22,6 +22,8 @@
         <DocblockTypeContradiction errorLevel="info" />
         <RedundantConditionGivenDocblockType errorLevel="info" />
 
+        <UnsafeInstantiation errorLevel="info" />
+
         <UnresolvableInclude errorLevel="info" />
     </issueHandlers>
 </psalm>

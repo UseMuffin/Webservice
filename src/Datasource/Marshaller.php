@@ -284,12 +284,9 @@ class Marshaller
             })
             ->toArray();
 
-        /** @psalm-suppress NullArrayOffset */
+        /** @psalm-suppress NullArrayOffset, InvalidArrayOffset */
         $new = $indexed[null] ?? [];
-        /**
-         * @psalm-suppress PossiblyNullArrayOffset
-         * @psalm-suppress NullArrayOffset
-         */
+        /** @psalm-suppress PossiblyNullArrayOffset, InvalidArrayOffset */
         unset($indexed[null]);
         $output = [];
 

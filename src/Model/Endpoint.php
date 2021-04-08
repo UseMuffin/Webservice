@@ -414,7 +414,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     {
         if ($this->_primaryKey === null) {
             $schema = $this->getSchema();
-            $key = (array)$schema->primaryKey();
+            $key = $schema->primaryKey();
             if (count($key) === 1) {
                 $key = $key[0];
             }
@@ -886,53 +886,53 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * returns the same resource after a successful save or false in case
      * of any error.
      *
-     * @param \Cake\Datasource\EntityInterface $resource the resource to be saved
+     * @param \Cake\Datasource\EntityInterface $entity the resource to be saved
      * @param array|\ArrayAccess $options The options to use when saving.
      * @return \Cake\Datasource\EntityInterface|false
      */
-    public function save(EntityInterface $resource, $options = [])
+    public function save(EntityInterface $entity, $options = [])
     {
         $options = new ArrayObject((array)$options + [
                 'checkRules' => true,
                 'checkExisting' => false,
             ]);
 
-        if ($resource->getErrors()) {
+        if ($entity->getErrors()) {
             return false;
         }
 
-        if ($resource->isNew() === false && !$resource->isDirty()) {
-            return $resource;
+        if ($entity->isNew() === false && !$entity->isDirty()) {
+            return $entity;
         }
 
         $primaryColumns = (array)$this->getPrimaryKey();
 
-        if ($options['checkExisting'] && $primaryColumns && $resource->isNew() && $resource->has($primaryColumns)) {
+        if ($options['checkExisting'] && $primaryColumns && $entity->isNew() && $entity->has($primaryColumns)) {
             $alias = $this->getAlias();
             $conditions = [];
-            foreach ($resource->extract($primaryColumns) as $k => $v) {
+            foreach ($entity->extract($primaryColumns) as $k => $v) {
                 $conditions["$alias.$k"] = $v;
             }
-            $resource->setNew(!$this->exists($conditions));
+            $entity->setNew(!$this->exists($conditions));
         }
 
-        $mode = $resource->isNew() ? RulesChecker::CREATE : RulesChecker::UPDATE;
-        if ($options['checkRules'] && !$this->checkRules($resource, $mode, $options)) {
+        $mode = $entity->isNew() ? RulesChecker::CREATE : RulesChecker::UPDATE;
+        if ($options['checkRules'] && !$this->checkRules($entity, $mode, $options)) {
             return false;
         }
 
-        $event = $this->dispatchEvent('Model.beforeSave', compact('resource', 'options'));
+        $event = $this->dispatchEvent('Model.beforeSave', compact('entity', 'options'));
 
         if ($event->isStopped()) {
             return $event->getResult();
         }
 
-        $data = $resource->extract($this->getSchema()->columns(), true);
+        $data = $entity->extract($this->getSchema()->columns(), true);
 
-        if ($resource->isNew()) {
+        if ($entity->isNew()) {
             $query = $this->query()->create();
         } else {
-            $query = $this->query()->update()->where($resource->extract($primaryColumns));
+            $query = $this->query()->update()->where($entity->extract($primaryColumns));
         }
         $query->set($data);
 
@@ -941,14 +941,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return false;
         }
 
-        if ($resource->isNew() && ($result instanceof EntityInterface)) {
+        if ($entity->isNew() && ($result instanceof EntityInterface)) {
             return $result;
         }
 
         /** @psalm-var class-string<\Cake\Datasource\EntityInterface> $className */
-        $className = get_class($resource);
+        $className = get_class($entity);
 
-        return new $className($resource->toArray(), [
+        return new $className($entity->toArray(), [
             'markNew' => false,
             'markClean' => true,
         ]);
@@ -957,14 +957,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Delete a single resource.
      *
-     * @param \Cake\Datasource\EntityInterface $resource The resource to remove.
+     * @param \Cake\Datasource\EntityInterface $entity The resource to remove.
      * @param array|\ArrayAccess $options The options for the delete.
      * @return bool
      */
-    public function delete(EntityInterface $resource, $options = []): bool
+    public function delete(EntityInterface $entity, $options = []): bool
     {
         $primaryKeys = (array)$this->getPrimaryKey();
-        $values = $resource->extract($primaryKeys);
+        $values = $entity->extract($primaryKeys);
 
         return (bool)$this->query()->delete()->where(array_combine($primaryKeys, $values))->execute();
     }

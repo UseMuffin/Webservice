@@ -328,14 +328,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * Pages should start at 1.
      *
-     * @param int $page The page number you want.
+     * @param int $num The page number you want.
      * @param int $limit The number of rows you want in the page. If null
      *  the current limit clause will be used.
      * @return $this
      */
-    public function page(int $page, ?int $limit = null)
+    public function page(int $num, ?int $limit = null)
     {
-        if ($page < 1) {
+        if ($num < 1) {
             throw new InvalidArgumentException('Pages must start at 1.');
         }
 
@@ -343,7 +343,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             $this->limit($limit);
         }
 
-        $this->_parts['page'] = $page;
+        $this->_parts['page'] = $num;
 
         return $this;
     }
@@ -558,6 +558,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             return new $decorator($this->__resultSet);
         }
 
+        /** @var \Cake\Datasource\ResultSetInterface */
         return $this->__resultSet = $this->_webservice->execute($this);
     }
 
