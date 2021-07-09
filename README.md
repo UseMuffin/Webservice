@@ -138,7 +138,7 @@ drivers connections.
 Until official documentation is written, [David Yell][1] wrote a good [post to get you started][2].
 
 [1]:https://github.com/davidyell
-[2]:http://jedistirfry.co.uk/blog/2015-09/connecting-to-a-web-service/
+[2]:https://github.com/davidyell/davidyell.github.com/blob/source/_posts/2015-09-11-connecting-to-a-web-service.markdown
 
 ## Implementations of webservices
 
