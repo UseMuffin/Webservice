@@ -363,6 +363,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param int $limit number of records to be returned
      * @return $this
      * @psalm-suppress MoreSpecificImplementedParamType
+     * @psalm-suppress ParamNameMismatch
      */
     public function limit($limit)
     {

@@ -178,7 +178,7 @@ class Schema implements SchemaInterface
     /**
      * Get the column names in the endpoint.
      *
-     * @return array
+     * @return string[]
      */
     public function columns(): array
     {
