@@ -126,7 +126,7 @@ class SchemaTest extends TestCase
     public function testPrimaryKey()
     {
         $this->schema->addColumn('id', ['type' => 'integer', 'primaryKey' => true]);
-        $this->assertEquals(['id'], $this->schema->primaryKey());
+        $this->assertEquals(['id'], $this->schema->getPrimaryKey());
     }
 
     public function testOptions()

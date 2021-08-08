@@ -414,7 +414,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     {
         if ($this->_primaryKey === null) {
             $schema = $this->getSchema();
-            $key = $schema->primaryKey();
+            $key = $schema->getPrimaryKey();
             if (count($key) === 1) {
                 $key = $key[0];
             }

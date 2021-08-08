@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Datasource;
 
 use Cake\Database\TypeFactory;
+use Cake\Datasource\SchemaInterface;
 
 /**
  * Represents a single endpoint in a database schema.
@@ -12,7 +13,7 @@ use Cake\Database\TypeFactory;
  * or by incrementally building an instance using
  * methods.
  */
-class Schema
+class Schema implements SchemaInterface
 {
     /**
      * The name of the endpoint
@@ -213,6 +214,21 @@ class Schema
     }
 
     /**
+     * Remove a column from the table schema.
+     *
+     * If the column is not defined in the table, no error will be raised.
+     *
+     * @param string $name The name of the column
+     * @return $this
+     */
+    public function removeColumn(string $name)
+    {
+        unset($this->_columns[$name], $this->_typeMap[$name]);
+
+        return $this;
+    }
+
+    /**
      * Set the type of a column
      *
      * @param string $name Column name
@@ -324,7 +340,7 @@ class Schema
      * @return array Column name(s) for the primary key. An
      *   empty list will be returned when the endpoint has no primary key.
      */
-    public function primaryKey(): array
+    public function getPrimaryKey(): array
     {
         $primaryKeys = [];
         foreach ($this->_columns as $name => $data) {
