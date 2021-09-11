@@ -57,7 +57,7 @@ class Articles extends AbstractDriver
     /**
      * Initialize is used to easily extend the constructor.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setClient(new Client([
             'host' => 'example.com'
