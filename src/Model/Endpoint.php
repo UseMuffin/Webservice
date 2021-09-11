@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
@@ -13,13 +14,15 @@ use Cake\Datasource\RulesChecker;
 use Cake\Event\EventDispatcherInterface;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
+use Cake\ORM\Exception\PersistenceFailedException;
 use Cake\Utility\Inflector;
 use Cake\Validation\ValidatorAwareTrait;
-use Muffin\Webservice\Exception\MissingResourceClassException;
-use Muffin\Webservice\Exception\UnexpectedDriverException;
-use Muffin\Webservice\Marshaller;
-use Muffin\Webservice\Query;
-use Muffin\Webservice\Schema;
+use Muffin\Webservice\Datasource\Connection;
+use Muffin\Webservice\Datasource\Marshaller;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\Schema;
+use Muffin\Webservice\Model\Exception\MissingResourceClassException;
+use Muffin\Webservice\Webservice\WebserviceInterface;
 
 /**
  * The table equivalent of a webservice endpoint
@@ -37,26 +40,26 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @var string
      */
-    const DEFAULT_VALIDATOR = 'default';
+    public const DEFAULT_VALIDATOR = 'default';
 
     /**
      * The alias this object is assigned to validators as.
      *
      * @var string
      */
-    const VALIDATOR_PROVIDER_NAME = 'endpoint';
+    public const VALIDATOR_PROVIDER_NAME = 'endpoint';
 
     /**
      * Connection instance this endpoint uses
      *
-     * @var \Muffin\Webservice\Connection
+     * @var \Muffin\Webservice\Datasource\Connection
      */
     protected $_connection;
 
     /**
      * The schema object containing a description of this endpoint fields
      *
-     * @var \Muffin\Webservice\Schema
+     * @var \Muffin\Webservice\Datasource\Schema
      */
     protected $_schema;
 
@@ -64,6 +67,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * The name of the class that represent a single resource for this endpoint
      *
      * @var string
+     * @psalm-var class-string<\Muffin\Webservice\Model\Resource>
      */
     protected $_resourceClass;
 
@@ -84,14 +88,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * The name of the field that represents the primary key in the endpoint
      *
-     * @var string|array
+     * @var string|array|null
      */
     protected $_primaryKey;
 
     /**
      * The name of the field that represents a human readable representation of a row
      *
-     * @var string
+     * @var string|string[]
      */
     protected $_displayField;
 
@@ -181,15 +185,18 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * instance is created through the EndpointRegistry without a connection.
      *
      * @return string
-     *
      * @see \Muffin\Webservice\Model\EndpointRegistry::get()
      */
-    public static function defaultConnectionName()
+    public static function defaultConnectionName(): string
     {
-        $namespaceParts = explode('\\', get_called_class());
-        $plugin = array_slice(array_reverse($namespaceParts), 3, 2);
+        $namespaceParts = explode('\\', static::class);
+        $plugin = current(array_slice(array_reverse($namespaceParts), 3, 2));
 
-        return Inflector::underscore(current($plugin));
+        if ($plugin === 'App') {
+            return 'webservice';
+        }
+
+        return Inflector::underscore($plugin);
     }
 
     /**
@@ -207,24 +214,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array $config Configuration options passed to the constructor
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
-    }
-
-    /**
-     * Returns the endpoint name or sets a new one
-     *
-     * @param string|null $endpoint the new endpoint name
-     * @return string
-     * @deprecated 2.0.0 use setName() and getName() instead.
-     */
-    public function endpoint($endpoint = null)
-    {
-        if ($endpoint !== null) {
-            $this->setName($endpoint);
-        }
-
-        return $this->getName();
     }
 
     /**
@@ -233,10 +224,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $name The name for this endpoint instance
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $inflectMethod = $this->getInflectionMethod();
-        $this->_name = Inflector::$inflectMethod($name);
+        $this->_name = Inflector::{$inflectMethod}($name);
 
         return $this;
     }
@@ -246,33 +237,17 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         if ($this->_name === null) {
-            $endpoint = namespaceSplit(get_class($this));
+            $endpoint = namespaceSplit(static::class);
             $endpoint = substr(end($endpoint), 0, -8);
 
             $inflectMethod = $this->getInflectionMethod();
-            $this->_name = Inflector::$inflectMethod($endpoint);
+            $this->_name = Inflector::{$inflectMethod}($endpoint);
         }
 
         return $this->_name;
-    }
-
-    /**
-     * Returns the endpoint alias or sets a new one
-     *
-     * @param string|null $alias the new endpoint alias
-     * @return string
-     * @deprecated 2.0.0 Use getAlias and setAlias instead
-     */
-    public function alias($alias = null)
-    {
-        if ($alias !== null) {
-            $this->setAlias($alias);
-        }
-
-        return $this->getAlias();
     }
 
     /**
@@ -281,25 +256,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $field The field to alias.
      * @return string The field prefixed with the endpoint alias.
      */
-    public function aliasField($field)
+    public function aliasField(string $field): string
     {
         return $this->getAlias() . '.' . $field;
-    }
-
-    /**
-     * Returns the endpoint registry key used to create this endpoint instance
-     *
-     * @param string|null $registryAlias the key used to access this object
-     * @return string
-     * @deprecated 2.0.0 Use setRegistryAlias()/getRegistryAlias() instead.
-     */
-    public function registryAlias($registryAlias = null)
-    {
-        if ($registryAlias !== null) {
-            $this->setRegistryAlias($registryAlias);
-        }
-
-        return $this->getRegistryAlias();
     }
 
     /**
@@ -308,7 +267,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $registryAlias The key used to access this object.
      * @return $this
      */
-    public function setRegistryAlias($registryAlias)
+    public function setRegistryAlias(string $registryAlias)
     {
         $this->_registryAlias = $registryAlias;
 
@@ -320,7 +279,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return string
      */
-    public function getRegistryAlias()
+    public function getRegistryAlias(): string
     {
         if ($this->_registryAlias === null) {
             $this->_registryAlias = $this->getAlias();
@@ -330,28 +289,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Set the driver to use
-     *
-     * @param \Muffin\Webservice\AbstractDriver|null $connection The driver to use
-     * @return \Muffin\Webservice\AbstractDriver|\Muffin\Webservice\Connection
-     * @deprecated 2.0.0 Use setConnection() and getConnection() instead.
-     */
-    public function connection($connection = null)
-    {
-        if ($connection !== null) {
-            $this->setConnection($connection);
-        }
-
-        return $this->getConnection();
-    }
-
-    /**
      * Sets the connection driver.
      *
-     * @param \Muffin\Webservice\Connection $connection Connection instance
+     * @param \Muffin\Webservice\Datasource\Connection $connection Connection instance
      * @return $this
      */
-    public function setConnection($connection)
+    public function setConnection(Connection $connection)
     {
         $this->_connection = $connection;
 
@@ -361,35 +304,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Returns the connection driver.
      *
-     * @return \Muffin\Webservice\Connection|null
+     * @return \Muffin\Webservice\Datasource\Connection
      */
-    public function getConnection()
+    public function getConnection(): Connection
     {
         return $this->_connection;
-    }
-
-    /**
-     * Returns the schema endpoint object describing this endpoint's properties.
-     *
-     * If an \Muffin\Webservice\Schema is passed, it will be used for this endpoint
-     * instead of the default one.
-     *
-     * If an array is passed, a new \Muffin\Webservice\Schema will be constructed
-     * out of it and used as the schema for this endpoint.
-     *
-     * @param array|\Muffin\Webservice\Schema|null $schema New schema to be used for this endpoint
-     * @return \Muffin\Webservice\Schema
-     * @deprecated 2.0.0 Use setSchema() and getSchema() instead
-     */
-    public function schema($schema = null)
-    {
-        if ($schema === null) {
-            return $this->getSchema();
-        }
-
-        $this->setSchema($schema);
-
-        return $this->getSchema();
     }
 
     /**
@@ -401,7 +320,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * If an array is passed, a new \Muffin\Webservice\Schema will be constructed
      * out of it and used as the schema for this endpoint.
      *
-     * @param \Muffin\Webservice\Schema|array $schema Either an array of fields and config, or a schema object
+     * @param \Muffin\Webservice\Datasource\Schema|array $schema Either an array of fields and config, or a schema object
      * @return $this
      */
     public function setSchema($schema)
@@ -418,9 +337,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Returns the schema endpoint object describing this endpoint's properties.
      *
-     * @return \Muffin\Webservice\Schema
+     * @return \Muffin\Webservice\Datasource\Schema
      */
-    public function getSchema()
+    public function getSchema(): Schema
     {
         if ($this->_schema === null) {
             $this->_schema = $this->_initializeSchema($this->getWebservice()->describe($this->getName()));
@@ -447,11 +366,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * }
      * ```
      *
-     * @param \Muffin\Webservice\Schema $schema The schema definition fetched from webservice.
-     * @return \Muffin\Webservice\Schema the altered schema
+     * @param \Muffin\Webservice\Datasource\Schema $schema The schema definition fetched from webservice.
+     * @return \Muffin\Webservice\Datasource\Schema the altered schema
      * @api
      */
-    protected function _initializeSchema(Schema $schema)
+    protected function _initializeSchema(Schema $schema): Schema
     {
         return $schema;
     }
@@ -465,27 +384,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $field The field to check for.
      * @return bool True if the field exists, false if it does not.
      */
-    public function hasField($field)
+    public function hasField(string $field): bool
     {
         $schema = $this->getSchema();
 
-        return $schema->column($field) !== null;
-    }
-
-    /**
-     * Returns the primary key field name or sets a new one
-     *
-     * @param string|array|null $key sets a new name to be used as primary key
-     * @return string|array
-     * @deprecated 2.0.0 Use getPrimaryKey() and setPrimaryKey() instead
-     */
-    public function primaryKey($key = null)
-    {
-        if ($key !== null) {
-            $this->setPrimaryKey($key);
-        }
-
-        return $this->getPrimaryKey();
+        return $schema->getColumn($field) !== null;
     }
 
     /**
@@ -505,16 +408,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Get the endpoints primary key, if one is not set, fetch it from the schema
      *
      * @return array|string
-     * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
+     * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
      */
     public function getPrimaryKey()
     {
         if ($this->_primaryKey === null) {
             $schema = $this->getSchema();
-            if (!$schema) {
-                throw new UnexpectedDriverException(__('No schema has been defined for this endpoint'));
-            }
-            $key = (array)$schema->primaryKey();
+            $key = $schema->getPrimaryKey();
             if (count($key) === 1) {
                 $key = $key[0];
             }
@@ -525,25 +425,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Returns the display field or sets a new one
-     *
-     * @param string|null $key sets a new name to be used as display field
-     * @return string
-     * @deprecated 2.0.0 Use setDisplayField and getDisplayField instead.
-     */
-    public function displayField($key = null)
-    {
-        if ($key !== null) {
-            $this->setDisplayField($key);
-        }
-
-        return $this->getDisplayField();
-    }
-
-    /**
      * Sets the endpoint display field
      *
-     * @param string $field The new field to use as the display field
+     * @param string|string[] $field The new field to use as the display field
      * @return $this
      */
     public function setDisplayField($field)
@@ -556,8 +440,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Get the endpoints current display field
      *
-     * @return string
-     * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
+     * @return string|string[]
+     * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
      */
     public function getDisplayField()
     {
@@ -566,13 +450,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $this->_displayField = array_shift($primary);
 
             $schema = $this->getSchema();
-            if (!$schema) {
-                throw new UnexpectedDriverException(__('No schema has been defined for this endpoint'));
-            }
-            if ($schema->column('title')) {
+            if ($schema->getColumn('title')) {
                 $this->_displayField = 'title';
             }
-            if ($schema->column('name')) {
+            if ($schema->getColumn('name')) {
                 $this->_displayField = 'name';
             }
         }
@@ -581,36 +462,21 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Returns the class used to hydrate resources for this endpoint or sets a new one
-     *
-     * @param string|null $name the name of the class to use
-     * @throws \Muffin\Webservice\Exception\MissingResourceClassException when the entity class cannot be found
-     * @return string
-     * @deprecated 2.0.0 Use setResourceClassName() and getResourceClassName() instead.
-     */
-    public function resourceClass($name = null)
-    {
-        if ($name !== null) {
-            $this->setResourceClass($name);
-        }
-
-        return $this->getResourceClass();
-    }
-
-    /**
      * Set the resource class name used to hydrate resources for this endpoint
      *
      * @param string $name Name of the class to use
      * @return $this
-     * @throws \Muffin\Webservice\Exception\MissingResourceClassException If the resource class specified does not exist
+     * @throws \Muffin\Webservice\Model\Exception\MissingResourceClassException If the resource class specified does not exist
      */
-    public function setResourceClass($name)
+    public function setResourceClass(string $name)
     {
-        $this->_resourceClass = App::className($name, 'Model/Resource');
-
-        if (!$this->_resourceClass) {
+        /** @psalm-var class-string<\Muffin\Webservice\Model\Resource>|null */
+        $className = App::className($name, 'Model/Resource');
+        if (!$className) {
             throw new MissingResourceClassException([$name]);
         }
+
+        $this->_resourceClass = $className;
 
         return $this;
     }
@@ -619,19 +485,21 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Get the resource class name used to hydrate resources for this endpoint
      *
      * @return string
+     * @psalm-return class-string<\Muffin\Webservice\Model\Resource>
      */
-    public function getResourceClass()
+    public function getResourceClass(): string
     {
         if (!$this->_resourceClass) {
-            $default = \Muffin\Webservice\Model\Resource::class;
-            $self = get_called_class();
+            $default = Resource::class;
+            $self = static::class;
             $parts = explode('\\', $self);
 
-            if ($self === __CLASS__ || count($parts) < 3) {
+            if ($self === self::class || count($parts) < 3) {
                 return $this->_resourceClass = $default;
             }
 
             $alias = Inflector::singularize(substr(array_pop($parts), 0, -8));
+            /** @psalm-var class-string<\Muffin\Webservice\Model\Resource> */
             $name = implode('\\', array_slice($parts, 0, -1)) . '\Resource\\' . $alias;
             if (!class_exists($name)) {
                 return $this->_resourceClass = $default;
@@ -644,28 +512,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     }
 
     /**
-     * Returns the inflect method or sets a new one
-     *
-     * @param null|string $method The inflection method to use
-     * @return null|string
-     * @deprecated 2.0.0 Use setInflectionMethod() and getInflectionMethod() instead.
-     */
-    public function inflectionMethod($method = null)
-    {
-        if ($method !== null) {
-            $this->setInflectionMethod($method);
-        }
-
-        return $this->getInflectionMethod();
-    }
-
-    /**
      * Set a new inflection method
      *
      * @param string $method The name of the inflection method
      * @return $this
      */
-    public function setInflectionMethod($method)
+    public function setInflectionMethod(string $method)
     {
         $this->_inflectionMethod = $method;
 
@@ -675,27 +527,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Get the inflection method
      *
-     * @return string|null
+     * @return string
      */
-    public function getInflectionMethod()
+    public function getInflectionMethod(): string
     {
         return $this->_inflectionMethod;
-    }
-
-    /**
-     * Returns an instance of the Webservice used
-     *
-     * @param \Muffin\Webservice\Webservice\WebserviceInterface|string|null $webservice The webservice to use
-     * @return $this|\Muffin\Webservice\Webservice\WebserviceInterface
-     * @deprecated 2.0.0 Use setWebservice() and getWebservice() instead.
-     */
-    public function webservice($webservice = null)
-    {
-        if ($webservice !== null) {
-            return $this->setWebservice($this->getName(), $webservice);
-        }
-
-        return $this->getWebservice();
     }
 
     /**
@@ -704,15 +540,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $alias Alias for the webservice
      * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice instance
      * @return $this
-     * @throws \Muffin\Webservice\Exception\UnexpectedDriverException When no driver exists for the endpoint
+     * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no driver exists for the endpoint
      */
-    public function setWebservice($alias, $webservice)
+    public function setWebservice(string $alias, WebserviceInterface $webservice)
     {
         $connection = $this->getConnection();
-        if (!$connection) {
-            throw new UnexpectedDriverException(__('No driver has been defined for this endpoint'));
-        }
-
         $connection->setWebservice($alias, $webservice);
         $this->_webservice = $connection->getWebservice($alias);
 
@@ -724,7 +556,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return \Muffin\Webservice\Webservice\WebserviceInterface
      */
-    public function getWebservice()
+    public function getWebservice(): WebserviceInterface
     {
         if ($this->_webservice === null) {
             $this->_webservice = $this->getConnection()->getWebservice($this->getName());
@@ -743,10 +575,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * listeners. Any listener can set a valid result set using $query
      *
      * @param string $type the type of query to perform
-     * @param array|\ArrayAccess $options An array that will be passed to Query::applyOptions()
-     * @return \Muffin\Webservice\Query
+     * @param array $options An array that will be passed to Query::applyOptions()
+     * @return \Muffin\Webservice\Datasource\Query
      */
-    public function find($type = 'all', $options = [])
+    public function find(string $type = 'all', array $options = []): Query
     {
         $query = $this->query()->read();
 
@@ -759,11 +591,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * By default findAll() applies no conditions, you
      * can override this method in subclasses to modify how `find('all')` works.
      *
-     * @param \Muffin\Webservice\Query $query The query to find with
+     * @param \Muffin\Webservice\Datasource\Query $query The query to find with
      * @param array $options The options to use for the find
-     * @return \Muffin\Webservice\Query The query builder
+     * @return \Muffin\Webservice\Datasource\Query The query builder
      */
-    public function findAll(Query $query, array $options)
+    public function findAll(Query $query, array $options): Query
     {
         return $query;
     }
@@ -821,11 +653,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * ]
      * ```
      *
-     * @param \Muffin\Webservice\Query $query The query to find with
+     * @param \Muffin\Webservice\Datasource\Query $query The query to find with
      * @param array $options The options for the find
-     * @return \Muffin\Webservice\Query The query builder
+     * @return \Muffin\Webservice\Datasource\Query The query builder
      */
-    public function findList(Query $query, array $options)
+    public function findList(Query $query, array $options): Query
     {
         $options += [
             'keyField' => $this->getPrimaryKey(),
@@ -860,7 +692,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * the associated value
      * @return array
      */
-    protected function _setFieldMatchers($options, $keys)
+    protected function _setFieldMatchers(array $options, array $keys): array
     {
         foreach ($keys as $field) {
             if (!is_array($options[$field])) {
@@ -900,12 +732,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * ```
      *
      * @param mixed $primaryKey primary key value to find
-     * @param array|\ArrayAccess $options options accepted by `Endpoint::find()`
+     * @param array $options Options.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException if the record with such id could not be found
      * @return \Cake\Datasource\EntityInterface
      * @see \Cake\Datasource\RepositoryInterface::find()
      */
-    public function get($primaryKey, $options = [])
+    public function get($primaryKey, array $options = []): EntityInterface
     {
         $key = (array)$this->getPrimaryKey();
         $alias = $this->getAlias();
@@ -922,14 +754,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             throw new InvalidPrimaryKeyException(sprintf(
                 'Record not found in endpoint "%s" with primary key [%s]',
                 $this->getName(),
-                implode($primaryKey, ', ')
+                implode(', ', $primaryKey)
             ));
         }
         $conditions = array_combine($key, $primaryKey);
 
-        $cacheConfig = isset($options['cache']) ? $options['cache'] : false;
-        $cacheKey = isset($options['key']) ? $options['key'] : false;
-        $finder = isset($options['finder']) ? $options['finder'] : 'all';
+        $cacheConfig = $options['cache'] ?? false;
+        $cacheKey = $options['key'] ?? false;
+        $finder = $options['finder'] ?? 'all';
         unset($options['key'], $options['cache'], $options['finder']);
 
         $query = $this->find($finder, $options)->where($conditions);
@@ -937,7 +769,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         if ($cacheConfig) {
             if (!$cacheKey) {
                 $cacheKey = sprintf(
-                    "get:%s.%s%s",
+                    'get:%s.%s%s',
                     $this->getConnection()->configName(),
                     $this->getName(),
                     json_encode($primaryKey)
@@ -961,34 +793,41 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * called allowing you to define additional default values. The new
      * entity will be saved and returned.
      *
-     * @param array $search The criteria to find existing records by.
+     * @param mixed $search The criteria to find existing records by.
      * @param callable|null $callback A callback that will be invoked for newly
      *   created entities. This callback will be called *before* the entity
      *   is persisted.
-     * @return \Cake\Datasource\EntityInterface An entity.
+     * @return \Cake\Datasource\EntityInterface|array An entity.
+     * @throws \Cake\ORM\Exception\PersistenceFailedException When the entity couldn't be saved
      */
-    public function findOrCreate($search, callable $callback = null)
+    public function findOrCreate($search, ?callable $callback = null)
     {
         $query = $this->find()->where($search);
         $row = $query->first();
         if ($row) {
             return $row;
         }
+
         $entity = $this->newEntity();
         $entity->set($search, ['guard' => false]);
         if ($callback) {
             $callback($entity);
         }
 
-        return $this->save($entity) ?: $entity;
+        $result = $this->save($entity);
+        if ($result === false) {
+            throw new PersistenceFailedException($entity, ['findOrCreate']);
+        }
+
+        return $entity;
     }
 
     /**
      * Creates a new Query instance for this repository
      *
-     * @return \Muffin\Webservice\Query
+     * @return \Muffin\Webservice\Datasource\Query
      */
-    public function query()
+    public function query(): Query
     {
         return new Query($this->getWebservice(), $this);
     }
@@ -1003,9 +842,11 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array $fields A hash of field => new value.
      * @param mixed $conditions Conditions to be used, accepts anything Query::where() can take.
      * @return int Count Returns the affected rows.
+     * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function updateAll($fields, $conditions)
+    public function updateAll($fields, $conditions): int
     {
+        /** @psalm-suppress PossiblyInvalidMethodCall, PossiblyUndefinedMethod */
         return $this->query()->update()->where($conditions)->set($fields)->execute()->count();
     }
 
@@ -1018,11 +859,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * need those first load a collection of records and delete them.
      *
      * @param mixed $conditions Conditions to be used, accepts anything Query::where() can take.
-     * @return \Traversable|int Count Returns the affected rows.
-     *
+     * @return int Count of affected rows.
      * @see \Muffin\Webservice\Endpoint::delete()
+     * @psalm-suppress InvalidReturnStatement
+     * @psalm-suppress InvalidReturnType
      */
-    public function deleteAll($conditions)
+    public function deleteAll($conditions): int
     {
         return $this->query()->delete()->where($conditions)->execute();
     }
@@ -1031,12 +873,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Returns true if there is any record in this repository matching the specified
      * conditions.
      *
-     * @param array|\ArrayAccess $conditions list of conditions to pass to the query
+     * @param mixed $conditions list of conditions to pass to the query
      * @return bool
      */
-    public function exists($conditions)
+    public function exists($conditions): bool
     {
-        return ($this->find()->where($conditions)->count() > 0);
+        return $this->find()->where($conditions)->count() > 0;
     }
 
     /**
@@ -1044,53 +886,53 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * returns the same resource after a successful save or false in case
      * of any error.
      *
-     * @param \Cake\Datasource\EntityInterface $resource the resource to be saved
+     * @param \Cake\Datasource\EntityInterface $entity the resource to be saved
      * @param array|\ArrayAccess $options The options to use when saving.
-     * @return \Cake\Datasource\EntityInterface|bool
+     * @return \Cake\Datasource\EntityInterface|false
      */
-    public function save(EntityInterface $resource, $options = [])
+    public function save(EntityInterface $entity, $options = [])
     {
         $options = new ArrayObject((array)$options + [
                 'checkRules' => true,
                 'checkExisting' => false,
             ]);
 
-        if ($resource->getErrors()) {
+        if ($entity->getErrors()) {
             return false;
         }
 
-        if ($resource->isNew() === false && !$resource->isDirty()) {
-            return $resource;
+        if ($entity->isNew() === false && !$entity->isDirty()) {
+            return $entity;
         }
 
         $primaryColumns = (array)$this->getPrimaryKey();
 
-        if ($options['checkExisting'] && $primaryColumns && $resource->isNew() && $resource->has($primaryColumns)) {
+        if ($options['checkExisting'] && $primaryColumns && $entity->isNew() && $entity->has($primaryColumns)) {
             $alias = $this->getAlias();
             $conditions = [];
-            foreach ($resource->extract($primaryColumns) as $k => $v) {
+            foreach ($entity->extract($primaryColumns) as $k => $v) {
                 $conditions["$alias.$k"] = $v;
             }
-            $resource->isNew(!$this->exists($conditions));
+            $entity->setNew(!$this->exists($conditions));
         }
 
-        $mode = $resource->isNew() ? RulesChecker::CREATE : RulesChecker::UPDATE;
-        if ($options['checkRules'] && !$this->checkRules($resource, $mode, $options)) {
+        $mode = $entity->isNew() ? RulesChecker::CREATE : RulesChecker::UPDATE;
+        if ($options['checkRules'] && !$this->checkRules($entity, $mode, $options)) {
             return false;
         }
 
-        $event = $this->dispatchEvent('Model.beforeSave', compact('resource', 'options'));
+        $event = $this->dispatchEvent('Model.beforeSave', compact('entity', 'options'));
 
         if ($event->isStopped()) {
-            return $event->result;
+            return $event->getResult();
         }
 
-        $data = $resource->extract($this->getSchema()->columns(), true);
+        $data = $entity->extract($this->getSchema()->columns(), true);
 
-        if ($resource->isNew()) {
+        if ($entity->isNew()) {
             $query = $this->query()->create();
         } else {
-            $query = $this->query()->update()->where($resource->extract($primaryColumns));
+            $query = $this->query()->update()->where($entity->extract($primaryColumns));
         }
         $query->set($data);
 
@@ -1099,13 +941,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             return false;
         }
 
-        if (($resource->isNew()) && ($result instanceof EntityInterface)) {
+        if ($entity->isNew() && ($result instanceof EntityInterface)) {
             return $result;
         }
 
-        $className = get_class($resource);
+        /** @psalm-var class-string<\Cake\Datasource\EntityInterface> $className */
+        $className = get_class($entity);
 
-        return new $className($resource->toArray(), [
+        return new $className($entity->toArray(), [
             'markNew' => false,
             'markClean' => true,
         ]);
@@ -1114,15 +957,16 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Delete a single resource.
      *
-     * @param \Cake\Datasource\EntityInterface $resource The resource to remove.
+     * @param \Cake\Datasource\EntityInterface $entity The resource to remove.
      * @param array|\ArrayAccess $options The options for the delete.
      * @return bool
      */
-    public function delete(EntityInterface $resource, $options = [])
+    public function delete(EntityInterface $entity, $options = []): bool
     {
-        return (bool)$this->query()->delete()->where([
-            $this->getPrimaryKey() => $resource->get($this->getPrimaryKey()),
-        ])->execute();
+        $primaryKeys = (array)$this->getPrimaryKey();
+        $values = $entity->extract($primaryKeys);
+
+        return (bool)$this->query()->delete()->where(array_combine($primaryKeys, $values))->execute();
     }
 
     /**
@@ -1131,7 +975,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $type name of finder to check
      * @return bool
      */
-    public function hasFinder($type)
+    public function hasFinder(string $type): bool
     {
         $finder = 'find' . $type;
 
@@ -1143,12 +987,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * if no query is passed a new one will be created and returned
      *
      * @param string $type name of the finder to be called
-     * @param \Muffin\Webservice\Query $query The query object to apply the finder options to
+     * @param \Muffin\Webservice\Datasource\Query $query The query object to apply the finder options to
      * @param array $options List of options to pass to the finder
-     * @return \Muffin\Webservice\Query
+     * @return \Muffin\Webservice\Datasource\Query
      * @throws \BadMethodCallException If the requested finder cannot be found
      */
-    public function callFinder($type, Query $query, array $options = [])
+    public function callFinder(string $type, Query $query, array $options = []): Query
     {
         $query->applyOptions($options);
         $options = $query->getOptions();
@@ -1170,7 +1014,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @return mixed
      * @throws \BadMethodCallException when there are missing arguments, or when and & or are combined.
      */
-    protected function _dynamicFinder($method, $args)
+    protected function _dynamicFinder(string $method, array $args)
     {
         $method = Inflector::underscore($method);
         preg_match('/^find_([\w]+)_by_/', $method, $matches);
@@ -1215,7 +1059,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             $conditions = [
                 'OR' => $makeConditions($fields, $args),
             ];
-        } elseif ($hasAnd !== false) {
+        } else {
             $fields = explode('_and_', $fields);
             $conditions = $makeConditions($fields, $args);
         }
@@ -1250,11 +1094,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * Override this method if you want a endpoint object to use custom
      * marshalling logic.
      *
-     * @return \Muffin\Webservice\Marshaller
-     *
-     * @see \Muffin\Webservice\Marshaller
+     * @return \Muffin\Webservice\Datasource\Marshaller
      */
-    public function marshaller()
+    public function marshaller(): Marshaller
     {
         return new Marshaller($this);
     }
@@ -1268,18 +1110,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * on the primary key data existing in the database when the entity
      * is saved. Until the entity is saved, it will be a detached record.
      *
-     * @param array|null $data The data to build an entity with.
+     * @param array $data The data to build an entity with.
      * @param array $options A list of options for the object hydration.
-     * @return \Muffin\Webservice\Model\Resource
+     * @return \Cake\Datasource\EntityInterface
      */
-    public function newEntity($data = null, array $options = [])
+    public function newEntity(array $data = [], array $options = []): EntityInterface
     {
-        if ($data === null) {
-            $class = $this->getResourceClass();
-            $entity = new $class([], ['source' => $this->getRegistryAlias()]);
-
-            return $entity;
-        }
         $marshaller = $this->marshaller();
 
         return $marshaller->one($data, $options);
@@ -1287,8 +1123,23 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
 
     /**
      * {@inheritDoc}
+     *
+     * @return \Cake\Datasource\EntityInterface
+     * @psalm-suppress InvalidReturnStatement
+     * @psalm-suppress InvalidReturnType
      */
-    public function newEntities(array $data, array $options = [])
+    public function newEmptyEntity(): EntityInterface
+    {
+        $class = $this->getResourceClass();
+        $entity = new $class([], ['source' => $this->getRegistryAlias()]);
+
+        return $entity;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function newEntities(array $data, array $options = []): array
     {
         $marshaller = $this->marshaller();
 
@@ -1310,10 +1161,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * data merged in
      * @param array $data key value list of fields to be merged into the resource
      * @param array $options A list of options for the object hydration.
-     *
      * @return \Cake\Datasource\EntityInterface
      */
-    public function patchEntity(EntityInterface $entity, array $data, array $options = [])
+    public function patchEntity(EntityInterface $entity, array $data, array $options = []): EntityInterface
     {
         $marshaller = $this->marshaller();
 
@@ -1336,10 +1186,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * data merged in
      * @param array $data list of arrays to be merged into the entities
      * @param array $options A list of options for the objects hydration.
-     *
      * @return array
+     * @psalm-return array<array-key, \Cake\Datasource\EntityInterface>
      */
-    public function patchEntities($entities, array $data, array $options = [])
+    public function patchEntities(iterable $entities, array $data, array $options = []): array
     {
         $marshaller = $this->marshaller();
 
@@ -1370,7 +1220,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return array
      */
-    public function implementedEvents()
+    public function implementedEvents(): array
     {
         $eventMap = [
             'Model.beforeMarshal' => 'beforeMarshal',
@@ -1405,7 +1255,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param \Cake\Datasource\RulesChecker $rules The rules object to be modified.
      * @return \Cake\Datasource\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+    public function buildRules(RulesChecker $rules): RulesChecker
     {
         return $rules;
     }
@@ -1417,15 +1267,13 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function __debugInfo()
     {
-        $conn = $this->getConnection();
-
         return [
             'registryAlias' => $this->getRegistryAlias(),
             'alias' => $this->getAlias(),
             'endpoint' => $this->getName(),
             'resourceClass' => $this->getResourceClass(),
             'defaultConnection' => $this->defaultConnectionName(),
-            'connectionName' => $conn ? $conn->configName() : null,
+            'connectionName' => $this->getConnection()->configName(),
             'inflector' => $this->getInflectionMethod(),
         ];
     }
@@ -1448,8 +1296,12 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias(): string
     {
+        if ($this->_alias === null) {
+            $this->_alias = $this->getName();
+        }
+
         return $this->_alias;
     }
 }

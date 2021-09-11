@@ -1,17 +1,18 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Entity;
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Connection;
-use Muffin\Webservice\Marshaller;
+use Muffin\Webservice\Datasource\Connection;
+use Muffin\Webservice\Datasource\Marshaller;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
+use TestApp\Model\Endpoint\TestEndpoint;
 
 class MarshallerTest extends TestCase
 {
-
     /**
      * @var Marshaller
      */
@@ -22,7 +23,7 @@ class MarshallerTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $connection = new Connection([
             'name' => 'test',
@@ -32,6 +33,7 @@ class MarshallerTest extends TestCase
             'connection' => $connection,
             'primaryKey' => 'id',
             'displayField' => 'title',
+            'alias' => 'TestEndpoint',
         ]);
 
         $this->marshaller = new Marshaller($endpoint);
@@ -221,7 +223,7 @@ class MarshallerTest extends TestCase
             'title' => 'Testing',
             'body' => 'Longer body',
         ]);
-        $entity->isNew(false);
+        $entity->setNew(false);
 
         $data = [
             'title' => 'Changed the title',

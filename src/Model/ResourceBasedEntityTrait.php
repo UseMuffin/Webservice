@@ -1,17 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
 trait ResourceBasedEntityTrait
 {
-
     /**
      * Apply the properties from a resource
      *
      * @param \Muffin\Webservice\Model\Resource $resource The resource to apply the properties from
      * @return void
      */
-    public function applyResource(Resource $resource)
+    public function applyResource(Resource $resource): void
     {
         $this->set($resource->toArray());
     }

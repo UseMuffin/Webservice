@@ -1,18 +1,23 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Controller\Controller;
-use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\FactoryLocator;
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Connection;
+use Muffin\Webservice\Datasource\Connection;
 use Muffin\Webservice\Model\EndpointLocator;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\TestEndpoint;
+use TestApp\Model\Endpoint\TestEndpoint;
 
 class BootstrapTest extends TestCase
 {
+    public function setUp(): void
+    {
+        $this->loadPlugins(['Muffin/Webservice']);
+    }
+
     /**
      * Test that the plugins bootstrap is correctly registering the Endpoint
      * repository type with the factory locator
@@ -38,7 +43,6 @@ class BootstrapTest extends TestCase
     {
         $result = FactoryLocator::get('Endpoint');
 
-        $this->assertInstanceOf(EndpointLocator::class, $result[0]);
-        $this->assertSame('get', $result[1]);
+        $this->assertInstanceOf(EndpointLocator::class, $result);
     }
 }

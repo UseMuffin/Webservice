@@ -1,14 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
 
 class ResourceTest extends TestCase
 {
-
     public function testBasicConstruct()
     {
         $resource = new Resource([]);
@@ -18,12 +17,10 @@ class ResourceTest extends TestCase
 
     public function testSoureConstruct()
     {
-        $endpoint = new Endpoint();
-
         $resource = new Resource([], [
-            'source' => $endpoint,
+            'source' => 'TestEndPoint',
         ]);
-        $this->assertEquals($endpoint, $resource->getSource());
+        $this->assertEquals('TestEndPoint', $resource->getSource());
     }
 
     public function testConstructUseSettersOff()

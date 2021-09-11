@@ -1,7 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice\Model;
 
+use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use Cake\TestSuite\TestCase;
+use RuntimeException;
+use TestApp\Model\Endpoint\TestEndpoint;
 
 class EndpointLocatorTest extends TestCase
 {
@@ -10,58 +15,18 @@ class EndpointLocatorTest extends TestCase
      */
     private $Locator;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->Locator = new EndpointLocator();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         unset($this->Locator);
-    }
-
-    public function testConfig()
-    {
-        $this->assertSame([], $this->Locator->getConfig());
-
-        $configTest = ['foo' => 'bar'];
-        $this->Locator->setConfig('test', $configTest);
-        $this->assertSame($configTest, $this->Locator->getConfig('test'));
-
-        $configExample = ['example' => true];
-        $this->Locator->setConfig('example', $configExample);
-        $this->assertSame($configExample, $this->Locator->getConfig('example'));
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You cannot configure "Test", it has already been constructed.
-     */
-    public function testSetConfigForExistingObject()
-    {
-        $this->Locator->get('Test', [
-            'registryAlias' => 'Test',
-            'connection' => 'test',
-        ]);
-
-        $this->Locator->setConfig('Test', ['foo' => 'bar']);
-    }
-
-    public function testSetConfigUsingAliasArray()
-    {
-        $multiAliasConfig = [
-            'Test' => ['foo' => 'bar'],
-            'Example' => ['foo' => 'bar'],
-        ];
-
-        $result = $this->Locator->setConfig($multiAliasConfig);
-        $this->assertInstanceOf(EndpointLocator::class, $result);
-
-        $this->assertSame($multiAliasConfig, $this->Locator->getConfig());
     }
 
     public function testRemoveUsingExists()
@@ -69,16 +34,16 @@ class EndpointLocatorTest extends TestCase
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Muffin\Webservice\Model\Endpoint $first */
         $first = $this->getMockBuilder(Endpoint::class)
             ->setConstructorArgs([['alias' => 'First']])
-            ->setMethods(['getAlias'])
+            ->onlyMethods(['getAlias'])
             ->getMock();
         $first->expects($this->any())
             ->method('getAlias')
             ->willReturn('First');
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Muffin\Webservice\Model\Endpoint $first */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Muffin\Webservice\Model\Endpoint $second */
         $second = $this->getMockBuilder(Endpoint::class)
             ->setConstructorArgs([['alias' => 'Second']])
-            ->setMethods(['getAlias'])
+            ->onlyMethods(['getAlias'])
             ->getMock();
         $second->expects($this->any())
             ->method('getAlias')
@@ -101,7 +66,7 @@ class EndpointLocatorTest extends TestCase
         /** @var \Muffin\Webservice\Model\Endpoint $first */
         $first = $this->getMockBuilder(Endpoint::class)
             ->setConstructorArgs([['alias' => 'First']])
-            ->setMethods(['getAlias'])
+            ->onlyMethods(['getAlias'])
             ->getMock();
         $first->expects($this->any())
             ->method('getAlias')
@@ -113,12 +78,23 @@ class EndpointLocatorTest extends TestCase
         $this->assertSame($first, $result);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You cannot configure "First", it already exists in the locator.
-     */
+    public function testGetException()
+    {
+        $this->expectException(MissingDatasourceConfigException::class);
+        $this->expectExceptionMessage(
+            'The datasource configuration "non-existent" was not found.'
+            . ' You can override Endpoint::defaultConnectionName() to return the connection name you want.'
+        );
+
+        $locator = new EndpointLocator();
+        $locator->get('Foo', ['className' => TestEndpoint::class, 'connection' => 'non-existent']);
+    }
+
     public function testGetWithExistingObject()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot configure "First", it already exists in the registry.');
+
         $result = $this->Locator->get('First', [
             'className' => Endpoint::class,
             'registryAlias' => 'First',
@@ -155,7 +131,7 @@ class EndpointLocatorTest extends TestCase
         /** @var \Muffin\Webservice\Model\Endpoint $first */
         $first = $this->getMockBuilder(Endpoint::class)
             ->setConstructorArgs([['alias' => 'First']])
-            ->setMethods(['getAlias'])
+            ->onlyMethods(['getAlias'])
             ->getMock();
         $first->expects($this->any())
             ->method('getAlias')

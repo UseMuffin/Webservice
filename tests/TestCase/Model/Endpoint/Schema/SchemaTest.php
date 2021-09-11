@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace Muffin\Webservice\Test\TestCase\Model\Endpoint\Schema;
 
 use Cake\TestSuite\TestCase;
-use Muffin\Webservice\Test\test_app\Model\Endpoint\Schema\TestSchema;
+use TestApp\Model\Endpoint\Schema\TestSchema;
 
 class SchemaTest extends TestCase
 {
@@ -11,7 +13,7 @@ class SchemaTest extends TestCase
      */
     private $schema;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->schema = new TestSchema('test');
     }
@@ -38,7 +40,7 @@ class SchemaTest extends TestCase
         $this->assertEquals(['id', 'title', 'body'], $this->schema->columns());
     }
 
-    public function testColumn()
+    public function testGetColumn()
     {
         $this->assertEquals(
             [
@@ -50,7 +52,7 @@ class SchemaTest extends TestCase
                 'comment' => null,
                 'primaryKey' => null,
             ],
-            $this->schema->column('id')
+            $this->schema->getColumn('id')
         );
     }
 
@@ -124,7 +126,7 @@ class SchemaTest extends TestCase
     public function testPrimaryKey()
     {
         $this->schema->addColumn('id', ['type' => 'integer', 'primaryKey' => true]);
-        $this->assertEquals(['id'], $this->schema->primaryKey());
+        $this->assertEquals(['id'], $this->schema->getPrimaryKey());
     }
 
     public function testOptions()

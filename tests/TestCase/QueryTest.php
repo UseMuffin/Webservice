@@ -1,18 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
-use Cake\Database\Expression\Comparison;
+use Cake\Database\Expression\ComparisonExpression;
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Resource;
-use Muffin\Webservice\Query;
-use Muffin\Webservice\ResultSet;
-use Muffin\Webservice\Test\test_app\Webservice\StaticWebservice;
+use TestApp\Webservice\StaticWebservice;
+use UnexpectedValueException;
 
 class QueryTest extends TestCase
 {
-
     /**
      * @var Query
      */
@@ -21,7 +22,7 @@ class QueryTest extends TestCase
     /**
      * @inheritDoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -30,25 +31,25 @@ class QueryTest extends TestCase
 
     public function testAction()
     {
-        $this->assertNull($this->query->action());
+        $this->assertNull($this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->action(Query::ACTION_READ));
-        $this->assertEquals(Query::ACTION_READ, $this->query->action());
+        $this->assertEquals(Query::ACTION_READ, $this->query->clause('action'));
     }
 
     public function testActionMethods()
     {
         $this->assertEquals($this->query, $this->query->create());
-        $this->assertEquals(Query::ACTION_CREATE, $this->query->action());
+        $this->assertEquals(Query::ACTION_CREATE, $this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->read());
-        $this->assertEquals(Query::ACTION_READ, $this->query->action());
+        $this->assertEquals(Query::ACTION_READ, $this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->update());
-        $this->assertEquals(Query::ACTION_UPDATE, $this->query->action());
+        $this->assertEquals(Query::ACTION_UPDATE, $this->query->clause('action'));
 
         $this->assertEquals($this->query, $this->query->delete());
-        $this->assertEquals(Query::ACTION_DELETE, $this->query->action());
+        $this->assertEquals(Query::ACTION_DELETE, $this->query->clause('action'));
     }
 
     public function testAliasField()
@@ -86,8 +87,8 @@ class QueryTest extends TestCase
             ],
             'customOption' => 'value',
         ]));
-        $this->assertEquals(1, $this->query->page());
-        $this->assertEquals(2, $this->query->limit());
+        $this->assertEquals(1, $this->query->clause('page'));
+        $this->assertEquals(2, $this->query->clause('limit'));
         $this->assertEquals([
             'field' => 'ASC',
         ], $this->query->clause('order'));
@@ -98,21 +99,20 @@ class QueryTest extends TestCase
 
     public function testFind()
     {
-        $this->query->endpoint()->setPrimaryKey('id');
-        $this->query->endpoint()->setDisplayField('title');
+        $this->query->getEndpoint()->setPrimaryKey('id');
+        $this->query->getEndpoint()->setDisplayField('title');
 
         $this->assertEquals($this->query, $this->query->find('list'));
 
         $debugInfo = $this->query->__debugInfo();
 
-        $this->assertInternalType('callable', $debugInfo['formatters'][0]);
+        $this->assertIsCallable($debugInfo['formatters'][0]);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
     public function testSetInvalidAction()
     {
+        $this->expectException(UnexpectedValueException::class);
+
         $this->query->read();
 
         $this->query->set([]);
@@ -166,11 +166,12 @@ class QueryTest extends TestCase
     public function testExecuteTwice()
     {
         $mockWebservice = $this
-            ->getMockBuilder('\Muffin\Webservice\Test\test_app\Webservice\StaticWebservice')
-            ->setMethods([
+            ->getMockBuilder('\TestApp\Webservice\StaticWebservice')
+            ->onlyMethods([
                 'execute',
             ])
             ->getMock();
+
         $mockWebservice->expects($this->once())
             ->method('execute')
             ->will($this->returnValue(new ResultSet([
@@ -187,7 +188,10 @@ class QueryTest extends TestCase
                     'title' => 'Webservices',
                 ]),
             ], 3)));
-        $this->query->webservice($mockWebservice);
+
+        $this->query
+            ->setWebservice($mockWebservice)
+            ->action(Query::ACTION_READ);
 
         $this->query->execute();
 
@@ -265,13 +269,13 @@ class QueryTest extends TestCase
 
     public function testSelectWithExpression()
     {
-        $exp = new Comparison('upvotes', 50, 'integer', '>=');
+        $exp = new ComparisonExpression('upvotes', 50, 'integer', '>=');
         $this->query->select($exp);
 
-        /** @var Comparison $comparisonClause */
+        /** @var ComparisonExpression $comparisonClause */
         $comparisonClause = $this->query->clause('select')[0];
 
-        $this->assertInstanceOf(Comparison::class, $comparisonClause);
+        $this->assertInstanceOf(ComparisonExpression::class, $comparisonClause);
         $this->assertEquals(50, $comparisonClause->getValue());
         $this->assertEquals('>=', $comparisonClause->getOperator());
     }
@@ -291,7 +295,7 @@ class QueryTest extends TestCase
     /**
      * @inheritDoc
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

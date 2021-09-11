@@ -1,17 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
-class Schema extends \Muffin\Webservice\Schema
-{
+use Muffin\Webservice\Datasource\Schema as BaseSchema;
 
+class Schema extends BaseSchema
+{
     /**
      * Constructor.
      *
      * @param string $endpoint The endpoint name.
      * @param array $fields The list of fields for the schema.
      */
-    public function __construct($endpoint, array $fields = [])
+    public function __construct(string $endpoint, array $fields = [])
     {
         parent::__construct($endpoint, $fields);
 
@@ -34,7 +36,7 @@ class Schema extends \Muffin\Webservice\Schema
      *
      * @return void
      */
-    public function initialize()
+    public function initialize(): void
     {
     }
 }

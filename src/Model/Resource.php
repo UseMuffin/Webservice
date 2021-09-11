@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice\Model;
 
@@ -44,11 +45,11 @@ class Resource implements EntityInterface, InvalidPropertyInterface
         }
 
         if ($options['markNew'] !== null) {
-            $this->isNew($options['markNew']);
+            $this->setNew($options['markNew']);
         }
 
         if (!empty($properties) && $options['markClean'] && !$options['useSetters']) {
-            $this->_properties = $properties;
+            $this->_fields = $properties;
 
             return;
         }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -10,11 +12,13 @@
  * @link          http://cakephp.org CakePHP(tm) Project
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
-use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
+use Muffin\Webservice\Datasource\Connection;
+use TestApp\Webservice\Driver\Test as TestDriver;
 
 require_once 'vendor/autoload.php';
 
@@ -33,13 +37,6 @@ define('CONFIG', APP . 'config' . DS);
 define('CACHE', TMP);
 define('LOGS', TMP);
 
-$loader = new \Cake\Core\ClassLoader();
-$loader->register();
-
-$loader->addNamespace('TestApp', APP);
-$loader->addNamespace('SomeVendor\SomePlugin', APP . 'plugins' . DS . 'SomeVendor' . DS . 'SomePlugin' . DS . 'src');
-$loader->addNamespace('TestPlugin', APP . 'plugins' . DS . 'TestPlugin' . DS . 'src');
-
 require_once CORE_PATH . 'config/bootstrap.php';
 
 date_default_timezone_set('UTC');
@@ -47,7 +44,7 @@ mb_internal_encoding('UTF-8');
 
 Configure::write('debug', true);
 Configure::write('App', [
-    'namespace' => 'Muffin\\Webservice\\Test\\test_app',
+    'namespace' => 'TestApp',
     'encoding' => 'UTF-8',
     'base' => false,
     'baseUrl' => false,
@@ -89,8 +86,10 @@ if (!getenv('DB_DSN')) {
     putenv('DB_DSN=sqlite:///:memory:');
 }
 
-ConnectionManager::setConfig('test', ['url' => getenv('DB_DSN')]);
-ConnectionManager::setConfig('test_webservice', ['url' => getenv('DB_DSN')]);
+ConnectionManager::setConfig('test', [
+    'className' => Connection::class,
+    'driver' => TestDriver::class,
+] + ConnectionManager::parseDsn(env('DB_DSN')));
 
 Log::setConfig([
     'debug' => [
@@ -104,8 +103,3 @@ Log::setConfig([
         'file' => 'error',
     ],
 ]);
-
-Plugin::getCollection()->add(new \Muffin\Webservice\Plugin());
-require Plugin::getCollection()->get('Muffin/Webservice')->getConfigPath() . 'bootstrap.php';
-
-loadPHPUnitAliases();

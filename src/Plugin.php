@@ -1,8 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Muffin\Webservice;
 
 use Cake\Core\BasePlugin;
+use Cake\Core\PluginApplicationInterface;
+use Cake\Datasource\FactoryLocator;
+use Muffin\Webservice\Model\EndpointLocator;
 
 class Plugin extends BasePlugin
 {
@@ -26,4 +30,12 @@ class Plugin extends BasePlugin
      * @var bool
      */
     protected $consoleEnabled = false;
+
+    /**
+     * @inheritDoc
+     */
+    public function bootstrap(PluginApplicationInterface $app): void
+    {
+        FactoryLocator::add('Endpoint', new EndpointLocator());
+    }
 }

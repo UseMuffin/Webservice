@@ -1,6 +1,6 @@
 # Webservice
 
-[![Build Status](https://img.shields.io/travis/UseMuffin/Webservice/master.svg?style=flat-square)](https://travis-ci.org/UseMuffin/Webservice)
+[![Build Status](https://img.shields.io/travis/UseMuffin/Webservice/master.svg?style=flat-square)](https://github.com/UseMuffin/Webservice/actions?query=workflow%3ACI+branch%3Amaster)
 [![Coverage](https://img.shields.io/codecov/c/github/UseMuffin/Webservice/master.svg?style=flat-square)](https://codecov.io/github/UseMuffin/Webservice)
 [![Total Downloads](https://img.shields.io/packagist/dt/muffin/webservice.svg?style=flat-square)](https://packagist.org/packages/muffin/webservice)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
@@ -23,6 +23,24 @@ bin/cake plugin load Muffin/Webservice
 
 ## Usage
 
+### Datasource Configuration
+
+In your `app.php`, add a new `webservice` config under `Datasources`:
+
+```php
+    'Datasources' => [
+        // Other db config here
+        'webservice' => [
+            'className' => \Muffin\Webservice\Connection::class,
+            'service' => 'Articles',
+            // Any additional keys will be set as Driver's config.
+        ],
+    ],
+```
+
+If you are making a plugin then conventionally the datasource config key name
+should be underscored version of plugin name.
+
 ### As an ORM
 
 #### Create driver
@@ -31,15 +49,15 @@ bin/cake plugin load Muffin/Webservice
 <?php
 namespace App\Webservice\Driver;
 
-use Cake\Network\Http\Client;
-use Muffin\Webservice\AbstractDriver;
+use Cake\Http\Client;
+use Muffin\Webservice\Driver\AbstractDriver;
 
 class Articles extends AbstractDriver
 {
     /**
      * Initialize is used to easily extend the constructor.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setClient(new Client([
             'host' => 'example.com'
@@ -54,8 +72,8 @@ class Articles extends AbstractDriver
 <?php
 namespace App\Webservice;
 
-use Muffin\Webservice\Query;
-use Muffin\Webservice\ResultSet;
+use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Webservice\Webservice;
 
 class ArticlesWebservice extends Webservice
@@ -110,7 +128,6 @@ class Article extends Resource
 <?php
 namespace App\Controller;
 
-use Cake\Event\Event;
 use Muffin\Webservice\Model\EndpointLocator;
 
 class ArticlesController extends AppController
