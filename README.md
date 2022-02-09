@@ -31,7 +31,7 @@ In your `app.php`, add a new `webservice` config under `Datasources`:
     'Datasources' => [
         // Other db config here
         'webservice' => [
-            'className' => \Muffin\Webservice\Connection::class,
+            'className' => \Muffin\Webservice\Datasource\Connection::class,
             'service' => 'Articles',
             // Any additional keys will be set as Driver's config.
         ],
