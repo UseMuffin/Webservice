@@ -592,6 +592,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return \Cake\Datasource\ResultSetInterface The data to convert to JSON.
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->all();
