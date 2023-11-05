@@ -12,5 +12,5 @@ class UnimplementedDriverMethodException extends CakeException
      *
      * @var string
      */
-    protected $_messageTemplate = 'Driver (`%s`) does not implement `%s`';
+    protected string $_messageTemplate = 'Driver (`%s`) does not implement `%s`';
 }

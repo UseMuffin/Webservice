@@ -20,49 +20,49 @@ class Schema implements SchemaInterface
      *
      * @var string
      */
-    protected $_repository;
+    protected string $_repository;
 
     /**
      * Columns in the endpoint.
      *
      * @var array
      */
-    protected $_columns = [];
+    protected array $_columns = [];
 
     /**
      * A map with columns to types
      *
      * @var array
      */
-    protected $_typeMap = [];
+    protected array $_typeMap = [];
 
     /**
      * Indexes in the endpoint.
      *
      * @var array
      */
-    protected $_indexes = [];
+    protected array $_indexes = [];
 
     /**
      * Constraints in the endpoint.
      *
      * @var array
      */
-    protected $_constraints = [];
+    protected array $_constraints = [];
 
     /**
      * Options for the endpoint.
      *
      * @var array
      */
-    protected $_options = [];
+    protected array $_options = [];
 
     /**
      * Whether or not the endpoint is temporary
      *
      * @var bool
      */
-    protected $_temporary = false;
+    protected bool $_temporary = false;
 
     /**
      * The valid keys that can be used in a column
@@ -70,7 +70,7 @@ class Schema implements SchemaInterface
      *
      * @var array
      */
-    protected static $_columnKeys = [
+    protected static array $_columnKeys = [
         'type' => null,
         'baseType' => null,
         'length' => null,
@@ -86,7 +86,7 @@ class Schema implements SchemaInterface
      *
      * @var array
      */
-    protected static $_columnExtras = [
+    protected static array $_columnExtras = [
         'string' => [
             'fixed' => null,
         ],
@@ -159,7 +159,7 @@ class Schema implements SchemaInterface
      * @param array|string $attrs The attributes for the column.
      * @return $this
      */
-    public function addColumn(string $name, $attrs)
+    public function addColumn(string $name, array|string $attrs)
     {
         if (is_string($attrs)) {
             $attrs = ['type' => $attrs];
@@ -178,7 +178,7 @@ class Schema implements SchemaInterface
     /**
      * Get the column names in the endpoint.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function columns(): array
     {
@@ -247,7 +247,7 @@ class Schema implements SchemaInterface
      * Get the type of a column
      *
      * @param string $name Column name
-     * @return null|string
+     * @return string|null
      */
     public function getColumnType(string $name): ?string
     {

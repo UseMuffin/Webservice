@@ -20,5 +20,5 @@ interface ResourceBasedEntityInterface
      * @param array $options The options to pass to the constructor
      * @return self
      */
-    public static function createFromResource(Resource $resource, array $options = []);
+    public static function createFromResource(Resource $resource, array $options = []): self;
 }

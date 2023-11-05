@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase;
 
-use Cake\Controller\Controller;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\FactoryLocator;
 use Cake\TestSuite\TestCase;
@@ -24,16 +23,15 @@ class BootstrapTest extends TestCase
      *
      * @return void
      */
-    public function testLoadingEndpointWithLoadModel()
+    public function testLoadingEndpointWithLocator()
     {
         $connection = new Connection([
             'name' => 'test',
             'service' => 'Test',
         ]);
         ConnectionManager::setConfig('test_app', $connection);
-
-        $controller = new Controller();
-        $endpoint = $controller->loadModel('Test', 'Endpoint');
+        $endpointlocator = new EndpointLocator();
+        $endpoint = $endpointlocator->get('Test');
 
         $this->assertInstanceOf(TestEndpoint::class, $endpoint);
         $this->assertEquals('Test', $endpoint->getAlias());

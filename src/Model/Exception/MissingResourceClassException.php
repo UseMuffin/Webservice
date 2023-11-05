@@ -7,5 +7,5 @@ use Cake\Core\Exception\CakeException;
 
 class MissingResourceClassException extends CakeException
 {
-    protected $_messageTemplate = 'Resource class %s could not be found.';
+    protected string $_messageTemplate = 'Resource class %s could not be found.';
 }

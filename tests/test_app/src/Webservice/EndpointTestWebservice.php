@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace TestApp\Webservice;
 
+use Cake\Utility\Hash;
 use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Model\Resource;
@@ -44,7 +45,7 @@ class EndpointTestWebservice extends Webservice
         ];
     }
 
-    protected function _executeCreateQuery(Query $query, array $options = [])
+    protected function _executeCreateQuery(Query $query, array $options = []): bool|Resource
     {
         $fields = $query->set();
 
@@ -52,15 +53,16 @@ class EndpointTestWebservice extends Webservice
             return false;
         }
 
-        $this->resources[] = new Resource($fields, [
+        $resource = new Resource($fields, [
             'markNew' => false,
             'markClean' => true,
         ]);
+        $this->resources[] = $resource;
 
-        return true;
+        return $resource;
     }
 
-    protected function _executeReadQuery(Query $query, array $options = [])
+    protected function _executeReadQuery(Query $query, array $options = []): bool|ResultSet
     {
         if (!empty($query->where()['id'])) {
             $index = $this->conditionsToIndex($query->where());
@@ -73,11 +75,12 @@ class EndpointTestWebservice extends Webservice
                 $this->resources[$index],
             ], 1);
         }
-        if (isset($query->where()[$query->getEndpoint()->aliasField('title')])) {
+        $conditions = $this->extractConditions($query->getOptions());
+        if (isset($conditions[$query->getEndpoint()->aliasField('title')])) {
             $resources = [];
 
             foreach ($this->resources as $resource) {
-                if ($resource->title !== $query->where()[$query->getEndpoint()->aliasField('title')]) {
+                if ($resource->title !== $conditions[$query->getEndpoint()->aliasField('title')]) {
                     continue;
                 }
 
@@ -90,7 +93,7 @@ class EndpointTestWebservice extends Webservice
         return new ResultSet($this->resources, count($this->resources));
     }
 
-    protected function _executeUpdateQuery(Query $query, array $options = [])
+    protected function _executeUpdateQuery(Query $query, array $options = []): int|bool|Resource
     {
         $this->resources[$this->conditionsToIndex($query->where())]->set($query->set());
 
@@ -99,7 +102,7 @@ class EndpointTestWebservice extends Webservice
         return 1;
     }
 
-    protected function _executeDeleteQuery(Query $query, array $options = [])
+    protected function _executeDeleteQuery(Query $query, array $options = []): int|bool
     {
         $conditions = $query->where();
 
@@ -130,5 +133,14 @@ class EndpointTestWebservice extends Webservice
     public function conditionsToIndex(array $conditions)
     {
         return $conditions['id'] - 1;
+    }
+
+    public function extractConditions(array $options)
+    {
+        foreach($options as $option) {
+            if(isset($option['conditions'])) {
+                return $option['conditions'];
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 
 class StaticWebservice implements WebserviceInterface
 {
-    public function execute(Query $query, array $options = [])
+    public function execute(Query $query, array $options = []): ResultSet
     {
         return new ResultSet([
             new Resource([

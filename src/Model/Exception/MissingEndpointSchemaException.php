@@ -12,5 +12,5 @@ class MissingEndpointSchemaException extends CakeException
      *
      * @var string
      */
-    protected $_messageTemplate = 'Missing schema %s or webservice %s describe implementation';
+    protected string $_messageTemplate = 'Missing schema %s or webservice %s describe implementation';
 }

@@ -12,6 +12,7 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use function Cake\Core\pluginSplit;
 
 abstract class AbstractDriver implements LoggerAwareInterface
 {
@@ -23,28 +24,28 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @var object
      */
-    protected $_client;
+    protected ?object $_client = null;
 
     /**
      * Default config
      *
      * @var array
      */
-    protected $_defaultConfig = [];
+    protected array $_defaultConfig = [];
 
     /**
      * Whatever queries should be logged
      *
      * @var bool
      */
-    protected $_logQueries = false;
+    protected bool $_logQueries = false;
 
     /**
      * The list of webservices to be used
      *
      * @var array
      */
-    protected $_webservices = [];
+    protected array $_webservices = [];
 
     /**
      * Constructor.
@@ -83,9 +84,9 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Get the client instance configured for this driver
      *
-     * @return object
+     * @return object|null
      */
-    public function getClient(): object
+    public function getClient(): ?object
     {
         return $this->_client;
     }
@@ -132,14 +133,12 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * Sets a logger
      *
      * @param \Psr\Log\LoggerInterface $logger Logger object
-     * @return $this
+     * @return void
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
-
-        return $this;
     }
 
     /**
@@ -205,7 +204,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @throws \RuntimeException If the client object has not been initialized.
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException If the method does not exist in the client.
      */
-    public function __call($method, $args)
+    public function __call(string $method, array $args): mixed
     {
         if (!method_exists($this->getClient(), $method)) {
             throw new UnimplementedWebserviceMethodException([
@@ -222,7 +221,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return array
      */
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         return [
             'client' => $this->getClient(),
