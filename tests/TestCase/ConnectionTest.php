@@ -31,7 +31,7 @@ class ConnectionTest extends TestCase
 
         new Connection([
             'name' => 'test',
-            'service' => 'MissingDriver',
+            'service' => 'Missing',
         ]);
     }
 
@@ -42,5 +42,10 @@ class ConnectionTest extends TestCase
         new Connection([
             'name' => 'test',
         ]);
+    }
+
+    public function testConfigName()
+    {
+        debug($this->connection->configName());
     }
 }

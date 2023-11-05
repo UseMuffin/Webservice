@@ -6,7 +6,8 @@ namespace Muffin\Webservice\Test\TestCase\Model;
 use Cake\Http\Client;
 use Cake\TestSuite\TestCase;
 use SomeVendor\SomePlugin\Webservice\Driver\SomePlugin;
-use TestApp\Webservice\Driver\Test;
+use StdClass;
+use TestApp\Webservice\Driver\TestDriver;
 use TestApp\Webservice\Logger;
 use TestApp\Webservice\TestWebservice;
 use TestPlugin\Webservice\Driver\TestPlugin;
@@ -37,9 +38,9 @@ class AbstractDriverTest extends TestCase
 
     public function testSetClient()
     {
-        $client = new \StdClass();
+        $client = new StdClass();
 
-        $driver = new Test();
+        $driver = new TestDriver();
         $driver->setClient($client);
 
         $this->assertSame($client, $driver->getClient());
@@ -47,7 +48,7 @@ class AbstractDriverTest extends TestCase
 
     public function testEnableQueryLogging()
     {
-        $driver = new Test();
+        $driver = new TestDriver();
         $driver->enableQueryLogging();
 
         $this->assertTrue($driver->isQueryLoggingEnabled());
@@ -55,7 +56,7 @@ class AbstractDriverTest extends TestCase
 
     public function testDisableQueryLogging()
     {
-        $driver = new Test();
+        $driver = new TestDriver();
         $driver->disableQueryLogging();
 
         $this->assertFalse($driver->isQueryLoggingEnabled());
@@ -73,7 +74,7 @@ class AbstractDriverTest extends TestCase
             'webservices' => ['example'],
         ];
 
-        $driver = new Test();
+        $driver = new TestDriver();
         $driver->setLogger($logger);
         $driver
             ->setClient($client)

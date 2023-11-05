@@ -50,7 +50,7 @@ class EndpointTest extends TestCase
         ]);
     }
 
-    public function providerEndpointNames()
+    public static function providerEndpointNames(): array
     {
         return [
             'No inflector' => ['user-groups', null, 'user_groups'],
@@ -102,7 +102,9 @@ class EndpointTest extends TestCase
             1 => 'Hello World',
             2 => 'New ORM',
             3 => 'Webservices',
-        ], $this->endpoint->find('list')->toArray());
+        ], $this->endpoint->find('list')->toArray(),
+            'Id => valueField'
+        );
 
         $this->assertEquals([
             'Hello World' => 'Some text',

@@ -12,5 +12,5 @@ class MissingConnectionException extends CakeException
      *
      * @var string
      */
-    protected $_messageTemplate = 'No `%s` connection configured.';
+    protected string $_messageTemplate = 'No `%s` connection configured.';
 }

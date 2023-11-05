@@ -18,7 +18,7 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Muffin\Webservice\Datasource\Connection;
-use TestApp\Webservice\Driver\Test as TestDriver;
+use TestApp\Webservice\Driver\TestDriver;
 
 require_once 'vendor/autoload.php';
 
@@ -89,7 +89,7 @@ if (!getenv('DB_DSN')) {
 ConnectionManager::setConfig('test', [
     'className' => Connection::class,
     'driver' => TestDriver::class,
-] + ConnectionManager::parseDsn(env('DB_DSN')));
+] + ConnectionManager::parseDsn(getenv('DB_DSN')));
 
 Log::setConfig([
     'debug' => [

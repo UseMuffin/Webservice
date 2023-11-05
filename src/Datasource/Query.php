@@ -4,21 +4,27 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Datasource;
 
 use ArrayObject;
+use Cake\Collection\Iterator\MapReduce;
+use Cake\Database\ExpressionInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Datasource\QueryCacher;
 use Cake\Datasource\QueryInterface;
-use Cake\Datasource\QueryTrait;
+use Cake\Datasource\RepositoryInterface;
+use Cake\Datasource\ResultSetDecorator;
 use Cake\Datasource\ResultSetInterface;
 use Cake\Utility\Hash;
+use Closure;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
 use Muffin\Webservice\Model\Endpoint;
+use Muffin\Webservice\Model\Resource;
 use Muffin\Webservice\Webservice\WebserviceInterface;
+use Traversable;
+use UnexpectedValueException;
 
 class Query implements IteratorAggregate, JsonSerializable, QueryInterface
 {
-    use QueryTrait;
-
     public const ACTION_CREATE = 1;
     public const ACTION_READ = 2;
     public const ACTION_UPDATE = 3;
@@ -50,7 +56,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @var bool
      */
-    protected $_beforeFindFired = false;
+    protected bool $_beforeFindFired = false;
+
+    /**
+     * Whether the query is standalone or the product of an eager load operation.
+     *
+     * @var bool
+     */
+    protected bool $_eagerLoaded = false;
 
     /**
      * Indicates whether internal state of this query was changed, this is used to
@@ -59,14 +72,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @var bool
      */
-    protected $_dirty = false;
+    protected bool $_dirty = false;
 
     /**
      * Parts being used to in the query
      *
      * @var array
      */
-    protected $_parts = [
+    protected array $_parts = [
         'order' => [],
         'set' => [],
         'where' => [],
@@ -74,18 +87,56 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     ];
 
     /**
+     * Holds any custom options passed using applyOptions that could not be processed
+     * by any method in this class.
+     *
+     * @var array
+     */
+    protected array $_options = [];
+
+    /**
      * Instance of the webservice to use
      *
      * @var \Muffin\Webservice\Webservice\WebserviceInterface
      */
-    protected $_webservice;
+    protected WebserviceInterface $_webservice;
 
     /**
      * The result from the webservice
      *
-     * @var bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
+     * @var \Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet|int|bool
      */
-    protected $_result;
+    protected mixed $_results = null;
+
+    /**
+     * Instance of a endpoint object this query is bound to
+     *
+     * @var \Cake\Datasource\RepositoryInterface
+     */
+    protected RepositoryInterface $_endpoint;
+
+    /**
+     * List of map-reduce routines that should be applied over the query
+     * result
+     *
+     * @var array
+     */
+    protected array $_mapReduce = [];
+
+    /**
+     * List of formatter classes or callbacks that will post-process the
+     * results when fetched
+     *
+     * @var array<\Closure>
+     */
+    protected array $_formatters = [];
+
+    /**
+     * A query cacher instance if this query has caching enabled.
+     *
+     * @var \Cake\Datasource\QueryCacher|null
+     */
+    protected ?QueryCacher $_cache = null;
 
     /**
      * Construct the query
@@ -97,6 +148,110 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     {
         $this->setWebservice($webservice);
         $this->setEndpoint($endpoint);
+    }
+
+    /**
+     * Executes this query and returns a results iterator. This function is required
+     * for implementing the IteratorAggregate interface and allows the query to be
+     * iterated without having to call execute() manually, thus making it look like
+     * a result set instead of the query itself.
+     *
+     * @return \Traversable
+     */
+    public function getIterator(): Traversable
+    {
+        return $this->all();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function aliasFields(array $fields, ?string $defaultAlias = null): array
+    {
+        $aliased = [];
+        foreach ($fields as $alias => $field) {
+            if (is_numeric($alias) && is_string($field)) {
+                $aliased += $this->aliasField($field, $defaultAlias);
+                continue;
+            }
+            $aliased[$alias] = $field;
+        }
+
+        return $aliased;
+    }
+
+    /**
+     * Fetch the results for this query.
+     *
+     * Will return either the results set through setResult(), or execute this query
+     * and return the ResultSetDecorator object ready for streaming of results.
+     *
+     * ResultSetDecorator is a traversable object that implements the methods found
+     * on Cake\Collection\Collection.
+     *
+     * @return \Cake\Datasource\ResultSetInterface
+     */
+    public function all(): ResultSetInterface
+    {
+        if ($this->_results !== null) {
+            if (!($this->_results instanceof ResultSetInterface)) {
+                $this->_results = $this->decorateResults($this->_results);
+            }
+
+            return $this->_results;
+        }
+
+        $results = null;
+        if ($this->_cache) {
+            $results = $this->_cache->fetch($this);
+        }
+        if ($results === null) {
+            $results = $this->decorateResults($this->_execute());
+            if ($this->_cache) {
+                $this->_cache->store($this, $results);
+            }
+        }
+        $this->_results = $results;
+
+        return $this->_results;
+    }
+
+    public function orderBy(Closure|array|string $fields, bool $overwrite = false): void
+    {
+    }
+
+    /**
+     * Returns an array representation of the results after executing the query.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->all()->toArray();
+    }
+
+    /**
+     * Set the default repository object that will be used by this query.
+     *
+     * @param \Cake\Datasource\RepositoryInterface $repository The default repository object to use.
+     * @return $this
+     */
+    public function setRepository(RepositoryInterface $repository)
+    {
+        $this->_endpoint = $repository;
+
+        return $this;
+    }
+
+    /**
+     * Returns the default repository object that will be used by this query,
+     * that is, the table that will appear in the from clause.
+     *
+     * @return \Muffin\Webservice\Model\Endpoint
+     */
+    public function getRepository(): ?RepositoryInterface
+    {
+        return $this->_endpoint;
     }
 
     /**
@@ -158,7 +313,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param string $name name of the clause to be returned
      * @return mixed
      */
-    public function clause(string $name)
+    public function clause(string $name): mixed
     {
         if (isset($this->_parts[$name])) {
             return $this->_parts[$name];
@@ -176,7 +331,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function setEndpoint(Endpoint $endpoint)
     {
-        $this->setRepository($endpoint);
+        $this->_endpoint = $endpoint;
 
         return $this;
     }
@@ -190,7 +345,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     public function getEndpoint(): Endpoint
     {
         /** @var \Muffin\Webservice\Model\Endpoint */
-        return $this->getRepository();
+        return $this->_endpoint;
     }
 
     /**
@@ -211,7 +366,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return \Muffin\Webservice\Webservice\WebserviceInterface
      */
-    public function getWebservice()
+    public function getWebservice(): WebserviceInterface
     {
         return $this->_webservice;
     }
@@ -229,13 +384,12 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * a single query.
      *
      * @param string $finder The finder method to use.
-     * @param array $options The options for the finder.
-     * @return $this Returns a modified query.
+     * @param mixed ...$args Arguments that match up to finder-specific parameters
+     * @return static Returns a modified query.
      */
-    public function find($finder, array $options = [])
+    public function find(string $finder, mixed ...$args): static
     {
-        /** @psalm-suppress UndefinedInterfaceMethod */
-        return $this->getRepository()->callFinder($finder, $this, $options);
+        return $this->_endpoint->callFinder($finder, $this, $args);
     }
 
     /**
@@ -244,7 +398,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @return mixed The first result from the ResultSet.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When there is no first record.
      */
-    public function firstOrFail()
+    public function firstOrFail(): mixed
     {
         $entity = $this->first();
         if ($entity) {
@@ -253,7 +407,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         /** @psalm-suppress UndefinedInterfaceMethod */
         throw new RecordNotFoundException(sprintf(
             'Record not found in endpoint "%s"',
-            $this->getRepository()->getName()
+            $this->_endpoint->getName()
         ));
     }
 
@@ -272,14 +426,16 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Apply conditions to the query
      *
-     * @param array|null $conditions The conditions to apply
-     * @param array $types Not used
-     * @param bool $overwrite Whether to overwrite the current conditions
+     * @param \Closure|array|string|null $conditions The list of conditions.
+     * @param array $types Not used, required to comply with QueryInterface.
+     * @param bool $overwrite Whether or not to replace previous queries.
      * @return $this
-     * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function where($conditions = null, array $types = [], bool $overwrite = false)
-    {
+    public function where(
+        Closure|array|string|null $conditions = null,
+        array $types = [],
+        bool $overwrite = false
+    ) {
         if ($conditions === null) {
             return $this->clause('where');
         }
@@ -292,14 +448,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Add AND conditions to the query
      *
-     * @param string|array $conditions The conditions to add with AND.
+     * @param array|string $conditions The conditions to add with AND.
      * @param array $types associative array of type names used to bind values to query
      * @return $this
      * @see \Cake\Database\Query::where()
      * @see \Cake\Database\Type
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function andWhere($conditions, array $types = [])
+    public function andWhere(string|array $conditions, array $types = [])
     {
         $this->where($conditions, $types);
 
@@ -360,12 +516,10 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * $query->limit(10) // generates LIMIT 10
      * ```
      *
-     * @param int $limit number of records to be returned
+     * @param ?int $limit number of records to be returned
      * @return $this
-     * @psalm-suppress MoreSpecificImplementedParamType
-     * @psalm-suppress ParamNameMismatch
      */
-    public function limit($limit)
+    public function limit(?int $limit)
     {
         $this->_parts['limit'] = $limit;
 
@@ -378,14 +532,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param array|null $fields The field to set
      * @return $this|array
      */
-    public function set($fields = null)
+    public function set(?array $fields = null)
     {
         if ($fields === null) {
             return $this->clause('set');
         }
 
         if (!in_array($this->clause('action'), [self::ACTION_CREATE, self::ACTION_UPDATE])) {
-            throw new \UnexpectedValueException(__('The action of this query needs to be either create update'));
+            throw new UnexpectedValueException('The action of this query needs to be either create update');
         }
 
         $this->_parts['set'] = $fields;
@@ -416,11 +570,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * By default this function will append any passed argument to the list of fields
      * to be selected, unless the second argument is set to true.
      *
-     * @param array|\Cake\Database\ExpressionInterface|\Closure|string $fields fields to be added to the list
+     * @param \Cake\Database\ExpressionInterface|\Closure|array|string $fields fields to be added to the list
      * @param bool $overwrite whether to reset order with field list or not
      * @return $this
      */
-    public function order($fields, $overwrite = false)
+    public function order(array|ExpressionInterface|Closure|string $fields, bool $overwrite = false)
     {
         $this->_parts['order'] = !$overwrite ? Hash::merge($this->clause('order'), $fields) : $fields;
 
@@ -473,13 +627,12 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             return 0;
         }
 
-        if (!$this->_result) {
+        if (!$this->_results) {
             $this->_execute();
         }
 
-        if ($this->_result) {
-            /** @psalm-suppress PossiblyInvalidMethodCall, PossiblyUndefinedMethod */
-            return (int)$this->_result->total();
+        if ($this->_results) {
+            return (int)$this->_results->total();
         }
 
         return 0;
@@ -495,11 +648,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * $singleUser = $query->first();
      * ```
      *
-     * @return \Cake\Datasource\EntityInterface|array|null the first result from the ResultSet
+     * @return mixed the first result from the ResultSet
      */
-    public function first()
+    public function first(): mixed
     {
-        if (!$this->_result) {
+        if ($this->_dirty) {
             $this->limit(1);
         }
 
@@ -513,7 +666,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return void
      */
-    public function triggerBeforeFind()
+    public function triggerBeforeFind(): void
     {
         if (!$this->_beforeFindFired && $this->clause('action') === self::ACTION_READ) {
             /** @var \Muffin\Webservice\Model\Endpoint $endpoint */
@@ -530,13 +683,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Execute the query
      *
-     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
-     * @psalm-suppress MoreSpecificReturnType
+     * @return \Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet|int|bool
      */
-    public function execute()
+    public function execute(): bool|int|Resource|ResultSetInterface
     {
         if ($this->clause('action') === self::ACTION_READ) {
-            /** @psalm-suppress LessSpecificReturnStatement */
             return $this->_execute();
         }
 
@@ -551,15 +702,14 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     protected function _execute(): ResultSetInterface
     {
         $this->triggerBeforeFind();
-        if ($this->_result) {
-            /** @psalm-var class-string<\Cake\Datasource\ResultSetInterface> $decorator */
-            $decorator = $this->_decoratorClass();
+        if ($this->_results) {
+            $decorator = $this->decoratorClass();
 
-            return new $decorator($this->_result);
+            return new $decorator($this->_results);
         }
 
         /** @var \Cake\Datasource\ResultSetInterface */
-        return $this->_result = $this->_webservice->execute($this);
+        return $this->_results = $this->_webservice->execute($this);
     }
 
     /**
@@ -567,7 +717,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return array
      */
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         return [
             '(help)' => 'This is a Query object, to get the results execute or iterate it.',
@@ -592,21 +742,25 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return \Cake\Datasource\ResultSetInterface The data to convert to JSON.
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): ResultSetInterface
     {
         return $this->all();
     }
 
     /**
-     * Select the fields to include in the query
+     * Adds fields to be selected from _source.
      *
-     * @param array|\Cake\Database\ExpressionInterface|string|callable $fields fields to be added to the list.
-     * @param bool $overwrite whether to reset fields with passed list or not
+     * Calling this function multiple times will append more fields to the
+     * list of fields to be selected from _source.
+     *
+     * If `true` is passed in the second argument, any previous selections
+     * will be overwritten with the list passed in the first argument.
+     *
+     * @param \Cake\Database\ExpressionInterface|\Closure|array|string|float|int $fields The list of fields to select from _source.
+     * @param bool $overwrite Whether or not to replace previous selections.
      * @return $this
-     * @see \Cake\Database\Query::select
-     * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function select($fields = [], bool $overwrite = false)
+    public function select(ExpressionInterface|Closure|array|string|int|float $fields, bool $overwrite = false)
     {
         if (!is_string($fields) && is_callable($fields)) {
             $fields = $fields($this);
@@ -621,6 +775,195 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         } else {
             $this->_parts['select'] = array_merge($this->_parts['select'], $fields);
         }
+
+        return $this;
+    }
+
+    /**
+     * Returns the name of the class to be used for decorating results
+     *
+     * @return class-string<\Cake\Datasource\ResultSetInterface>
+     */
+    protected function decoratorClass(): string
+    {
+        return ResultSetDecorator::class;
+    }
+
+    /**
+     * Decorates the results iterator with MapReduce routines and formatters
+     *
+     * @param iterable $result Original results
+     * @return \Cake\Datasource\ResultSetInterface
+     */
+    protected function decorateResults(iterable $result): ResultSetInterface
+    {
+        $decorator = $this->decoratorClass();
+
+        if (!empty($this->_mapReduce)) {
+            foreach ($this->_mapReduce as $functions) {
+                $result = new MapReduce($result, $functions['mapper'], $functions['reducer']);
+            }
+            $result = new $decorator($result);
+        }
+
+        if (!($result instanceof ResultSetInterface)) {
+            $result = new $decorator($result);
+        }
+
+        if (!empty($this->_formatters)) {
+            foreach ($this->_formatters as $formatter) {
+                $result = $formatter($result, $this);
+            }
+
+            if (!($result instanceof ResultSetInterface)) {
+                $result = new $decorator($result);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Register a new MapReduce routine to be executed on top of the database results
+     *
+     * The MapReduce routing will only be run when the query is executed and the first
+     * result is attempted to be fetched.
+     *
+     * If the third argument is set to true, it will erase previous map reducers
+     * and replace it with the arguments passed.
+     *
+     * @param \Closure|null $mapper The mapper function
+     * @param \Closure|null $reducer The reducing function
+     * @param bool $overwrite Set to true to overwrite existing map + reduce functions.
+     * @return $this
+     * @see \Cake\Collection\Iterator\MapReduce for details on how to use emit data to the map reducer.
+     */
+    public function mapReduce(?Closure $mapper = null, ?Closure $reducer = null, bool $overwrite = false)
+    {
+        if ($overwrite) {
+            $this->_mapReduce = [];
+        }
+        if ($mapper === null) {
+            if (!$overwrite) {
+                throw new InvalidArgumentException('$mapper can be null only when $overwrite is true.');
+            }
+
+            return $this;
+        }
+        $this->_mapReduce[] = compact('mapper', 'reducer');
+
+        return $this;
+    }
+
+    /**
+     * Returns an array with the custom options that were applied to this query
+     * and that were not already processed by another method in this class.
+     *
+     * ### Example:
+     *
+     * ```
+     *  $query->applyOptions(['doABarrelRoll' => true, 'fields' => ['id', 'name']);
+     *  $query->getOptions(); // Returns ['doABarrelRoll' => true]
+     * ```
+     *
+     * @see \Cake\Datasource\QueryInterface::applyOptions() to read about the options that will
+     * be processed by this class and not returned by this function
+     * @return array
+     * @see applyOptions()
+     */
+    public function getOptions(): array
+    {
+        return $this->_options;
+    }
+
+    /**
+     * Returns the current configured query `_eagerLoaded` value
+     *
+     * @return bool
+     */
+    public function isEagerLoaded(): bool
+    {
+        return $this->_eagerLoaded;
+    }
+
+    /**
+     * Sets the query instance to be an eager loaded query. If no argument is
+     * passed, the current configured query `_eagerLoaded` value is returned.
+     *
+     * @param bool $value Whether to eager load.
+     * @return $this
+     */
+    public function eagerLoaded(bool $value)
+    {
+        $this->_eagerLoaded = $value;
+
+        return $this;
+    }
+
+    /**
+     * Registers a new formatter callback function that is to be executed when trying
+     * to fetch the results from the database.
+     *
+     * If the second argument is set to true, it will erase previous formatters
+     * and replace them with the passed first argument.
+     *
+     * Callbacks are required to return an iterator object, which will be used as
+     * the return value for this query's result. Formatter functions are applied
+     * after all the `MapReduce` routines for this query have been executed.
+     *
+     * Formatting callbacks will receive two arguments, the first one being an object
+     * implementing `\Cake\Collection\CollectionInterface`, that can be traversed and
+     * modified at will. The second one being the query instance on which the formatter
+     * callback is being applied.
+     *
+     * ### Examples:
+     *
+     * Return all results from the table indexed by id:
+     *
+     * ```
+     * $query->select(['id', 'name'])->formatResults(function ($results) {
+     *     return $results->indexBy('id');
+     * });
+     * ```
+     *
+     * Add a new column to the ResultSet:
+     *
+     * ```
+     * $query->select(['name', 'birth_date'])->formatResults(function ($results) {
+     *     return $results->map(function ($row) {
+     *         $row['age'] = $row['birth_date']->diff(new DateTime)->y;
+     *
+     *         return $row;
+     *     });
+     * });
+     * ```
+     *
+     * @param \Closure|null $formatter The formatting function
+     * @param int|bool $mode Whether to overwrite, append or prepend the formatter.
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function formatResults(?Closure $formatter = null, int|bool $mode = self::APPEND)
+    {
+        if ($mode === self::OVERWRITE) {
+            $this->_formatters = [];
+        }
+        if ($formatter === null) {
+            /** @psalm-suppress RedundantCondition */
+            if ($mode !== self::OVERWRITE) {
+                throw new InvalidArgumentException('$formatter can be null only when $mode is overwrite.');
+            }
+
+            return $this;
+        }
+
+        if ($mode === self::PREPEND) {
+            array_unshift($this->_formatters, $formatter);
+
+            return $this;
+        }
+
+        $this->_formatters[] = $formatter;
 
         return $this;
     }

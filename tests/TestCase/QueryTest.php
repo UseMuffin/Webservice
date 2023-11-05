@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Database\Expression\ComparisonExpression;
+use Cake\Datasource\ResultSetInterface;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Datasource\ResultSet;
@@ -284,7 +285,7 @@ class QueryTest extends TestCase
     {
         $fields = ['id', 'username', 'email', 'biography'];
 
-        $callable = function (Query $query) use ($fields) {
+        $callable = function () use ($fields) {
             return $fields;
         };
         $this->query->select($callable);
