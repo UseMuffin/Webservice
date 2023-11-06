@@ -46,6 +46,6 @@ class ConnectionTest extends TestCase
 
     public function testConfigName()
     {
-        debug($this->connection->configName());
+        $this->assertEquals('test', $this->connection->configName());
     }
 }
