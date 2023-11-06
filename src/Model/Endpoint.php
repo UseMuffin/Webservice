@@ -666,21 +666,20 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     public function findList(Query $query, array $options): Query
     {
-
-        debug($options);
+        if (isset($options[0])) {
+            $options = $options[0];
+        }
         $options += [
             'keyField' => $this->getPrimaryKey(),
             'valueField' => $this->getDisplayField(),
             'groupField' => null,
         ];
 
-        debug($options);
         $options = $this->_setFieldMatchers(
             $options,
             ['keyField', 'valueField', 'groupField']
         );
 
-        debug($options);
         return $query->formatResults(function (CollectionInterface $results) use ($options) {
             return $results->combine(
                 $options['keyField'],
@@ -706,7 +705,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      */
     protected function _setFieldMatchers(array $options, array $keys): array
     {
-        debug($options);
         foreach ($keys as $field) {
             if (!is_array($options[$field])) {
                 continue;
@@ -727,7 +725,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                 return implode(';', $matches);
             };
         }
-        debug($options);
 
         return $options;
     }
@@ -783,10 +780,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         }
         $conditions = array_combine($key, $primaryKey);
 
-        $cacheConfig = $options['cache'] ?? false;
-        $cacheKey = $options['key'] ?? false;
-        $finder = $options['finder'] ?? 'all';
-        unset($options['key'], $options['cache'], $options['finder']);
+        $cacheConfig = $args['cache'] ?? false;
+        $cacheKey = $args['key'] ?? false;
+        $finder = $args['finder'] ?? 'all';
+        unset($args['key'], $args['cache'], $args['finder']);
 
         $query = $this->find($finder, $args)->where($conditions);
 

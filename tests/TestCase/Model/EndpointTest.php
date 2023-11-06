@@ -113,7 +113,16 @@ class EndpointTest extends TestCase
         ], $this->endpoint->find('list', [
             'keyField' => 'title',
             'valueField' => 'body',
-        ])->toArray());
+        ])->toArray(), 'Find with options array');
+
+        $this->assertEquals([
+            'Hello World' => 'Some text',
+            'New ORM' => 'Some more text',
+            'Webservices' => 'Even more text',
+        ], $this->endpoint->find('list',
+            keyField: 'title',
+            valueField: 'body',
+        )->toArray(), 'Find with named parameters');
     }
 
     public function testGet()
