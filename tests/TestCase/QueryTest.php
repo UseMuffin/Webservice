@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Database\Expression\ComparisonExpression;
-use Cake\Datasource\ResultSetInterface;
 use Cake\TestSuite\TestCase;
 use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Datasource\ResultSet;

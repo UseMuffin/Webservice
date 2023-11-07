@@ -24,7 +24,6 @@ use Closure;
 use Muffin\Webservice\Datasource\Connection;
 use Muffin\Webservice\Datasource\Marshaller;
 use Muffin\Webservice\Datasource\Query;
-use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Datasource\Schema;
 use Muffin\Webservice\Model\Exception\MissingResourceClassException;
 use Muffin\Webservice\Webservice\WebserviceInterface;
@@ -687,7 +686,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
                 $options['groupField']
             );
         });
-
     }
 
     /**
@@ -761,7 +759,6 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
         mixed ...$args
     ): EntityInterface {
         $key = (array)$this->getPrimaryKey();
-        $alias = $this->getAlias();
         foreach ($key as $index => $keyname) {
             $key[$index] = $keyname;
         }

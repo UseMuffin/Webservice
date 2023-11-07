@@ -98,11 +98,13 @@ class EndpointTest extends TestCase
 
     public function testFindList()
     {
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             1 => 'Hello World',
             2 => 'New ORM',
             3 => 'Webservices',
-        ], $this->endpoint->find('list')->toArray(),
+            ],
+            $this->endpoint->find('list')->toArray(),
             'Id => valueField'
         );
 
@@ -119,7 +121,8 @@ class EndpointTest extends TestCase
             'Hello World' => 'Some text',
             'New ORM' => 'Some more text',
             'Webservices' => 'Even more text',
-        ], $this->endpoint->find('list',
+        ], $this->endpoint->find(
+            'list',
             keyField: 'title',
             valueField: 'body',
         )->toArray(), 'Find with named parameters');
