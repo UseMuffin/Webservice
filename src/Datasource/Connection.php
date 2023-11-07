@@ -56,9 +56,18 @@ class Connection implements ConnectionInterface
         }
     }
 
-    public function setCacher(CacheInterface $cacher) { }
+    /**
+     * @param \Psr\SimpleCache\CacheInterface $cacher
+     * @return void
+     */
+    public function setCacher(CacheInterface $cacher): void
+    {
+    }
 
-    public function getCacher(): CacheInterface { }
+    /** @return \Psr\SimpleCache\CacheInterface  */
+    public function getCacher(): CacheInterface
+    {
+    }
 
     /**
      * {@inheritDoc}

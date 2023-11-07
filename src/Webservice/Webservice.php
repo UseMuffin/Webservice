@@ -187,7 +187,7 @@ abstract class Webservice implements WebserviceInterface
     public function describe(string $endpoint): Schema
     {
         $shortName = App::shortName(static::class, 'Webservice', 'Webservice');
-        [$plugin, $name] = pluginSplit($shortName);
+        [$plugin] = pluginSplit($shortName);
 
         $endpoint = Inflector::classify(str_replace('-', '_', $endpoint));
         $schemaShortName = implode('.', array_filter([$plugin, $endpoint]));

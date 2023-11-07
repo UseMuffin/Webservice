@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace TestApp\Webservice;
 
-use Cake\Utility\Hash;
 use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Model\Resource;
@@ -137,8 +136,8 @@ class EndpointTestWebservice extends Webservice
 
     public function extractConditions(array $options)
     {
-        foreach($options as $option) {
-            if(isset($option['conditions'])) {
+        foreach ($options as $option) {
+            if (isset($option['conditions'])) {
                 return $option['conditions'];
             }
         }

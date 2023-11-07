@@ -216,6 +216,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         return $this->_results;
     }
 
+    /**
+     * @param \Closure|array|string $fields
+     * @param bool $overwrite
+     * @return void
+     */
     public function orderBy(Closure|array|string $fields, bool $overwrite = false): void
     {
     }
