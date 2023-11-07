@@ -12,5 +12,6 @@ class UnexpectedDriverException extends CakeException
      *
      * @var string
      */
-    protected $_messageTemplate = 'Driver (`%s`) should extend `Muffin\Webservice\Webservice\Driver\AbstractDriver`';
+    protected string $_messageTemplate
+        = 'Driver (`%s`) should extend `Muffin\Webservice\Webservice\Driver\AbstractDriver`';
 }

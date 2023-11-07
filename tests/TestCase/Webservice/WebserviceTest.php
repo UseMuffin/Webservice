@@ -8,7 +8,7 @@ use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException;
-use TestApp\Webservice\Driver\Test;
+use TestApp\Webservice\Driver\TestDriver;
 use TestApp\Webservice\TestWebservice;
 
 class WebserviceTest extends TestCase
@@ -26,7 +26,7 @@ class WebserviceTest extends TestCase
         parent::setUp();
 
         $this->webservice = new TestWebservice([
-            'driver' => new Test([]),
+            'driver' => new TestDriver([]),
         ]);
     }
 
@@ -42,7 +42,7 @@ class WebserviceTest extends TestCase
 
     public function testConstructor()
     {
-        $testDriver = new Test([]);
+        $testDriver = new TestDriver([]);
 
         $webservice = new TestWebservice([
             'driver' => $testDriver,

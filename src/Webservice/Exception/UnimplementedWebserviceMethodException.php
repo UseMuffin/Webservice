@@ -12,5 +12,5 @@ class UnimplementedWebserviceMethodException extends CakeException
      *
      * @var string
      */
-    protected $_messageTemplate = 'Webservice %s does not implement %s';
+    protected string $_messageTemplate = 'Webservice %s does not implement %s';
 }

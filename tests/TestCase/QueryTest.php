@@ -284,7 +284,7 @@ class QueryTest extends TestCase
     {
         $fields = ['id', 'username', 'email', 'biography'];
 
-        $callable = function (Query $query) use ($fields) {
+        $callable = function () use ($fields) {
             return $fields;
         };
         $this->query->select($callable);

@@ -12,5 +12,5 @@ class MissingDriverException extends CakeException
      *
      * @var string
      */
-    protected $_messageTemplate = 'Webservice driver %s could not be found.';
+    protected string $_messageTemplate = 'Webservice driver %s could not be found.';
 }

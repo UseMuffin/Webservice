@@ -9,6 +9,7 @@ use Cake\Datasource\EntityInterface;
 use Cake\Datasource\InvalidPropertyInterface;
 use Muffin\Webservice\Model\Endpoint;
 use RuntimeException;
+use Traversable;
 
 /**
  * Contains logic to convert array data into resources.
@@ -22,7 +23,7 @@ class Marshaller
      *
      * @var \Muffin\Webservice\Model\Endpoint
      */
-    protected $_endpoint;
+    protected Endpoint $_endpoint;
 
     /**
      * Constructor.
@@ -110,25 +111,20 @@ class Marshaller
         if (!$options['validate']) {
             return [];
         }
-
-        $validator = null;
         if ($options['validate'] === true) {
-            $validator = $this->_endpoint->getValidator('default');
-        } elseif (is_string($options['validate'])) {
-            $validator = $this->_endpoint->getValidator($options['validate']);
-        } else {
-            /** @var \Cake\Validation\Validator $validator */
-            $validator = $options['validator'];
+            $options['validate'] = $this->_endpoint->getValidator('default');
         }
 
-        if (!is_callable([$validator, 'errors'])) {
-            throw new RuntimeException(sprintf(
-                '"validate" must be a boolean, a string or an object with method "errors()". Got %s instead.',
-                gettype($options['validate'])
-            ));
+        if (is_string($options['validate'])) {
+            $options['validate'] = $this->_endpoint->getValidator($options['validate']);
+        }
+        if (!is_object($options['validate'])) {
+            throw new RuntimeException(
+                sprintf('validate must be a boolean, a string or an object. Got %s.', gettype($options['validate']))
+            );
         }
 
-        return $validator->validate($data, $isNew);
+        return $options['validate']->validate($data, $isNew);
     }
 
     /**
@@ -165,7 +161,7 @@ class Marshaller
      *
      * @param array $data The data to hydrate.
      * @param array $options List of options
-     * @return \Cake\Datasource\EntityInterface[] An array of hydrated records.
+     * @return array<\Cake\Datasource\EntityInterface> An array of hydrated records.
      * @see \Muffin\Webservice\Model\Endpoint::newEntities()
      */
     public function many(array $data, array $options = []): array
@@ -260,13 +256,13 @@ class Marshaller
      *   the accessible fields list in the entity will be used.
      * - accessibleFields: A list of fields to allow or deny in entity accessible fields.
      *
-     * @param array|\Traversable $entities the entities that will get the
+     * @param \Traversable|array $entities the entities that will get the
      *   data merged in
      * @param array $data list of arrays to be merged into the entities
      * @param array $options List of options.
-     * @return \Cake\Datasource\EntityInterface[]
+     * @return array<\Cake\Datasource\EntityInterface>
      */
-    public function mergeMany($entities, array $data, array $options = []): array
+    public function mergeMany(array|Traversable $entities, array $data, array $options = []): array
     {
         $primary = (array)$this->_endpoint->getPrimaryKey();
 
