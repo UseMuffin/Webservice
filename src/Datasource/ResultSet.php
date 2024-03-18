@@ -6,6 +6,10 @@ namespace Muffin\Webservice\Datasource;
 use Cake\Collection\CollectionTrait;
 use Cake\Datasource\ResultSetInterface;
 
+/**
+ * @template T of \Cake\Datasource\EntityInterface|array
+ * @implements \Cake\Datasource\ResultSetInterface<T>
+ */
 class ResultSet implements ResultSetInterface
 {
     use CollectionTrait;
@@ -20,7 +24,8 @@ class ResultSet implements ResultSetInterface
     /**
      * Last record fetched from the statement
      *
-     * @var array
+     * @var \Cake\Datasource\EntityInterface|array
+     * @psalm-var T
      */
     protected $_current;
 
@@ -55,8 +60,10 @@ class ResultSet implements ResultSetInterface
      *
      * Part of Iterator interface.
      *
-     * @return array|object
+     * @return \Cake\Datasource\EntityInterface|array
+     * @psalm-return T
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->_current;
@@ -67,7 +74,6 @@ class ResultSet implements ResultSetInterface
      *
      * Part of Iterator interface.
      *
-     * @throws \Cake\Database\Exception
      * @return void
      */
     public function rewind()

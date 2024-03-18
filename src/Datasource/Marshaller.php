@@ -260,7 +260,7 @@ class Marshaller
      *   the accessible fields list in the entity will be used.
      * - accessibleFields: A list of fields to allow or deny in entity accessible fields.
      *
-     * @param array|\Traversable $entities the entities that will get the
+     * @param iterable<\Cake\Datasource\EntityInterface> $entities the entities that will get the
      *   data merged in
      * @param array $data list of arrays to be merged into the entities
      * @param array $options List of options.

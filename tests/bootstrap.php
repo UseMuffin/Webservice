@@ -103,3 +103,7 @@ Log::setConfig([
         'file' => 'error',
     ],
 ]);
+
+Configure::write('Error.ignoredDeprecationPaths', [
+    'ests/TestCase/BootstrapTest.php',
+]);
