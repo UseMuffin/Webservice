@@ -189,7 +189,7 @@ class Schema implements SchemaInterface
      * Get column data in the endpoint.
      *
      * @param string $name The column name.
-     * @return array|null Column data or null.
+     * @return array<string, mixed>|null Column data or null.
      */
     public function getColumn(string $name): ?array
     {
@@ -289,7 +289,7 @@ class Schema implements SchemaInterface
      * Returns an array where the keys are the column names in the schema
      * and the values the schema type they have.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function typeMap(): array
     {
@@ -316,7 +316,7 @@ class Schema implements SchemaInterface
     /**
      * Get a hash of columns and their default values.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function defaultValues(): array
     {
@@ -357,7 +357,7 @@ class Schema implements SchemaInterface
     /**
      * Set the schema options for an endpoint
      *
-     * @param array $options Array of options to set
+     * @param array<string, mixed> $options Array of options to set
      * @return $this
      */
     public function setOptions(array $options)
@@ -370,7 +370,7 @@ class Schema implements SchemaInterface
     /**
      * Get the schema options
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getOptions(): array
     {

@@ -176,7 +176,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function setEndpoint(Endpoint $endpoint)
     {
-        $this->repository($endpoint);
+        $this->setRepository($endpoint);
 
         return $this;
     }
@@ -262,7 +262,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @param string $field The field to alias.
      * @param string|null $alias Not being used
-     * @return array The field prefixed with the endpoint alias.
+     * @return array<string, string> The field prefixed with the endpoint alias.
      */
     public function aliasField(string $field, ?string $alias = null): array
     {
@@ -396,9 +396,9 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * @inheritDoc
      */
-    public function offset($num)
+    public function offset($offset)
     {
-        $this->_parts['offset'] = $num;
+        $this->_parts['offset'] = $offset;
 
         return $this;
     }
