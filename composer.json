@@ -58,5 +58,10 @@
             "SomeVendor\\SomePlugin\\": "tests/test_app/plugins/SomeVendor/SomePlugin/src",
             "TestPlugin\\": "tests/test_app/plugins/TestPlugin/src"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

@@ -10,15 +10,15 @@ on:
 
 jobs:
   testsuite:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.2', '7.4', '8.0']
+        php-version: ['7.4', '8.0', '8.3']
         db-type: ['mysql', 'pgsql']
         prefer-lowest: ['']
         include:
-          - php-version: '7.2'
+          - php-version: '7.4'
             db-type: 'sqlite'
             prefer-lowest: 'prefer-lowest'
 
@@ -31,7 +31,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup Service
       if: matrix.db-type == 'mysql'
@@ -73,7 +73,7 @@ jobs:
 
   cs-stan:
     name: Coding Standard & Static Analysis
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v2
@@ -84,7 +84,7 @@ jobs:
         php-version: '7.4'
         extensions: mbstring, intl
         coverage: none
-        tools: psalm:4.7, phpstan:0.12
+        tools: psalm:4, phpstan:1
 
     - name: Composer Install
       run: composer require cakephp/cakephp-codesniffer:^4.2
