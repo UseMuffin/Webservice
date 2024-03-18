@@ -356,13 +356,11 @@ abstract class Webservice implements WebserviceInterface
      */
     protected function _transformResource(Endpoint $endpoint, array $result): Resource
     {
-        $properties = [];
+        $entity = $endpoint->newEntity($result);
+        $entity->setNew(false);
+        $entity->clean();
 
-        foreach ($result as $property => $value) {
-            $properties[$property] = $value;
-        }
-
-        return $this->_createResource($endpoint->getResourceClass(), $properties);
+        return $entity;
     }
 
     /**

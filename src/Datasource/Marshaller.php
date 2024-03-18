@@ -5,8 +5,14 @@ namespace Muffin\Webservice\Datasource;
 
 use ArrayObject;
 use Cake\Collection\Collection;
+use Cake\Core\Configure;
+use Cake\Database\TypeFactory;
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\InvalidPropertyInterface;
+use Cake\Error\Debugger;
+use Cake\Http\Exception\InternalErrorException;
+use Cake\ORM\PropertyMarshalInterface;
+use Cake\Utility\Inflector;
 use Muffin\Webservice\Model\Endpoint;
 use RuntimeException;
 
@@ -32,6 +38,33 @@ class Marshaller
     public function __construct(Endpoint $endpoint)
     {
         $this->_endpoint = $endpoint;
+    }
+
+    /**
+     * Build the map of property => marshalling callable.
+     *
+     * @param array $data The data being marshalled.
+     * @param array<string, mixed> $options List of options containing the 'associated' key.
+     * @throws \InvalidArgumentException When associations do not exist.
+     * @return array
+     */
+    protected function _buildPropertyMap(array $data, array $options): array
+    {
+        $map = [];
+        $schema = $this->_endpoint->getSchema();
+
+        // Is a concrete column?
+        foreach (array_keys($data) as $prop) {
+            $prop = (string)$prop;
+            $columnType = $schema->getColumnType($prop);
+            if ($columnType) {
+                $map[$prop] = function ($value, $entity) use ($columnType) {
+                    return TypeFactory::build($columnType)->marshal($value);
+                };
+            }
+        }
+
+        return $map;
     }
 
     /**
@@ -65,6 +98,7 @@ class Marshaller
         }
 
         $errors = $this->_validate($data, $options, true);
+        $propertyMap = $this->_buildPropertyMap($data, $options);
         $properties = [];
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
@@ -75,7 +109,11 @@ class Marshaller
                 // Skip marshalling '' for pk fields.
                 continue;
             }
-            $properties[$key] = $value;
+            if (isset($propertyMap[$key])) {
+                $properties[$key] = $propertyMap[$key]($value, $entity);
+            } else {
+                $properties[$key] = $value;
+            }
         }
 
         if (!isset($options['fieldList'])) {
@@ -92,6 +130,7 @@ class Marshaller
         }
 
         $entity->setErrors($errors);
+        $this->dispatchAfterMarshal($entity, $data, $options);
 
         return $entity;
     }
@@ -216,6 +255,7 @@ class Marshaller
         }
 
         $errors = $this->_validate($data + $keys, $options, $isNew);
+        $propertyMap = $this->_buildPropertyMap($data, $options);
         $properties = [];
         foreach ($data as $key => $value) {
             if (!empty($errors[$key])) {
@@ -224,7 +264,33 @@ class Marshaller
                 }
                 continue;
             }
+            $original = $entity->get($key);
 
+            if (isset($propertyMap[$key])) {
+                $value = $propertyMap[$key]($value, $entity);
+
+                // Don't dirty scalar values and objects that didn't
+                // change. Arrays will always be marked as dirty because
+                // the original/updated list could contain references to the
+                // same objects, even though those objects may have changed internally.
+                if (
+                    (
+                        is_scalar($value)
+                        && $original === $value
+                    )
+                    || (
+                        $value === null
+                        && $original === $value
+                    )
+                    || (
+                        is_object($value)
+                        && !($value instanceof EntityInterface)
+                        && $original == $value
+                    )
+                ) {
+                    continue;
+                }
+            }
             $properties[$key] = $value;
         }
 
@@ -242,6 +308,7 @@ class Marshaller
         }
 
         $entity->setErrors($errors);
+        $this->dispatchAfterMarshal($entity, $data, $options);
 
         return $entity;
     }
@@ -312,5 +379,20 @@ class Marshaller
         }
 
         return $output;
+    }
+
+    /**
+     * dispatch Model.afterMarshal event.
+     *
+     * @param \Cake\Datasource\EntityInterface $entity The entity that was marshaled.
+     * @param array $data readOnly $data to use.
+     * @param array<string, mixed> $options List of options that are readOnly.
+     * @return void
+     */
+    protected function dispatchAfterMarshal(EntityInterface $entity, array $data, array $options = []): void
+    {
+        $data = new ArrayObject($data);
+        $options = new ArrayObject($options);
+        $this->_endpoint->dispatchEvent('Model.afterMarshal', compact('entity', 'data', 'options'));
     }
 }
