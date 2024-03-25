@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Model;
+namespace Muffin\Webservice\Test\TestCase\Model;
 
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Model\Endpoint;
+use Muffin\Webservice\Model\EndpointLocator;
 use RuntimeException;
 use TestApp\Model\Endpoint\TestEndpoint;
 

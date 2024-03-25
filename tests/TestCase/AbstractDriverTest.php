@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Test\TestCase\Model;
+namespace Muffin\Webservice\Test\TestCase;
 
 use Cake\Http\Client;
 use Cake\TestSuite\TestCase;
