@@ -202,14 +202,10 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         }
 
         $results = null;
-        if ($this->_cache) {
-            $results = $this->_cache->fetch($this);
-        }
+        $results = $this->_cache?->fetch($this);
         if ($results === null) {
             $results = $this->decorateResults($this->_execute());
-            if ($this->_cache) {
-                $this->_cache->store($this, $results);
-            }
+            $this->_cache?->store($this, $results);
         }
         $this->_results = $results;
 
@@ -241,7 +237,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param \Cake\Datasource\RepositoryInterface $repository The default repository object to use.
      * @return $this
      */
-    public function setRepository(RepositoryInterface $repository)
+    public function setRepository(RepositoryInterface $repository): Query
     {
         $this->_endpoint = $repository;
 
@@ -252,9 +248,9 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Returns the default repository object that will be used by this query,
      * that is, the table that will appear in the from clause.
      *
-     * @return \Muffin\Webservice\Model\Endpoint
+     * @return \Cake\Datasource\RepositoryInterface
      */
-    public function getRepository(): ?RepositoryInterface
+    public function getRepository(): RepositoryInterface
     {
         return $this->_endpoint;
     }
@@ -264,7 +260,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return $this
      */
-    public function create()
+    public function create(): Query
     {
         $this->action(self::ACTION_CREATE);
 
@@ -276,7 +272,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return $this
      */
-    public function read()
+    public function read(): Query
     {
         $this->action(self::ACTION_READ);
 
@@ -288,7 +284,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return $this
      */
-    public function update()
+    public function update(): Query
     {
         $this->action(self::ACTION_UPDATE);
 
@@ -300,7 +296,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @return $this
      */
-    public function delete()
+    public function delete(): Query
     {
         $this->action(self::ACTION_DELETE);
 
@@ -334,7 +330,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @return $this
      * @psalm-suppress LessSpecificReturnStatement
      */
-    public function setEndpoint(Endpoint $endpoint)
+    public function setEndpoint(Endpoint $endpoint): Query
     {
         $this->_endpoint = $endpoint;
 
@@ -359,7 +355,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice The webservice to use
      * @return $this
      */
-    public function setWebservice(WebserviceInterface $webservice)
+    public function setWebservice(WebserviceInterface $webservice): Query
     {
         $this->_webservice = $webservice;
 
@@ -433,14 +429,15 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      *
      * @param \Closure|array|string|null $conditions The list of conditions.
      * @param array $types Not used, required to comply with QueryInterface.
-     * @param bool $overwrite Whether or not to replace previous queries.
-     * @return $this
+     * @param bool $overwrite Whether to replace previous queries.
+     * @return Query|null|array
      */
     public function where(
         Closure|array|string|null $conditions = null,
         array $types = [],
         bool $overwrite = false
-    ) {
+    ): Query|null|array
+    {
         if ($conditions === null) {
             return $this->clause('where');
         }
@@ -460,7 +457,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @see \Cake\Database\Type
      * @psalm-suppress PossiblyInvalidArgument
      */
-    public function andWhere(string|array $conditions, array $types = [])
+    public function andWhere(string|array $conditions, array $types = []): Query
     {
         $this->where($conditions, $types);
 
@@ -473,7 +470,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param int $action Action to use
      * @return $this
      */
-    public function action(int $action)
+    public function action(int $action): Query
     {
         $this->_parts['action'] = $action;
 
@@ -490,11 +487,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Pages should start at 1.
      *
      * @param int $num The page number you want.
-     * @param int $limit The number of rows you want in the page. If null
+     * @param int|null $limit The number of rows you want in the page. If null
      *  the current limit clause will be used.
      * @return $this
      */
-    public function page(int $num, ?int $limit = null)
+    public function page(int $num, ?int $limit = null): Query
     {
         if ($num < 1) {
             throw new InvalidArgumentException('Pages must start at 1.');
@@ -524,7 +521,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param ?int $limit number of records to be returned
      * @return $this
      */
-    public function limit(?int $limit)
+    public function limit(?int $limit): Query
     {
         $this->_parts['limit'] = $limit;
 
@@ -535,9 +532,9 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Set fields to save in resources
      *
      * @param array|null $fields The field to set
-     * @return $this|array
+     * @return $this|null|array
      */
-    public function set(?array $fields = null)
+    public function set(?array $fields = null): Query|null|array
     {
         if ($fields === null) {
             return $this->clause('set');
@@ -555,7 +552,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * @inheritDoc
      */
-    public function offset($offset)
+    public function offset(?int $offset): Query|QueryInterface
     {
         $this->_parts['offset'] = $offset;
 
@@ -579,7 +576,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param bool $overwrite whether to reset order with field list or not
      * @return $this
      */
-    public function order(array|ExpressionInterface|Closure|string $fields, bool $overwrite = false)
+    public function order(array|ExpressionInterface|Closure|string $fields, bool $overwrite = false): Query
     {
         $this->_parts['order'] = !$overwrite ? Hash::merge($this->clause('order'), $fields) : $fields;
 
@@ -593,7 +590,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param array $options the options to be applied
      * @return $this This object
      */
-    public function applyOptions(array $options)
+    public function applyOptions(array $options): Query
     {
         if (isset($options['page'])) {
             $this->page($options['page']);
@@ -765,7 +762,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param bool $overwrite Whether or not to replace previous selections.
      * @return $this
      */
-    public function select(ExpressionInterface|Closure|array|string|int|float $fields, bool $overwrite = false)
+    public function select(ExpressionInterface|Closure|array|string|int|float $fields, bool $overwrite = false): Query
     {
         if (!is_string($fields) && is_callable($fields)) {
             $fields = $fields($this);
@@ -843,7 +840,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @return $this
      * @see \Cake\Collection\Iterator\MapReduce for details on how to use emit data to the map reducer.
      */
-    public function mapReduce(?Closure $mapper = null, ?Closure $reducer = null, bool $overwrite = false)
+    public function mapReduce(?Closure $mapper = null, ?Closure $reducer = null, bool $overwrite = false): Query
     {
         if ($overwrite) {
             $this->_mapReduce = [];
@@ -898,7 +895,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param bool $value Whether to eager load.
      * @return $this
      */
-    public function eagerLoaded(bool $value)
+    public function eagerLoaded(bool $value): Query
     {
         $this->_eagerLoaded = $value;
 
@@ -948,7 +945,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @return $this
      * @throws \InvalidArgumentException
      */
-    public function formatResults(?Closure $formatter = null, int|bool $mode = self::APPEND)
+    public function formatResults(?Closure $formatter = null, int|bool $mode = self::APPEND): Query
     {
         if ($mode === self::OVERWRITE) {
             $this->_formatters = [];

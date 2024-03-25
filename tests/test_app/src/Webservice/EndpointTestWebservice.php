@@ -10,7 +10,10 @@ use Muffin\Webservice\Webservice\Webservice;
 
 class EndpointTestWebservice extends Webservice
 {
-    protected $resources;
+    /**
+     * @var Resource[]
+     */
+    protected array $resources;
 
     public function initialize(): void
     {
@@ -129,7 +132,7 @@ class EndpointTestWebservice extends Webservice
         return 0;
     }
 
-    public function conditionsToIndex(array $conditions)
+    public function conditionsToIndex(array $conditions): int
     {
         return $conditions['id'] - 1;
     }
@@ -141,5 +144,7 @@ class EndpointTestWebservice extends Webservice
                 return $option['conditions'];
             }
         }
+
+        return null;
     }
 }

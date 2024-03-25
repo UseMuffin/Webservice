@@ -262,7 +262,7 @@ class Marshaller
      * @param array $options List of options.
      * @return array<\Cake\Datasource\EntityInterface>
      */
-    public function mergeMany(array|Traversable $entities, array $data, array $options = []): array
+    public function mergeMany(iterable $entities, array $data, array $options = []): array
     {
         $primary = (array)$this->_endpoint->getPrimaryKey();
 

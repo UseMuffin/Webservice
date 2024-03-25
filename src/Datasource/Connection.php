@@ -9,14 +9,14 @@ use Muffin\Webservice\Datasource\Exception\MissingConnectionException;
 use Muffin\Webservice\Webservice\Driver\AbstractDriver;
 use Muffin\Webservice\Webservice\Exception\MissingDriverException;
 use Muffin\Webservice\Webservice\Exception\UnexpectedDriverException;
+use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
  * Class Connection
  *
- * @method \Muffin\Webservice\Webservice\Driver\AbstractDriver setWebservice(string $name, \Muffin\Webservice\Webservice\WebserviceInterface $webservice) Proxy method through to the Driver
- * @method \Muffin\Webservice\Webservice\WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
- * @method string configName() Proxy method through to the Driver
+ * @method AbstractDriver setWebservice(string $name, WebserviceInterface $webservice) Proxy method through to the Driver
+ * @method WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
  */
 class Connection implements ConnectionInterface
 {
@@ -25,7 +25,7 @@ class Connection implements ConnectionInterface
      *
      * @var \Muffin\Webservice\Webservice\Driver\AbstractDriver
      */
-    protected ?AbstractDriver $_driver = null;
+    protected AbstractDriver $_driver;
 
     protected CacheInterface $cacher;
 
@@ -49,11 +49,12 @@ class Connection implements ConnectionInterface
         $driver = $config['driver'];
         unset($config['driver'], $config['service']);
 
-        $this->_driver = new $driver($config);
+        $tempDriver = new $driver($config);
 
-        if (!($this->_driver instanceof AbstractDriver)) {
+        if (!($tempDriver instanceof AbstractDriver)) {
             throw new UnexpectedDriverException(['driver' => $driver]);
         }
+        $this->_driver = $tempDriver;
     }
 
     /**
@@ -62,11 +63,13 @@ class Connection implements ConnectionInterface
      */
     public function setCacher(CacheInterface $cacher): void
     {
+        $this->cacher = $cacher;
     }
 
     /** @return \Psr\SimpleCache\CacheInterface  */
     public function getCacher(): CacheInterface
     {
+        return $this->cacher;
     }
 
     /**
@@ -75,7 +78,7 @@ class Connection implements ConnectionInterface
      * @see \Cake\Datasource\ConnectionInterface::getDriver()
      * @return \Muffin\Webservice\Webservice\Driver\AbstractDriver
      */
-    public function getDriver(string $role = self::ROLE_WRITE): object
+    public function getDriver(string $role = self::ROLE_WRITE): AbstractDriver
     {
         return $this->_driver;
     }

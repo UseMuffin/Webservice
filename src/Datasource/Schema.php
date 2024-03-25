@@ -159,7 +159,7 @@ class Schema implements SchemaInterface
      * @param array|string $attrs The attributes for the column.
      * @return $this
      */
-    public function addColumn(string $name, array|string $attrs)
+    public function addColumn(string $name, array|string $attrs): Schema
     {
         if (is_string($attrs)) {
             $attrs = ['type' => $attrs];
@@ -221,7 +221,7 @@ class Schema implements SchemaInterface
      * @param string $name The name of the column
      * @return $this
      */
-    public function removeColumn(string $name)
+    public function removeColumn(string $name): Schema
     {
         unset($this->_columns[$name], $this->_typeMap[$name]);
 
@@ -235,7 +235,7 @@ class Schema implements SchemaInterface
      * @param string $type Type to set for the column
      * @return $this
      */
-    public function setColumnType(string $name, string $type)
+    public function setColumnType(string $name, string $type): Schema
     {
         $this->_columns[$name]['type'] = $type;
         $this->_typeMap[$name] = $type;
@@ -360,7 +360,7 @@ class Schema implements SchemaInterface
      * @param array<string, mixed> $options Array of options to set
      * @return $this
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): Schema
     {
         $this->_options = array_merge($this->_options, $options);
 

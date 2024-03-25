@@ -14,9 +14,9 @@ use TestApp\Model\Endpoint\TestEndpoint;
 class MarshallerTest extends TestCase
 {
     /**
-     * @var Marshaller
+     * @var Marshaller|null
      */
-    private $marshaller;
+    private ?Marshaller $marshaller;
 
     /**
      * Create a marshaller instance for testing

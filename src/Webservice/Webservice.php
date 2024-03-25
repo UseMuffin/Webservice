@@ -28,14 +28,14 @@ abstract class Webservice implements WebserviceInterface
     /**
      * The driver to use to communicate with the webservice
      *
-     * @var \Muffin\Webservice\Webservice\Driver\AbstractDriver
+     * @var \Muffin\Webservice\Webservice\Driver\AbstractDriver|null
      */
-    protected AbstractDriver $_driver;
+    protected ?AbstractDriver $_driver = null;
 
     /**
      * The webservice to call
      *
-     * @var string
+     * @var string|null
      */
     protected ?string $_endpoint = null;
 
@@ -78,7 +78,7 @@ abstract class Webservice implements WebserviceInterface
      * @param \Muffin\Webservice\Webservice\Driver\AbstractDriver $driver Instance of the driver
      * @return $this
      */
-    public function setDriver(AbstractDriver $driver)
+    public function setDriver(AbstractDriver $driver): Webservice
     {
         $this->_driver = $driver;
 
@@ -105,7 +105,7 @@ abstract class Webservice implements WebserviceInterface
      * @param string $endpoint Endpoint path
      * @return $this
      */
-    public function setEndpoint(string $endpoint)
+    public function setEndpoint(string $endpoint): Webservice
     {
         $this->_endpoint = $endpoint;
 
@@ -214,18 +214,14 @@ abstract class Webservice implements WebserviceInterface
      */
     protected function _executeQuery(Query $query, array $options = []): bool|int|Resource|ResultSet
     {
-        switch ($query->clause('action')) {
-            case Query::ACTION_CREATE:
-                return $this->_executeCreateQuery($query, $options);
-            case Query::ACTION_READ:
-                return $this->_executeReadQuery($query, $options);
-            case Query::ACTION_UPDATE:
-                return $this->_executeUpdateQuery($query, $options);
-            case Query::ACTION_DELETE:
-                return $this->_executeDeleteQuery($query, $options);
-        }
+        return match ($query->clause('action')) {
+            Query::ACTION_CREATE => $this->_executeCreateQuery($query, $options),
+            Query::ACTION_READ => $this->_executeReadQuery($query, $options),
+            Query::ACTION_UPDATE => $this->_executeUpdateQuery($query, $options),
+            Query::ACTION_DELETE => $this->_executeDeleteQuery($query, $options),
+            default => false,
+        };
 
-        return false;
     }
 
     /**

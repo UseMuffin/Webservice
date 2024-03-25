@@ -44,7 +44,8 @@
     "require-dev": {
         "cakephp/cakephp": "^5.0",
         "cakephp/cakephp-codesniffer": "^5.0",
-        "phpunit/phpunit": "^10.1"
+        "phpunit/phpunit": "^10.1",
+        "ext-mbstring": "*"
     },
     "scripts": {
         "cs-check": "phpcs --colors --parallel=16 -p src/ tests/",

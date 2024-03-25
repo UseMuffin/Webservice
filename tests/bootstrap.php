@@ -24,18 +24,18 @@ require_once 'vendor/autoload.php';
 
 // Path constants to a few helpful things.
 define('ROOT', dirname(__DIR__) . DS);
-define('CAKE_CORE_INCLUDE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp');
-define('CORE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
-define('CAKE', CORE_PATH . 'src' . DS);
-define('TESTS', ROOT . 'tests');
-define('APP', ROOT . 'tests' . DS . 'test_app' . DS);
-define('APP_DIR', 'test_app');
-define('WEBROOT_DIR', 'webroot');
-define('WWW_ROOT', APP . 'webroot' . DS);
+const CAKE_CORE_INCLUDE_PATH = ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp';
+const CORE_PATH = ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS;
+const CAKE = CORE_PATH . 'src' . DS;
+const TESTS = ROOT . 'tests';
+const APP = ROOT . 'tests' . DS . 'test_app' . DS;
+const APP_DIR = 'test_app';
+const WEBROOT_DIR = 'webroot';
+const WWW_ROOT = APP . 'webroot' . DS;
 define('TMP', sys_get_temp_dir() . DS);
-define('CONFIG', APP . 'config' . DS);
-define('CACHE', TMP);
-define('LOGS', TMP);
+const CONFIG = APP . 'config' . DS;
+const CACHE = TMP;
+const LOGS = TMP;
 
 require_once CORE_PATH . 'config/bootstrap.php';
 

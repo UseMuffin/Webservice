@@ -36,10 +36,10 @@ class EndpointLocator extends AbstractLocator
      *
      * @param string $alias The alias name you want to get.
      * @param array $options The options you want to build the endpoint with.
-     * @return \Muffin\Webservice\Model\Endpoint
+     * @return \Cake\Datasource\RepositoryInterface
      * @throws \RuntimeException If the registry alias is already in use.
      */
-    public function get(string $alias, array $options = []): Endpoint
+    public function get(string $alias, array $options = []): RepositoryInterface
     {
         return parent::get($alias, $options);
     }
@@ -63,7 +63,7 @@ class EndpointLocator extends AbstractLocator
         if ($className) {
             $options['className'] = $className;
         } else {
-            if (!isset($options['endpoint']) && strpos($options['className'], '\\') === false) {
+            if (!isset($options['endpoint']) && !str_contains($options['className'], '\\')) {
                 [, $endpoint] = pluginSplit($options['className']);
                 $options['endpoint'] = Inflector::underscore($endpoint);
             }
@@ -74,7 +74,7 @@ class EndpointLocator extends AbstractLocator
             if ($options['className'] !== Endpoint::class) {
                 $connectionName = $options['className']::defaultConnectionName();
             } else {
-                if (strpos($alias, '.') === false) {
+                if (!str_contains($alias, '.')) {
                     $connectionName = 'webservice';
                 } else {
                     $pluginParts = explode('/', pluginSplit($alias)[0]);

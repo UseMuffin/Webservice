@@ -11,9 +11,9 @@ use TestApp\Model\Endpoint\TestEndpoint;
 class EndpointLocatorTest extends TestCase
 {
     /**
-     * @var \Muffin\Webservice\Model\EndpointLocator
+     * @var \Muffin\Webservice\Model\EndpointLocator|null
      */
-    private $Locator;
+    private ?EndpointLocator $Locator;
 
     public function setUp(): void
     {

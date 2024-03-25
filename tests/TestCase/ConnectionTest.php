@@ -11,9 +11,9 @@ use Muffin\Webservice\Webservice\Exception\MissingDriverException;
 class ConnectionTest extends TestCase
 {
     /**
-     * @var Connection
+     * @var Connection|null
      */
-    public $connection;
+    public ?Connection $connection;
 
     public function setUp(): void
     {

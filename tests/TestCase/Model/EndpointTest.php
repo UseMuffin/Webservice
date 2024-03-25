@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Muffin\Webservice\Test\TestCase\Model;
 
+use AllowDynamicProperties;
 use BadMethodCallException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\EventManager;
@@ -20,17 +21,18 @@ use TestApp\Model\Endpoint\ExampleEndpoint;
 use TestApp\Model\Endpoint\TestEndpoint;
 use TestApp\Webservice\TestWebservice;
 
+#[AllowDynamicProperties]
 class EndpointTest extends TestCase
 {
     /**
-     * @var \Muffin\Webservice\Connection
+     * @var Connection|null
      */
-    protected $connection;
+    protected ?Connection $connection;
 
     /**
-     * @var Endpoint
+     * @var Endpoint|null
      */
-    protected $endpoint;
+    protected ?Endpoint $endpoint;
 
     /**
      * @inheritDoc
@@ -65,7 +67,7 @@ class EndpointTest extends TestCase
      * @param string|null $inflector
      * @param string $expected
      */
-    public function testEndpointName($name, $inflector, $expected)
+    public function testEndpointName(string $name, ?string $inflector, string $expected)
     {
         $endpoint = new Endpoint(['name' => $name, 'inflect' => $inflector]);
         $this->assertSame($expected, $endpoint->getName());

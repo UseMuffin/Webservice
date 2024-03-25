@@ -8,15 +8,16 @@ use Muffin\Webservice\Datasource\Query;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Exception\MissingEndpointSchemaException;
 use Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException;
+use Muffin\Webservice\Webservice\Webservice;
 use TestApp\Webservice\Driver\TestDriver;
 use TestApp\Webservice\TestWebservice;
 
 class WebserviceTest extends TestCase
 {
     /**
-     * @var \Muffin\Webservice\Webservice\Webservice
+     * @var \Muffin\Webservice\Webservice\Webservice|null
      */
-    public $webservice;
+    public ?Webservice $webservice;
 
     /**
      * @inheritDoc
@@ -159,7 +160,6 @@ class WebserviceTest extends TestCase
         /** @var \Muffin\Webservice\Model\Resource $resource */
         $resource = $this->webservice->createResource('\Muffin\Webservice\Model\Resource', []);
 
-        $this->assertInstanceOf('\Muffin\Webservice\Model\Resource', $resource);
         $this->assertFalse($resource->isNew());
         $this->assertFalse($resource->isDirty());
     }

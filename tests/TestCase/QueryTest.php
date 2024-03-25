@@ -15,9 +15,9 @@ use UnexpectedValueException;
 class QueryTest extends TestCase
 {
     /**
-     * @var Query
+     * @var Query|null
      */
-    public $query;
+    public ?Query $query;
 
     /**
      * @inheritDoc

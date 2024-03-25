@@ -32,7 +32,7 @@ class TestEndpoint extends Endpoint
      *
      * @return true
      */
-    public function findExamples()
+    public function findExamples(): true
     {
         return true;
     }

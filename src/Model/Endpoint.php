@@ -58,7 +58,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * The webservice instance to call
      *
-     * @var \Muffin\Webservice\Webservice\WebserviceInterface
+     * @var \Muffin\Webservice\Webservice\WebserviceInterface|null
      */
     protected ?WebserviceInterface $_webservice = null;
 
@@ -79,7 +79,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * The schema object containing a description of this endpoint fields
      *
-     * @var \Muffin\Webservice\Datasource\Schema
+     * @var \Muffin\Webservice\Datasource\Schema|null
      */
     protected ?Schema $_schema = null;
 
@@ -100,14 +100,14 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * The name of the endpoint to contact
      *
-     * @var string
+     * @var string|null
      */
     protected ?string $_name = null;
 
     /**
      * The name of the class that represent a single resource for this endpoint
      *
-     * @var string
+     * @var string|null
      * @psalm-var class-string<\Muffin\Webservice\Model\Resource>
      */
     protected ?string $_resourceClass = null;
@@ -115,7 +115,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Registry key used to create this endpoint object
      *
-     * @var string
+     * @var string|null
      */
     protected ?string $_registryAlias = null;
 
@@ -230,7 +230,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $name The name for this endpoint instance
      * @return $this
      */
-    public function setName(string $name)
+    public function setName(string $name) : Endpoint
     {
         $inflectMethod = $this->getInflectionMethod();
         $this->_name = Inflector::{$inflectMethod}($name);
@@ -273,7 +273,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $registryAlias The key used to access this object.
      * @return $this
      */
-    public function setRegistryAlias(string $registryAlias)
+    public function setRegistryAlias(string $registryAlias) : Endpoint
     {
         $this->_registryAlias = $registryAlias;
 
@@ -300,7 +300,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param \Muffin\Webservice\Datasource\Connection $connection Connection instance
      * @return $this
      */
-    public function setConnection(Connection $connection)
+    public function setConnection(Connection $connection) : Endpoint
     {
         $this->_connection = $connection;
 
@@ -329,7 +329,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param \Muffin\Webservice\Datasource\Schema|array $schema Either an array of fields and config, or a schema object
      * @return $this
      */
-    public function setSchema(Schema|array $schema)
+    public function setSchema(Schema|array $schema) : Endpoint
     {
         if (is_array($schema)) {
             $schema = new Schema($this->getName(), $schema);
@@ -403,7 +403,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array|string|null $key sets a new name to be used as primary key
      * @return $this
      */
-    public function setPrimaryKey(string|array|null $key)
+    public function setPrimaryKey(string|array|null $key): Endpoint
     {
         $this->_primaryKey = $key;
 
@@ -436,7 +436,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param array<string>|string $field The new field to use as the display field
      * @return $this
      */
-    public function setDisplayField(string|array $field)
+    public function setDisplayField(string|array $field): Endpoint
     {
         $this->_displayField = $field;
 
@@ -474,9 +474,9 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @return $this
      * @throws \Muffin\Webservice\Model\Exception\MissingResourceClassException If the resource class specified does not exist
      */
-    public function setResourceClass(string $name)
+    public function setResourceClass(string $name): Endpoint
     {
-        /** @psalm-var class-string<\Muffin\Webservice\Model\Resource>|null */
+        /** @psalm-var class-string<\Muffin\Webservice\Model\Resource>|null $className */
         $className = App::className($name, 'Model/Resource');
         if (!$className) {
             throw new MissingResourceClassException([$name]);
@@ -505,7 +505,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
             }
 
             $alias = Inflector::singularize(substr(array_pop($parts), 0, -8));
-            /** @psalm-var class-string<\Muffin\Webservice\Model\Resource> */
+            /** @psalm-var class-string<\Muffin\Webservice\Model\Resource> $alias */
             $name = implode('\\', array_slice($parts, 0, -1)) . '\Resource\\' . $alias;
             if (!class_exists($name)) {
                 return $this->_resourceClass = $default;
@@ -523,7 +523,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $method The name of the inflection method
      * @return $this
      */
-    public function setInflectionMethod(string $method)
+    public function setInflectionMethod(string $method): Endpoint
     {
         $this->_inflectionMethod = $method;
 
@@ -548,7 +548,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @return $this
      * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no driver exists for the endpoint
      */
-    public function setWebservice(string $alias, WebserviceInterface $webservice)
+    public function setWebservice(string $alias, WebserviceInterface $webservice): Endpoint
     {
         $connection = $this->getConnection();
         $connection->setWebservice($alias, $webservice);
@@ -746,8 +746,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *   Defaults to `null`, i.e. no caching.
      * @param \Closure|string|null $cacheKey The cache key to use. If not provided
      *   one will be autogenerated if `$cache` is not null.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException if the record with such id
-     * could not be found
+     * @param mixed ...$args
      * @return \Cake\Datasource\EntityInterface
      * @see \Cake\Datasource\RepositoryInterface::find()
      */
@@ -857,7 +856,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * This method will *not* trigger beforeSave/afterSave events. If you need those
      * first load a collection of records and update them.
      *
-     * @param Closure|array|string = array(); $fields A hash of field => new value.
+     * @param Closure|array|string $fields = array(); $fields A hash of field => new value.
      * @param \Closure|array|string|null $conditions Conditions to be used, accepts anything Query::where() can take.
      * @return int Count Returns the affected rows.
      * @psalm-suppress MoreSpecificImplementedParamType
@@ -1029,10 +1028,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @param string $method The method name that was fired.
      * @param array $args List of arguments passed to the function.
-     * @return mixed
+     * @return \Cake\Datasource\QueryInterface
      * @throws \BadMethodCallException when there are missing arguments, or when and & or are combined.
      */
-    protected function _dynamicFinder(string $method, array $args): mixed
+    protected function _dynamicFinder(string $method, array $args): QueryInterface
     {
         $method = Inflector::underscore($method);
         preg_match('/^find_([\w]+)_by_/', $method, $matches);
@@ -1092,10 +1091,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @param string $method name of the method to be invoked
      * @param array $args List of arguments passed to the function
-     * @return mixed
+     * @return QueryInterface
      * @throws \BadMethodCallException If the request dynamic finder cannot be found
      */
-    public function __call(string $method, array $args): mixed
+    public function __call(string $method, array $args): QueryInterface
     {
         if (preg_match('/^find(?:\w+)?By/', $method) > 0) {
             return $this->_dynamicFinder($method, $args);
@@ -1149,9 +1148,8 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     public function newEmptyEntity(): EntityInterface
     {
         $class = $this->getResourceClass();
-        $entity = new $class([], ['source' => $this->getRegistryAlias()]);
 
-        return $entity;
+        return new $class([], ['source' => $this->getRegistryAlias()]);
     }
 
     /**
@@ -1307,7 +1305,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $alias Alias for this endpoint
      * @return $this
      */
-    public function setAlias(string $alias)
+    public function setAlias(string $alias): Endpoint
     {
         $this->_alias = $alias;
 
