@@ -84,7 +84,7 @@ jobs:
         php-version: '8.2'
         extensions: mbstring, intl
         coverage: none
-        tools: psalm:5.23.1, phpstan:1.0.65
+        tools: psalm:5.23.1, phpstan:1.10.65
 
     - name: Composer Install
       run: composer require cakephp/cakephp-codesniffer:^4.2

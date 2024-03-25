@@ -9,7 +9,6 @@ use Cake\Datasource\EntityInterface;
 use Cake\Datasource\InvalidPropertyInterface;
 use Muffin\Webservice\Model\Endpoint;
 use RuntimeException;
-use Traversable;
 
 /**
  * Contains logic to convert array data into resources.
@@ -54,7 +53,6 @@ class Marshaller
         [$data, $options] = $this->_prepareDataAndOptions($data, $options);
 
         $primaryKey = (array)$this->_endpoint->getPrimaryKey();
-        /** @psalm-var class-string<\Muffin\Webservice\Model\Resource> */
         $resourceClass = $this->_endpoint->getResourceClass();
         $entity = new $resourceClass();
         $entity->setSource($this->_endpoint->getRegistryAlias());

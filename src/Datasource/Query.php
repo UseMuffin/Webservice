@@ -23,6 +23,11 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 use Traversable;
 use UnexpectedValueException;
 
+/**
+ * @template TKey
+ * @template-covariant TValue
+ * @template-implements IteratorAggregate<TKey, TValue>
+ */
 class Query implements IteratorAggregate, JsonSerializable, QueryInterface
 {
     public const ACTION_CREATE = 1;
@@ -104,7 +109,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * The result from the webservice
      *
-     * @var \Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet|int|bool
+     * @var ResultSetInterface|null
      */
     protected mixed $_results = null;
 
@@ -430,14 +435,13 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param \Closure|array|string|null $conditions The list of conditions.
      * @param array $types Not used, required to comply with QueryInterface.
      * @param bool $overwrite Whether to replace previous queries.
-     * @return Query|null|array
+     * @return \Muffin\Webservice\Datasource\Query|array|null
      */
     public function where(
         Closure|array|string|null $conditions = null,
         array $types = [],
         bool $overwrite = false
-    ): Query|null|array
-    {
+    ): Query|array|null {
         if ($conditions === null) {
             return $this->clause('where');
         }
@@ -532,9 +536,9 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * Set fields to save in resources
      *
      * @param array|null $fields The field to set
-     * @return $this|null|array
+     * @return $this|array|null
      */
-    public function set(?array $fields = null): Query|null|array
+    public function set(?array $fields = null): Query|array|null
     {
         if ($fields === null) {
             return $this->clause('set');

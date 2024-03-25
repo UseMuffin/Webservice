@@ -221,7 +221,6 @@ abstract class Webservice implements WebserviceInterface
             Query::ACTION_DELETE => $this->_executeDeleteQuery($query, $options),
             default => false,
         };
-
     }
 
     /**

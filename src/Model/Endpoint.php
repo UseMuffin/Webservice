@@ -230,7 +230,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $name The name for this endpoint instance
      * @return $this
      */
-    public function setName(string $name) : Endpoint
+    public function setName(string $name): Endpoint
     {
         $inflectMethod = $this->getInflectionMethod();
         $this->_name = Inflector::{$inflectMethod}($name);
@@ -273,7 +273,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param string $registryAlias The key used to access this object.
      * @return $this
      */
-    public function setRegistryAlias(string $registryAlias) : Endpoint
+    public function setRegistryAlias(string $registryAlias): Endpoint
     {
         $this->_registryAlias = $registryAlias;
 
@@ -300,7 +300,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param \Muffin\Webservice\Datasource\Connection $connection Connection instance
      * @return $this
      */
-    public function setConnection(Connection $connection) : Endpoint
+    public function setConnection(Connection $connection): Endpoint
     {
         $this->_connection = $connection;
 
@@ -329,7 +329,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * @param \Muffin\Webservice\Datasource\Schema|array $schema Either an array of fields and config, or a schema object
      * @return $this
      */
-    public function setSchema(Schema|array $schema) : Endpoint
+    public function setSchema(Schema|array $schema): Endpoint
     {
         if (is_array($schema)) {
             $schema = new Schema($this->getName(), $schema);
@@ -413,10 +413,10 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
     /**
      * Get the endpoints primary key, if one is not set, fetch it from the schema
      *
-     * @return array|string
+     * @return list<string>|string|null
      * @throws \Muffin\Webservice\Webservice\Exception\UnexpectedDriverException When no schema exists to fetch the key from
      */
-    public function getPrimaryKey(): array|string
+    public function getPrimaryKey(): array|string|null
     {
         if ($this->_primaryKey === null) {
             $schema = $this->getSchema();
@@ -856,7 +856,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      * This method will *not* trigger beforeSave/afterSave events. If you need those
      * first load a collection of records and update them.
      *
-     * @param Closure|array|string $fields = array(); $fields A hash of field => new value.
+     * @param \Closure|array|string $fields = array(); $fields A hash of field => new value.
      * @param \Closure|array|string|null $conditions Conditions to be used, accepts anything Query::where() can take.
      * @return int Count Returns the affected rows.
      * @psalm-suppress MoreSpecificImplementedParamType
@@ -1091,7 +1091,7 @@ class Endpoint implements RepositoryInterface, EventListenerInterface, EventDisp
      *
      * @param string $method name of the method to be invoked
      * @param array $args List of arguments passed to the function
-     * @return QueryInterface
+     * @return \Cake\Datasource\QueryInterface
      * @throws \BadMethodCallException If the request dynamic finder cannot be found
      */
     public function __call(string $method, array $args): QueryInterface

@@ -9,14 +9,13 @@ use Muffin\Webservice\Datasource\Exception\MissingConnectionException;
 use Muffin\Webservice\Webservice\Driver\AbstractDriver;
 use Muffin\Webservice\Webservice\Exception\MissingDriverException;
 use Muffin\Webservice\Webservice\Exception\UnexpectedDriverException;
-use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
  * Class Connection
  *
- * @method AbstractDriver setWebservice(string $name, WebserviceInterface $webservice) Proxy method through to the Driver
- * @method WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
+ * @method \Muffin\Webservice\Webservice\Driver\AbstractDriver setWebservice(string $name, \Muffin\Webservice\Datasource\WebserviceInterface $webservice) Proxy method through to the Driver
+ * @method \Muffin\Webservice\Datasource\WebserviceInterface getWebservice(string $name) Proxy method through to the Driver
  */
 class Connection implements ConnectionInterface
 {
@@ -59,11 +58,13 @@ class Connection implements ConnectionInterface
 
     /**
      * @param \Psr\SimpleCache\CacheInterface $cacher
-     * @return void
+     * @return $this
      */
-    public function setCacher(CacheInterface $cacher): void
+    public function setCacher(CacheInterface $cacher): ConnectionInterface
     {
         $this->cacher = $cacher;
+
+        return $this;
     }
 
     /** @return \Psr\SimpleCache\CacheInterface  */
@@ -96,7 +97,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the config data for this connection.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function config(): array
     {
