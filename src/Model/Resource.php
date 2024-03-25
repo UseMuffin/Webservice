@@ -30,7 +30,7 @@ class Resource implements EntityInterface, InvalidPropertyInterface
      * @param array $properties hash of properties to set in this resource
      * @param array $options list of options to use when creating this resource
      */
-    public function __construct(array $properties = [], array $options = [])
+    final public function __construct(array $properties = [], array $options = [])
     {
         $options += [
             'useSetters' => true,
