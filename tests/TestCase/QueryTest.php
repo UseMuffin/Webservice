@@ -174,7 +174,7 @@ class QueryTest extends TestCase
 
         $mockWebservice->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue(new ResultSet([
+            ->willReturn(new ResultSet([
                 new Resource([
                     'id' => 1,
                     'title' => 'Hello World',
@@ -187,7 +187,7 @@ class QueryTest extends TestCase
                     'id' => 3,
                     'title' => 'Webservices',
                 ]),
-            ], 3)));
+            ], 3));
 
         $this->query
             ->setWebservice($mockWebservice)

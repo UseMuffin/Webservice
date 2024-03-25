@@ -20,7 +20,7 @@ class SchemaTest extends TestCase
 
     public function testName()
     {
-        $this->assertEquals($this->schema->name(), 'test');
+        $this->assertEquals('test', $this->schema->name());
     }
 
     public function testAddColumn()

@@ -190,7 +190,7 @@ class EndpointTest extends TestCase
         $this->assertFalse($savedResource->isNew());
 
         $newResource = $this->endpoint->get(2);
-        $this->assertEquals($newResource->title, 'New ORM for webservices');
+        $this->assertEquals('New ORM for webservices', $newResource->title);
     }
 
     public function testDelete()

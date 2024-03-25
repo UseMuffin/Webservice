@@ -696,7 +696,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             return $this->_execute();
         }
 
-        return $this->_result = $this->_webservice->execute($this);
+        return $this->_webservice->execute($this);
     }
 
     /**
