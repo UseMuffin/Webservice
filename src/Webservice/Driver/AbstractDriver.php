@@ -206,7 +206,8 @@ abstract class AbstractDriver implements LoggerAwareInterface
      */
     public function __call(string $method, array $args): mixed
     {
-        if (!method_exists($this->getClient(), $method)) {
+        /** @psalm-suppress PossiblyNullArgument Only the left expression is executed if the getClient returns null **/
+        if ($this->getClient() === null || !method_exists($this->getClient(), $method)) {
             throw new UnimplementedWebserviceMethodException([
                 'name' => $this->getConfig('name'),
                 'method' => $method,
@@ -253,7 +254,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
         $fallbackWebserviceClass = end($namespaceParts);
 
         [$pluginName] = pluginSplit($className);
-        if ($pluginName) {
+        if ($pluginName !== null) {
             $fallbackWebserviceClass = $pluginName . '.' . $fallbackWebserviceClass;
         }
 

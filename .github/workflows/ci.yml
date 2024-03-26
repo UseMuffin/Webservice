@@ -90,7 +90,8 @@ jobs:
       run: composer require cakephp/cakephp-codesniffer:^4.2
 
     - name: Run phpcs
-      run: vendor/bin/phpcs --standard=CakePHP src/ tests/
+      # Exclude Type hint sniffing, as it interferes with psalm
+      run: vendor/bin/phpcs --standard=CakePHP --exclude=CakePHP.Classes.ReturnTypeHint src/ tests/
 
     - name: Run psalm
       if: success() || failure()

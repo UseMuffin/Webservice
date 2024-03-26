@@ -127,7 +127,7 @@ class QueryTest extends TestCase
         ]));
         $this->assertEquals([
             'field' => 'value',
-        ], $this->query->set());
+        ], $this->query->clause('set'));
     }
 
     public function testPage()

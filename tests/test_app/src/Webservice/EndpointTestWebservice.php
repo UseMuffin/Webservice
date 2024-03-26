@@ -49,7 +49,7 @@ class EndpointTestWebservice extends Webservice
 
     protected function _executeCreateQuery(Query $query, array $options = []): bool|Resource
     {
-        $fields = $query->set();
+        $fields = $query->clause('set');
 
         if (!is_numeric($fields['id'])) {
             return false;
@@ -66,8 +66,9 @@ class EndpointTestWebservice extends Webservice
 
     protected function _executeReadQuery(Query $query, array $options = []): bool|ResultSet
     {
-        if (!empty($query->where()['id'])) {
-            $index = $this->conditionsToIndex($query->where());
+        $whereConditions = $query->clause('where');
+        if (!empty($whereConditions['id'])) {
+            $index = $this->conditionsToIndex($whereConditions);
 
             if (!isset($this->resources[$index])) {
                 return new ResultSet([], 0);
@@ -97,16 +98,16 @@ class EndpointTestWebservice extends Webservice
 
     protected function _executeUpdateQuery(Query $query, array $options = []): int|bool|Resource
     {
-        $this->resources[$this->conditionsToIndex($query->where())]->set($query->set());
+        $this->resources[$this->conditionsToIndex($query->clause('where'))]->set($query->clause('set'));
 
-        $this->resources[$this->conditionsToIndex($query->where())]->clean();
+        $this->resources[$this->conditionsToIndex($query->clause('where'))]->clean();
 
         return 1;
     }
 
     protected function _executeDeleteQuery(Query $query, array $options = []): int|bool
     {
-        $conditions = $query->where();
+        $conditions = $query->clause('where');
 
         if (is_int($conditions['id'])) {
             $exists = isset($this->resources[$this->conditionsToIndex($conditions)]);

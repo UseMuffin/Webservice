@@ -77,6 +77,7 @@ class EndpointLocator extends AbstractLocator
                 if (!str_contains($alias, '.')) {
                     $connectionName = 'webservice';
                 } else {
+                    /** @psalm-suppress PossiblyNullArgument Not clean, but cannot happen with incorrect configuration and was not a problem before **/
                     $pluginParts = explode('/', pluginSplit($alias)[0]);
                     $connectionName = Inflector::underscore(end($pluginParts));
                 }

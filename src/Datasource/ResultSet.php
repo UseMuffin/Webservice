@@ -5,7 +5,6 @@ namespace Muffin\Webservice\Datasource;
 
 use Cake\Collection\CollectionTrait;
 use Cake\Datasource\ResultSetInterface;
-use IteratorIterator;
 use Muffin\Webservice\Model\Resource;
 
 /** @package Muffin\Webservice\Datasource */
@@ -62,11 +61,9 @@ class ResultSet implements ResultSetInterface
      *
      * Part of Iterator interface.
      *
-     * @return \Cake\Datasource\EntityInterface|array
-     * @psalm-return T
+     * @return Resource
      */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): Resource
     {
         return $this->_current;
     }
@@ -124,6 +121,8 @@ class ResultSet implements ResultSetInterface
      *
      * @return int
      */
+
+    /** @psalm-suppress ImplementedReturnTypeMismatch This seems to be implemented with the key as an integer everywhere **/
     public function key(): int
     {
         return $this->_index;

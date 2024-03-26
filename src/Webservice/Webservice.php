@@ -115,9 +115,9 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Get the endpoint path for this webservice
      *
-     * @return string
+     * @return string|null
      */
-    public function getEndpoint(): string
+    public function getEndpoint(): ?string
     {
         return $this->_endpoint;
     }
@@ -323,7 +323,7 @@ abstract class Webservice implements WebserviceInterface
         }
 
         $logger->debug($query->getEndpoint()->getName(), [
-            'params' => $query->where(),
+            'params' => $query->clause('where'),
         ]);
     }
 

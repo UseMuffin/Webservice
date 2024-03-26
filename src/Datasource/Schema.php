@@ -32,7 +32,7 @@ class Schema implements SchemaInterface
     /**
      * A map with columns to types
      *
-     * @var array
+     * @var array<string, string>
      */
     protected array $_typeMap = [];
 
@@ -53,7 +53,7 @@ class Schema implements SchemaInterface
     /**
      * Options for the endpoint.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected array $_options = [];
 
@@ -178,7 +178,7 @@ class Schema implements SchemaInterface
     /**
      * Get the column names in the endpoint.
      *
-     * @return array<string>
+     * @return list<string>
      */
     public function columns(): array
     {
@@ -278,7 +278,7 @@ class Schema implements SchemaInterface
             return null;
         }
 
-        if (TypeFactory::getMap($type)) {
+        if (TypeFactory::getMap($type) !== null) {
             $type = TypeFactory::build($type)->getBaseType();
         }
 
@@ -337,7 +337,7 @@ class Schema implements SchemaInterface
     /**
      * Get the column(s) used for the primary key.
      *
-     * @return array Column name(s) for the primary key. An
+     * @return list<string> Column name(s) for the primary key. An
      *   empty list will be returned when the endpoint has no primary key.
      */
     public function getPrimaryKey(): array

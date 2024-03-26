@@ -5,7 +5,11 @@ namespace Muffin\Webservice\Datasource;
 
 use ArrayObject;
 use Cake\Collection\Iterator\MapReduce;
+use Cake\Database\Expression\OrderByExpression;
+use Cake\Database\Expression\QueryExpression;
 use Cake\Database\ExpressionInterface;
+use Cake\Database\TypeMap;
+use Cake\Database\TypeMapTrait;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\QueryCacher;
 use Cake\Datasource\QueryInterface;
@@ -26,10 +30,12 @@ use UnexpectedValueException;
 /**
  * @template TKey
  * @template-covariant TValue
- * @template-implements IteratorAggregate<TKey, TValue>
+ * @template-implements \IteratorAggregate<TKey, TValue>
  */
 class Query implements IteratorAggregate, JsonSerializable, QueryInterface
 {
+    use TypeMapTrait;
+
     public const ACTION_CREATE = 1;
     public const ACTION_READ = 2;
     public const ACTION_UPDATE = 3;
@@ -109,16 +115,16 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * The result from the webservice
      *
-     * @var ResultSetInterface|null
+     * @var Resource|\Cake\Datasource\ResultSetInterface|int|bool|null
      */
-    protected mixed $_results = null;
+    protected bool|int|Resource|ResultSetInterface|null $_results = null;
 
     /**
      * Instance of a endpoint object this query is bound to
      *
-     * @var \Cake\Datasource\RepositoryInterface
+     * @var \Muffin\Webservice\Model\Endpoint
      */
-    protected RepositoryInterface $_endpoint;
+    protected Endpoint $_endpoint;
 
     /**
      * List of map-reduce routines that should be applied over the query
@@ -198,18 +204,23 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function all(): ResultSetInterface
     {
-        if ($this->_results !== null) {
-            if (!($this->_results instanceof ResultSetInterface)) {
-                $this->_results = $this->decorateResults($this->_results);
-            }
+        if (is_iterable($this->_results)) {
+            $this->_results = $this->decorateResults($this->_results);
 
             return $this->_results;
         }
 
-        $results = null;
+        /** @psalm-suppress InternalMethod Could not find a better way apart from implementing it as a custom class **/
         $results = $this->_cache?->fetch($this);
         if ($results === null) {
-            $results = $this->decorateResults($this->_execute());
+            $res = $this->_execute();
+
+            if (!is_iterable($res)) {
+                return new ResultSet([], 0);
+            }
+
+            $results = $this->decorateResults($res);
+            /** @psalm-suppress InternalMethod Could not find a better way apart from implementing it as a custom class **/
             $this->_cache?->store($this, $results);
         }
         $this->_results = $results;
@@ -220,10 +231,133 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * @param \Closure|array|string $fields
      * @param bool $overwrite
+     * @return $this
+     */
+    public function orderBy(Closure|array|string $fields, bool $overwrite = false): Query
+    {
+        if ($overwrite) {
+            $this->_parts['order'] = null;
+        }
+
+        if (is_array($fields) && empty($fields)) {
+            return $this;
+        }
+
+        $this->_parts['order'] ??= new OrderByExpression();
+        $this->_conjugate('order', $fields, '', []);
+
+        return $this;
+    }
+
+    /**
+     * Helper function used to build conditions by composing QueryExpression objects.
+     *
+     * @param string $part Name of the query part to append the new part to
+     * @param \Cake\Database\ExpressionInterface|\Closure|array|string|null $append Expression or builder function to append.
+     *   to append.
+     * @param string $conjunction type of conjunction to be used to operate part
+     * @param array<string, string> $types Associative array of type names used to bind values to query
      * @return void
      */
-    public function orderBy(Closure|array|string $fields, bool $overwrite = false): void
+    protected function _conjugate(
+        string $part,
+        ExpressionInterface|Closure|array|string|null $append,
+        string $conjunction,
+        array $types
+    ): void {
+        /** @var \Cake\Database\Expression\QueryExpression $expression */
+        $expression = $this->_parts[$part] ?: $this->newExpr();
+        if ((is_array($append) && empty($append)) || $append === null) {
+            $this->_parts[$part] = $expression;
+
+            return;
+        }
+
+        if ($append instanceof Closure) {
+            $append = $append($this->newExpr(), $this);
+        }
+
+        if ($expression->getConjunction() === $conjunction) {
+            $expression->add($append, $types);
+        } else {
+            $expression = $this->newExpr()
+                ->setConjunction($conjunction)
+                ->add([$expression, $append], $types);
+        }
+
+        $this->_parts[$part] = $expression;
+        $this->_dirty();
+    }
+
+    /**
+     * Marks a query as dirty, removing any preprocessed information
+     * from in memory caching.
+     *
+     * @return void
+     */
+    protected function _dirty(): void
     {
+        $this->_dirty = true;
+    }
+
+    /**
+     * Returns a new QueryExpression object. This is a handy function when
+     * building complex queries using a fluent interface. You can also override
+     * this function in subclasses to use a more specialized QueryExpression class
+     * if required.
+     *
+     * You can optionally pass a single raw SQL string or an array or expressions in
+     * any format accepted by \Cake\Database\Expression\QueryExpression:
+     *
+     * ```
+     * $expression = $query->expr(); // Returns an empty expression object
+     * $expression = $query->expr('Table.column = Table2.column'); // Return a raw SQL expression
+     * ```
+     *
+     * @param \Cake\Database\ExpressionInterface|array|string|null $rawExpression A string, array or anything you want wrapped in an expression object
+     * @return \Cake\Database\Expression\QueryExpression
+     */
+    public function newExpr(ExpressionInterface|array|string|null $rawExpression = null): QueryExpression
+    {
+        return $this->expr($rawExpression);
+    }
+
+    /**
+     * Returns a new QueryExpression object. This is a handy function when
+     * building complex queries using a fluent interface. You can also override
+     * this function in subclasses to use a more specialized QueryExpression class
+     * if required.
+     *
+     * You can optionally pass a single raw SQL string or an array or expressions in
+     * any format accepted by \Cake\Database\Expression\QueryExpression:
+     *
+     * ```
+     * $expression = $query->expr(); // Returns an empty expression object
+     * $expression = $query->expr('Table.column = Table2.column'); // Return a raw SQL expression
+     * ```
+     *
+     * @param \Cake\Database\ExpressionInterface|array|string|null $rawExpression A string, array or anything you want wrapped in an expression object
+     * @return \Cake\Database\Expression\QueryExpression
+     */
+    public function expr(ExpressionInterface|array|string|null $rawExpression = null): QueryExpression
+    {
+        $expression = new QueryExpression([], $this->getTypeMap());
+
+        if ($rawExpression !== null) {
+            $expression->add($rawExpression);
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Returns the existing type map.
+     *
+     * @return \Cake\Database\TypeMap
+     */
+    public function getTypeMap(): TypeMap
+    {
+        return $this->_typeMap ??= new TypeMap();
     }
 
     /**
@@ -244,7 +378,9 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function setRepository(RepositoryInterface $repository): Query
     {
-        $this->_endpoint = $repository;
+        if ($repository instanceof Endpoint) {
+            $this->_endpoint = $repository;
+        }
 
         return $this;
     }
@@ -350,7 +486,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      */
     public function getEndpoint(): Endpoint
     {
-        /** @var \Muffin\Webservice\Model\Endpoint */
         return $this->_endpoint;
     }
 
@@ -375,27 +510,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     public function getWebservice(): WebserviceInterface
     {
         return $this->_webservice;
-    }
-
-    /**
-     * Apply custom finds to against an existing query object.
-     *
-     * Allows custom find methods to be combined and applied to each other.
-     *
-     * ```
-     * $repository->find('all')->find('recent');
-     * ```
-     *
-     * The above is an example of stacking multiple finder methods onto
-     * a single query.
-     *
-     * @param string $finder The finder method to use.
-     * @param mixed ...$args Arguments that match up to finder-specific parameters
-     * @return static Returns a modified query.
-     */
-    public function find(string $finder, mixed ...$args): static
-    {
-        return $this->_endpoint->callFinder($finder, $this, $args);
     }
 
     /**
@@ -435,17 +549,18 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param \Closure|array|string|null $conditions The list of conditions.
      * @param array $types Not used, required to comply with QueryInterface.
      * @param bool $overwrite Whether to replace previous queries.
-     * @return \Muffin\Webservice\Datasource\Query|array|null
+     * @return \Cake\Datasource\QueryInterface|array
      */
+
+    /** @psalm-suppress ImplementedReturnTypeMismatch Not the nicest solution, but wishing to keep the functionality backwards compatible **/
     public function where(
         Closure|array|string|null $conditions = null,
         array $types = [],
         bool $overwrite = false
-    ): Query|array|null {
-        if ($conditions === null) {
-            return $this->clause('where');
+    ): QueryInterface {
+        if ($overwrite) {
+            $this->_parts['where'] = $conditions;
         }
-
         $this->_parts['where'] = !$overwrite ? Hash::merge($this->clause('where'), $conditions) : $conditions;
 
         return $this;
@@ -535,15 +650,11 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Set fields to save in resources
      *
-     * @param array|null $fields The field to set
-     * @return $this|array|null
+     * @param \Closure|array|string $fields The field to set
+     * @return $this
      */
-    public function set(?array $fields = null): Query|array|null
+    public function set(Closure|array|string $fields): Query
     {
-        if ($fields === null) {
-            return $this->clause('set');
-        }
-
         if (!in_array($this->clause('action'), [self::ACTION_CREATE, self::ACTION_UPDATE])) {
             throw new UnexpectedValueException('The action of this query needs to be either create update');
         }
@@ -633,15 +744,22 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             return 0;
         }
 
-        if (!$this->_results) {
+        if ($this->_results === null || $this->_results === false) {
             $this->_execute();
         }
 
-        if ($this->_results) {
+        if ($this->_results instanceof ResultSet) {
             return (int)$this->_results->total();
         }
+        if ($this->_results instanceof ResultSetInterface) {
+            return $this->_results->count();
+        }
+        if ($this->_results === null) {
+            return 0;
+        }
 
-        return 0;
+        // There is a single integer or boolean value
+        return 1;
     }
 
     /**
@@ -689,7 +807,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Execute the query
      *
-     * @return \Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet|int|bool
+     * @return Resource|\Cake\Datasource\ResultSetInterface|int|bool
      */
     public function execute(): bool|int|Resource|ResultSetInterface
     {
@@ -703,18 +821,17 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     /**
      * Executes this query and returns a traversable object containing the results
      *
-     * @return \Cake\Datasource\ResultSetInterface
+     * @return \Muffin\Webservice\Model\Resource|\Cake\Datasource\ResultSetInterface|int|bool
      */
-    protected function _execute(): ResultSetInterface
+    protected function _execute(): bool|int|Resource|ResultSetInterface
     {
         $this->triggerBeforeFind();
-        if ($this->_results) {
+        if (is_iterable($this->_results)) {
             $decorator = $this->decoratorClass();
 
             return new $decorator($this->_results);
         }
 
-        /** @var \Cake\Datasource\ResultSetInterface */
         return $this->_results = $this->_webservice->execute($this);
     }
 
@@ -732,10 +849,10 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
             'offset' => $this->clause('offset'),
             'page' => $this->clause('page'),
             'limit' => $this->clause('limit'),
-            'set' => $this->set(),
+            'set' => $this->clause('set'),
             'sort' => $this->clause('order'),
             'extraOptions' => $this->getOptions(),
-            'conditions' => $this->where(),
+            'conditions' => $this->clause('where'),
             'repository' => $this->getEndpoint(),
             'webservice' => $this->getWebservice(),
         ];
@@ -972,5 +1089,28 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
         $this->_formatters[] = $formatter;
 
         return $this;
+    }
+
+    /**
+     * Apply custom finds to against an existing query object.
+     *
+     * Allows custom find methods to be combined and applied to each other.
+     *
+     * ```
+     * $repository->find('all')->find('recent');
+     * ```
+     *
+     * The above is an example of stacking multiple finder methods onto
+     * a single query.
+     *
+     * @param string $finder The finder method to use.
+     * @param mixed ...$args Arguments that match up to finder-specific parameters
+     * @return static Returns a modified query.
+     */
+    /** @psalm-suppress MoreSpecificReturnType Couldn't get it to work with the interface and has no impact **/
+    public function find(string $finder, mixed ...$args): static
+    {
+        /** @psalm-suppress LessSpecificReturnStatement Couldn't get it to work with the interface and has no impact **/
+        return $this->_endpoint->callFinder($finder, $this, $args);
     }
 }
