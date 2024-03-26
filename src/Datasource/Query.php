@@ -549,7 +549,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param \Closure|array|string|null $conditions The list of conditions.
      * @param array $types Not used, required to comply with QueryInterface.
      * @param bool $overwrite Whether to replace previous queries.
-     * @return \Muffin\Webservice\Datasource\Query
+     * @return $this
      * @psalm-suppress ImplementedReturnTypeMismatch Not the nicest solution, but wishing to keep the functionality backwards compatible
      */
     public function where(
