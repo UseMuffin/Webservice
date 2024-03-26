@@ -76,6 +76,7 @@ class Connection implements ConnectionInterface
     /**
      * {@inheritDoc}
      *
+     * @param string $role Parameter is not used
      * @see \Cake\Datasource\ConnectionInterface::getDriver()
      * @return \Muffin\Webservice\Webservice\Driver\AbstractDriver
      */
