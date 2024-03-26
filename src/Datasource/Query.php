@@ -549,10 +549,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param \Closure|array|string|null $conditions The list of conditions.
      * @param array $types Not used, required to comply with QueryInterface.
      * @param bool $overwrite Whether to replace previous queries.
-     * @return \Cake\Datasource\QueryInterface|array
-     */
-
-    /** @psalm-suppress ImplementedReturnTypeMismatch Not the nicest solution, but wishing to keep the functionality backwards compatible **/
+     * @return \Cake\Datasource\QueryInterface
+     * @psalm-suppress ImplementedReturnTypeMismatch Not the nicest solution, but wishing to keep the functionality backwards compatible **/
     public function where(
         Closure|array|string|null $conditions = null,
         array $types = [],
@@ -1106,8 +1104,7 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
      * @param string $finder The finder method to use.
      * @param mixed ...$args Arguments that match up to finder-specific parameters
      * @return static Returns a modified query.
-     */
-    /** @psalm-suppress MoreSpecificReturnType Couldn't get it to work with the interface and has no impact **/
+     * @psalm-suppress MoreSpecificReturnType Couldn't get it to work with the interface and has no impact **/
     public function find(string $finder, mixed ...$args): static
     {
         /** @psalm-suppress LessSpecificReturnStatement Couldn't get it to work with the interface and has no impact **/

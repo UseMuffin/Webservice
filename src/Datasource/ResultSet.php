@@ -120,9 +120,7 @@ class ResultSet implements ResultSetInterface
      * Part of Iterator interface.
      *
      * @return int
-     */
-
-    /** @psalm-suppress ImplementedReturnTypeMismatch This seems to be implemented with the key as an integer everywhere **/
+     * @psalm-suppress ImplementedReturnTypeMismatch This seems to be implemented with the key as an integer everywhere **/
     public function key(): int
     {
         return $this->_index;
