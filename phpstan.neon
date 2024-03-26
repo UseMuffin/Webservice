@@ -5,18 +5,3 @@ parameters:
 	treatPhpDocTypesAsCertain: false
 	paths:
 		- src/
-	ignoreErrors:
-		-
-			message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:callFinder\\(\\)\\.$#"
-			count: 1
-			path: src/Datasource/Query.php
-
-		-
-			message: "#^Call to an undefined method Cake\\\\Datasource\\\\RepositoryInterface\\:\\:getName\\(\\)\\.$#"
-			count: 1
-			path: src/Datasource/Query.php
-
-		-
-			message: "#^Method Muffin\\\\Webservice\\\\Datasource\\\\Query\\:\\:execute\\(\\) should return bool\\|int\\|Muffin\\\\Webservice\\\\Datasource\\\\ResultSet\\|Muffin\\\\Webservice\\\\Model\\\\Resource but returns Cake\\\\Datasource\\\\ResultSetInterface\\.$#"
-			count: 1
-			path: src/Datasource/Query.php

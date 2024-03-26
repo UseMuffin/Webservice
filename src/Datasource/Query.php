@@ -229,8 +229,8 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     }
 
     /**
-     * @param \Closure|array|string $fields
-     * @param bool $overwrite
+     * @param \Closure|array|string $fields The field configuration for the order by clause
+     * @param bool $overwrite Whether to overwrite the existing conditions
      * @return $this
      */
     public function orderBy(Closure|array|string $fields, bool $overwrite = false): Query
@@ -1111,6 +1111,6 @@ class Query implements IteratorAggregate, JsonSerializable, QueryInterface
     public function find(string $finder, mixed ...$args): static
     {
         /** @psalm-suppress LessSpecificReturnStatement Couldn't get it to work with the interface and has no impact **/
-        return $this->_endpoint->callFinder($finder, $this, $args);
+        return $this->_endpoint->callFinder($finder, $this, $args); /* @phpstan-ignore-line */
     }
 }

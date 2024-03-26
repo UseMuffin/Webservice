@@ -214,6 +214,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
             ]);
         }
 
+        /* @phpstan-ignore-next-line This is supported behavior for now: https://www.php.net/manual/en/function.call-user-func-array.php (example 1) */
         return call_user_func_array([$this->_client, $method], $args);
     }
 

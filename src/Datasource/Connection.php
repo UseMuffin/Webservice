@@ -57,7 +57,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * @param \Psr\SimpleCache\CacheInterface $cacher
+     * @param \Psr\SimpleCache\CacheInterface $cacher The cacher instance to use for query caching.
      * @return $this
      */
     public function setCacher(CacheInterface $cacher): ConnectionInterface
@@ -137,6 +137,7 @@ class Connection implements ConnectionInterface
      */
     public function __call(string $method, array $args): mixed
     {
+        /* @phpstan-ignore-next-line This is supported behavior for now: https://www.php.net/manual/en/function.call-user-func-array.php (example 1) */
         return call_user_func_array([$this->_driver, $method], $args);
     }
 }

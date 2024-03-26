@@ -78,7 +78,7 @@ class EndpointLocator extends AbstractLocator
                     $connectionName = 'webservice';
                 } else {
                     /** @psalm-suppress PossiblyNullArgument Not clean, but cannot happen with incorrect configuration and was not a problem before **/
-                    $pluginParts = explode('/', pluginSplit($alias)[0]);
+                    $pluginParts = explode('/', pluginSplit($alias)[0]); /* @phpstan-ignore-line */
                     $connectionName = Inflector::underscore(end($pluginParts));
                 }
             }

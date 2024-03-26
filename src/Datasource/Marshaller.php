@@ -122,6 +122,7 @@ class Marshaller
             );
         }
 
+        /* @phpstan-ignore-next-line Magic method */
         return $options['validate']->validate($data, $isNew);
     }
 

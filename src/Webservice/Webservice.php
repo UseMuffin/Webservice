@@ -303,6 +303,7 @@ abstract class Webservice implements WebserviceInterface
      */
     protected function _createResource(string $resourceClass, array $properties = []): Resource
     {
+        /* @phpstan-ignore-next-line See psalm suppress comments */
         return new $resourceClass($properties, [
             'markClean' => true,
             'markNew' => false,
