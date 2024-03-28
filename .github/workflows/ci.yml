@@ -14,11 +14,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.3']
+        php-version: ['8.2', '8.3']
         db-type: ['mysql', 'pgsql']
         prefer-lowest: ['']
         include:
-          - php-version: '7.4'
+          - php-version: '8.3'
             db-type: 'sqlite'
             prefer-lowest: 'prefer-lowest'
 
@@ -61,14 +61,14 @@ jobs:
         if [[ ${{ matrix.db-type }} == 'mysql' ]]; then export DB_URL='mysql://root:root@127.0.0.1/cakephp'; fi
         if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DB_URL='postgres://postgres:postgres@127.0.0.1/postgres'; fi
 
-        if [[ ${{ matrix.php-version }} == '7.4' && ${{ matrix.db-type }} == 'mysql' ]]; then
+        if [[ ${{ matrix.php-version }} == '8.3' && ${{ matrix.db-type }} == 'mysql' ]]; then
           vendor/bin/phpunit --coverage-clover=coverage.xml
         else
           vendor/bin/phpunit
         fi
 
     - name: Code Coverage Report
-      if: success() && matrix.php-version == '7.4' && matrix.db-type == 'mysql'
+      if: success() && matrix.php-version == '8.3' && matrix.db-type == 'mysql'
       uses: codecov/codecov-action@v1
 
   cs-stan:
@@ -81,16 +81,17 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.4'
+        php-version: '8.3'
         extensions: mbstring, intl
         coverage: none
-        tools: psalm:4, phpstan:1
+        tools: psalm:5.23.1, phpstan:1.10.65
 
     - name: Composer Install
       run: composer require cakephp/cakephp-codesniffer:^4.2
 
     - name: Run phpcs
-      run: vendor/bin/phpcs --standard=CakePHP src/ tests/
+      # Exclude Type hint sniffing, as it interferes with psalm
+      run: vendor/bin/phpcs --standard=CakePHP --exclude=CakePHP.Classes.ReturnTypeHint src/ tests/
 
     - name: Run psalm
       if: success() || failure()

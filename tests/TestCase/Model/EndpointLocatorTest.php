@@ -1,19 +1,21 @@
 <?php
 declare(strict_types=1);
 
-namespace Muffin\Webservice\Model;
+namespace Muffin\Webservice\Test\TestCase\Model;
 
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Model\Endpoint;
+use Muffin\Webservice\Model\EndpointLocator;
 use RuntimeException;
 use TestApp\Model\Endpoint\TestEndpoint;
 
 class EndpointLocatorTest extends TestCase
 {
     /**
-     * @var \Muffin\Webservice\Model\EndpointLocator
+     * @var \Muffin\Webservice\Model\EndpointLocator|null
      */
-    private $Locator;
+    private ?EndpointLocator $Locator;
 
     public function setUp(): void
     {
@@ -82,7 +84,7 @@ class EndpointLocatorTest extends TestCase
     {
         $this->expectException(MissingDatasourceConfigException::class);
         $this->expectExceptionMessage(
-            'The datasource configuration "non-existent" was not found.'
+            'The datasource configuration `non-existent` was not found.'
             . ' You can override Endpoint::defaultConnectionName() to return the connection name you want.'
         );
 
@@ -93,13 +95,14 @@ class EndpointLocatorTest extends TestCase
     public function testGetWithExistingObject()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('You cannot configure "First", it already exists in the registry.');
+        $this->expectExceptionMessage('You cannot configure `First`, it already exists in the registry.');
 
         $result = $this->Locator->get('First', [
             'className' => Endpoint::class,
             'registryAlias' => 'First',
             'connection' => 'test',
         ]);
+        // debug($result);
         $this->assertInstanceOf(Endpoint::class, $result);
 
         $this->Locator->get('First', ['registryAlias' => 'NotFirst']);

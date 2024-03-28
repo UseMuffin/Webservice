@@ -12,6 +12,7 @@ use Muffin\Webservice\Webservice\WebserviceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use function Cake\Core\pluginSplit;
 
 abstract class AbstractDriver implements LoggerAwareInterface
 {
@@ -23,28 +24,28 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @var object
      */
-    protected $_client;
+    protected object $_client;
 
     /**
      * Default config
      *
      * @var array
      */
-    protected $_defaultConfig = [];
+    protected array $_defaultConfig = [];
 
     /**
      * Whatever queries should be logged
      *
      * @var bool
      */
-    protected $_logQueries = false;
+    protected bool $_logQueries = false;
 
     /**
      * The list of webservices to be used
      *
      * @var array
      */
-    protected $_webservices = [];
+    protected array $_webservices = [];
 
     /**
      * Constructor.
@@ -73,7 +74,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @param object $client Client instance
      * @return $this
      */
-    public function setClient(object $client)
+    public function setClient(object $client): AbstractDriver
     {
         $this->_client = $client;
 
@@ -83,9 +84,9 @@ abstract class AbstractDriver implements LoggerAwareInterface
     /**
      * Get the client instance configured for this driver
      *
-     * @return object
+     * @return object|null
      */
-    public function getClient(): object
+    public function getClient(): ?object
     {
         return $this->_client;
     }
@@ -97,7 +98,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @param \Muffin\Webservice\Webservice\WebserviceInterface $webservice Instance of the webservice
      * @return $this
      */
-    public function setWebservice(string $name, WebserviceInterface $webservice)
+    public function setWebservice(string $name, WebserviceInterface $webservice): AbstractDriver
     {
         $this->_webservices[$name] = $webservice;
 
@@ -132,14 +133,12 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * Sets a logger
      *
      * @param \Psr\Log\LoggerInterface $logger Logger object
-     * @return $this
+     * @return void
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
-
-        return $this;
     }
 
     /**
@@ -167,7 +166,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return $this
      */
-    public function enableQueryLogging()
+    public function enableQueryLogging(): AbstractDriver
     {
         $this->_logQueries = true;
 
@@ -179,7 +178,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return $this
      */
-    public function disableQueryLogging()
+    public function disableQueryLogging(): AbstractDriver
     {
         $this->_logQueries = false;
 
@@ -205,15 +204,17 @@ abstract class AbstractDriver implements LoggerAwareInterface
      * @throws \RuntimeException If the client object has not been initialized.
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException If the method does not exist in the client.
      */
-    public function __call($method, $args)
+    public function __call(string $method, array $args): mixed
     {
-        if (!method_exists($this->getClient(), $method)) {
+        /** @psalm-suppress PossiblyNullArgument Only the left expression is executed if the getClient returns null **/
+        if ($this->getClient() === null || !method_exists($this->getClient(), $method)) {
             throw new UnimplementedWebserviceMethodException([
                 'name' => $this->getConfig('name'),
                 'method' => $method,
             ]);
         }
 
+        /* @phpstan-ignore-next-line This is supported behavior for now: https://www.php.net/manual/en/function.call-user-func-array.php (example 1) */
         return call_user_func_array([$this->_client, $method], $args);
     }
 
@@ -222,7 +223,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
      *
      * @return array
      */
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         return [
             'client' => $this->getClient(),
@@ -254,7 +255,7 @@ abstract class AbstractDriver implements LoggerAwareInterface
         $fallbackWebserviceClass = end($namespaceParts);
 
         [$pluginName] = pluginSplit($className);
-        if ($pluginName) {
+        if ($pluginName !== null) {
             $fallbackWebserviceClass = $pluginName . '.' . $fallbackWebserviceClass;
         }
 

@@ -15,9 +15,9 @@ use UnexpectedValueException;
 class QueryTest extends TestCase
 {
     /**
-     * @var Query
+     * @var Query|null
      */
-    public $query;
+    public ?Query $query;
 
     /**
      * @inheritDoc
@@ -127,7 +127,7 @@ class QueryTest extends TestCase
         ]));
         $this->assertEquals([
             'field' => 'value',
-        ], $this->query->set());
+        ], $this->query->clause('set'));
     }
 
     public function testPage()
@@ -174,7 +174,7 @@ class QueryTest extends TestCase
 
         $mockWebservice->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue(new ResultSet([
+            ->willReturn(new ResultSet([
                 new Resource([
                     'id' => 1,
                     'title' => 'Hello World',
@@ -187,7 +187,7 @@ class QueryTest extends TestCase
                     'id' => 3,
                     'title' => 'Webservices',
                 ]),
-            ], 3)));
+            ], 3));
 
         $this->query
             ->setWebservice($mockWebservice)
@@ -284,7 +284,7 @@ class QueryTest extends TestCase
     {
         $fields = ['id', 'username', 'email', 'biography'];
 
-        $callable = function (Query $query) use ($fields) {
+        $callable = function () use ($fields) {
             return $fields;
         };
         $this->query->select($callable);

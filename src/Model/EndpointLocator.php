@@ -10,6 +10,7 @@ use Cake\Datasource\Locator\AbstractLocator;
 use Cake\Datasource\RepositoryInterface;
 use Cake\Utility\Inflector;
 use Muffin\Webservice\Datasource\Connection;
+use function Cake\Core\pluginSplit;
 
 /**
  * Class EndpointLocator
@@ -35,12 +36,11 @@ class EndpointLocator extends AbstractLocator
      *
      * @param string $alias The alias name you want to get.
      * @param array $options The options you want to build the endpoint with.
-     * @return \Muffin\Webservice\Model\Endpoint
+     * @return \Cake\Datasource\RepositoryInterface
      * @throws \RuntimeException If the registry alias is already in use.
      */
-    public function get(string $alias, array $options = []): Endpoint
+    public function get(string $alias, array $options = []): RepositoryInterface
     {
-        /** @var \Muffin\Webservice\Model\Endpoint */
         return parent::get($alias, $options);
     }
 
@@ -49,9 +49,9 @@ class EndpointLocator extends AbstractLocator
      *
      * @param string $alias Endpoint alias.
      * @param array $options The alias to check for.
-     * @return \Muffin\Webservice\Model\Endpoint
+     * @return \Cake\Datasource\RepositoryInterface
      */
-    protected function createInstance(string $alias, array $options)
+    protected function createInstance(string $alias, array $options): RepositoryInterface
     {
         [, $classAlias] = pluginSplit($alias);
         $options = ['alias' => $classAlias] + $options;
@@ -63,7 +63,7 @@ class EndpointLocator extends AbstractLocator
         if ($className) {
             $options['className'] = $className;
         } else {
-            if (!isset($options['endpoint']) && strpos($options['className'], '\\') === false) {
+            if (!isset($options['endpoint']) && !str_contains($options['className'], '\\')) {
                 [, $endpoint] = pluginSplit($options['className']);
                 $options['endpoint'] = Inflector::underscore($endpoint);
             }
@@ -74,11 +74,11 @@ class EndpointLocator extends AbstractLocator
             if ($options['className'] !== Endpoint::class) {
                 $connectionName = $options['className']::defaultConnectionName();
             } else {
-                if (strpos($alias, '.') === false) {
+                if (!str_contains($alias, '.')) {
                     $connectionName = 'webservice';
                 } else {
-                    /** @psalm-suppress PossiblyNullArgument */
-                    $pluginParts = explode('/', pluginSplit($alias)[0]);
+                    /** @psalm-suppress PossiblyNullArgument Not clean, but cannot happen with incorrect configuration and was not a problem before **/
+                    $pluginParts = explode('/', pluginSplit($alias)[0]); /* @phpstan-ignore-line */
                     $connectionName = Inflector::underscore(end($pluginParts));
                 }
             }
@@ -111,7 +111,6 @@ class EndpointLocator extends AbstractLocator
             $message = $e->getMessage()
                 . ' You can override Endpoint::defaultConnectionName() to return the connection name you want.';
 
-            /** @psalm-suppress PossiblyInvalidArgument */
             throw new MissingDatasourceConfigException($message, $e->getCode(), $e->getPrevious());
         }
     }

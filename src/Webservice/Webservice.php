@@ -7,6 +7,7 @@ use Cake\Core\App;
 use Cake\Utility\Inflector;
 use Cake\Utility\Text;
 use Muffin\Webservice\Datasource\Query;
+use Muffin\Webservice\Datasource\ResultSet;
 use Muffin\Webservice\Datasource\Schema;
 use Muffin\Webservice\Model\Endpoint;
 use Muffin\Webservice\Model\Exception\MissingEndpointSchemaException;
@@ -15,6 +16,7 @@ use Muffin\Webservice\Webservice\Driver\AbstractDriver;
 use Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use function Cake\Core\pluginSplit;
 
 /**
  * Basic implementation of a webservice
@@ -26,23 +28,23 @@ abstract class Webservice implements WebserviceInterface
     /**
      * The driver to use to communicate with the webservice
      *
-     * @var \Muffin\Webservice\Webservice\Driver\AbstractDriver
+     * @var \Muffin\Webservice\Webservice\Driver\AbstractDriver|null
      */
-    protected $_driver;
+    protected ?AbstractDriver $_driver = null;
 
     /**
      * The webservice to call
      *
-     * @var string
+     * @var string|null
      */
-    protected $_endpoint;
+    protected ?string $_endpoint = null;
 
     /**
      * A list of nested resources with their path and needed conditions
      *
      * @var array
      */
-    protected $_nestedResources = [];
+    protected array $_nestedResources = [];
 
     /**
      * Construct the webservice
@@ -76,7 +78,7 @@ abstract class Webservice implements WebserviceInterface
      * @param \Muffin\Webservice\Webservice\Driver\AbstractDriver $driver Instance of the driver
      * @return $this
      */
-    public function setDriver(AbstractDriver $driver)
+    public function setDriver(AbstractDriver $driver): Webservice
     {
         $this->_driver = $driver;
 
@@ -103,7 +105,7 @@ abstract class Webservice implements WebserviceInterface
      * @param string $endpoint Endpoint path
      * @return $this
      */
-    public function setEndpoint(string $endpoint)
+    public function setEndpoint(string $endpoint): Webservice
     {
         $this->_endpoint = $endpoint;
 
@@ -113,9 +115,9 @@ abstract class Webservice implements WebserviceInterface
     /**
      * Get the endpoint path for this webservice
      *
-     * @return string
+     * @return string|null
      */
-    public function getEndpoint(): string
+    public function getEndpoint(): ?string
     {
         return $this->_endpoint;
     }
@@ -161,9 +163,9 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
+     * @return \Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet|int|bool
      */
-    public function execute(Query $query, array $options = [])
+    public function execute(Query $query, array $options = []): bool|int|Resource|ResultSet
     {
         $result = $this->_executeQuery($query, $options);
 
@@ -185,7 +187,7 @@ abstract class Webservice implements WebserviceInterface
     public function describe(string $endpoint): Schema
     {
         $shortName = App::shortName(static::class, 'Webservice', 'Webservice');
-        [$plugin, $name] = pluginSplit($shortName);
+        [$plugin] = pluginSplit($shortName);
 
         $endpoint = Inflector::classify(str_replace('-', '_', $endpoint));
         $schemaShortName = implode('.', array_filter([$plugin, $endpoint]));
@@ -206,24 +208,19 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return bool|int|\Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet
+     * @return \Muffin\Webservice\Model\Resource|\Muffin\Webservice\Datasource\ResultSet|int|bool
      * @psalm-suppress NullableReturnStatement
      * @psalm-suppress InvalidNullableReturnType
      */
-    protected function _executeQuery(Query $query, array $options = [])
+    protected function _executeQuery(Query $query, array $options = []): bool|int|Resource|ResultSet
     {
-        switch ($query->clause('action')) {
-            case Query::ACTION_CREATE:
-                return $this->_executeCreateQuery($query, $options);
-            case Query::ACTION_READ:
-                return $this->_executeReadQuery($query, $options);
-            case Query::ACTION_UPDATE:
-                return $this->_executeUpdateQuery($query, $options);
-            case Query::ACTION_DELETE:
-                return $this->_executeDeleteQuery($query, $options);
-        }
-
-        return false;
+        return match ($query->clause('action')) {
+            Query::ACTION_CREATE => $this->_executeCreateQuery($query, $options),
+            Query::ACTION_READ => $this->_executeReadQuery($query, $options),
+            Query::ACTION_UPDATE => $this->_executeUpdateQuery($query, $options),
+            Query::ACTION_DELETE => $this->_executeDeleteQuery($query, $options),
+            default => false,
+        };
     }
 
     /**
@@ -231,11 +228,11 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return bool|\Muffin\Webservice\Model\Resource
+     * @return \Muffin\Webservice\Model\Resource|bool
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
-    protected function _executeCreateQuery(Query $query, array $options = [])
+    protected function _executeCreateQuery(Query $query, array $options = []): bool|Resource
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => static::class,
@@ -248,11 +245,11 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return bool|\Muffin\Webservice\Datasource\ResultSet
+     * @return \Muffin\Webservice\Datasource\ResultSet|bool
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
-    protected function _executeReadQuery(Query $query, array $options = [])
+    protected function _executeReadQuery(Query $query, array $options = []): bool|ResultSet
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => static::class,
@@ -265,11 +262,11 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Datasource\Query $query The query to execute
      * @param array $options The options to use
-     * @return int|bool|\Muffin\Webservice\Model\Resource
+     * @return \Muffin\Webservice\Model\Resource|int|bool
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
-    protected function _executeUpdateQuery(Query $query, array $options = [])
+    protected function _executeUpdateQuery(Query $query, array $options = []): int|bool|Resource
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => static::class,
@@ -286,7 +283,7 @@ abstract class Webservice implements WebserviceInterface
      * @throws \Muffin\Webservice\Webservice\Exception\UnimplementedWebserviceMethodException When this method has not been
      * implemented into userland classes
      */
-    protected function _executeDeleteQuery(Query $query, array $options = [])
+    protected function _executeDeleteQuery(Query $query, array $options = []): int|bool
     {
         throw new UnimplementedWebserviceMethodException([
             'name' => static::class,
@@ -306,6 +303,7 @@ abstract class Webservice implements WebserviceInterface
      */
     protected function _createResource(string $resourceClass, array $properties = []): Resource
     {
+        /* @phpstan-ignore-next-line See psalm suppress comments */
         return new $resourceClass($properties, [
             'markClean' => true,
             'markNew' => false,
@@ -326,7 +324,7 @@ abstract class Webservice implements WebserviceInterface
         }
 
         $logger->debug($query->getEndpoint()->getName(), [
-            'params' => $query->where(),
+            'params' => $query->clause('where'),
         ]);
     }
 
@@ -335,7 +333,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @param \Muffin\Webservice\Model\Endpoint $endpoint The endpoint class to use
      * @param array $results Array of results from the API
-     * @return \Muffin\Webservice\Model\Resource[] Array of resource objects
+     * @return array<\Muffin\Webservice\Model\Resource> Array of resource objects
      */
     protected function _transformResults(Endpoint $endpoint, array $results): array
     {
@@ -370,7 +368,7 @@ abstract class Webservice implements WebserviceInterface
      *
      * @return array
      */
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         return [
             'driver' => $this->_driver,

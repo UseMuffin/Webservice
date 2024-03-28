@@ -39,12 +39,19 @@
         "irc": "irc://irc.freenode.org/muffin"
     },
     "require": {
-        "cakephp/orm": "^4.5"
+        "cakephp/orm": "^5.0"
     },
     "require-dev": {
-        "cakephp/cakephp": "^4.5",
-        "cakephp/cakephp-codesniffer": "^4.2",
-        "phpunit/phpunit": "^9.3"
+        "cakephp/cakephp": "^5.0",
+        "cakephp/cakephp-codesniffer": "^5.0",
+        "phpunit/phpunit": "^10.1",
+        "ext-mbstring": "*",
+        "vimeo/psalm": "5.23.1",
+        "phpstan/phpstan": "1.10.65"
+    },
+    "scripts": {
+        "cs-check": "phpcs --colors --parallel=16 -p src/ tests/",
+        "cs-fix": "phpcbf --colors --parallel=16 -p src/ tests/"
     },
     "autoload": {
         "psr-4": {

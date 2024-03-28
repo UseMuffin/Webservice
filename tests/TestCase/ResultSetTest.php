@@ -10,9 +10,9 @@ use Muffin\Webservice\Model\Resource;
 class ResultSetTest extends TestCase
 {
     /**
-     * @var ResultSet
+     * @var ResultSet|null
      */
-    public $resultSet;
+    public ?ResultSet $resultSet;
 
     /**
      * @inheritDoc

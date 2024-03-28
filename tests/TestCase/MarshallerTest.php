@@ -14,9 +14,9 @@ use TestApp\Model\Endpoint\TestEndpoint;
 class MarshallerTest extends TestCase
 {
     /**
-     * @var Marshaller
+     * @var Marshaller|null
      */
-    private $marshaller;
+    private ?Marshaller $marshaller;
 
     /**
      * Create a marshaller instance for testing
@@ -45,7 +45,7 @@ class MarshallerTest extends TestCase
             [
                 'title' => 'Testing one',
                 'body' => 'Testing the marshaller',
-            ]
+            ],
         );
 
         $this->assertInstanceOf(Resource::class, $result);
@@ -63,6 +63,7 @@ class MarshallerTest extends TestCase
             ],
             [
                 'fieldList' => ['title'],
+                'validate' => false,
             ]
         );
 
@@ -80,6 +81,7 @@ class MarshallerTest extends TestCase
             ],
             [
                 'accessibleFields' => ['body' => false],
+                'validate' => false,
             ]
         );
 
@@ -97,6 +99,7 @@ class MarshallerTest extends TestCase
             ],
             [
                 'fieldList' => [],
+                'validate' => false,
             ]
         );
 
@@ -114,6 +117,7 @@ class MarshallerTest extends TestCase
             ],
             [
                 'accessibleFields' => ['title' => false, 'body' => false],
+                'validate' => false,
             ]
         );
 
@@ -137,6 +141,7 @@ class MarshallerTest extends TestCase
             [
                 'fieldList' => ['title', 'body'],
                 'accessibleFields' => ['title' => false, 'body' => false],
+                'validate' => false,
             ]
         );
 

@@ -4,14 +4,15 @@ declare(strict_types=1);
 namespace Muffin\Webservice\Test\TestCase\Model\Endpoint\Schema;
 
 use Cake\TestSuite\TestCase;
+use Muffin\Webservice\Model\Schema;
 use TestApp\Model\Endpoint\Schema\TestSchema;
 
 class SchemaTest extends TestCase
 {
     /**
-     * @var \Muffin\Webservice\Schema
+     * @var Schema|null
      */
-    private $schema;
+    private ?Schema $schema;
 
     public function setUp(): void
     {
@@ -20,7 +21,7 @@ class SchemaTest extends TestCase
 
     public function testName()
     {
-        $this->assertEquals($this->schema->name(), 'test');
+        $this->assertEquals('test', $this->schema->name());
     }
 
     public function testAddColumn()

@@ -11,9 +11,9 @@ use Muffin\Webservice\Webservice\Exception\MissingDriverException;
 class ConnectionTest extends TestCase
 {
     /**
-     * @var Connection
+     * @var Connection|null
      */
-    public $connection;
+    public ?Connection $connection;
 
     public function setUp(): void
     {
@@ -31,7 +31,7 @@ class ConnectionTest extends TestCase
 
         new Connection([
             'name' => 'test',
-            'service' => 'MissingDriver',
+            'service' => 'Missing',
         ]);
     }
 
@@ -42,5 +42,10 @@ class ConnectionTest extends TestCase
         new Connection([
             'name' => 'test',
         ]);
+    }
+
+    public function testConfigName()
+    {
+        $this->assertEquals('test', $this->connection->configName());
     }
 }
